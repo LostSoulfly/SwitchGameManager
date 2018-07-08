@@ -6,6 +6,7 @@ using BrightIdeasSoftware;
 using System.IO;
 using SwitchGameManager.Helpers;
 using SwitchGameManager.Properties;
+using System.Diagnostics;
 
 namespace SwitchGameManager
 {
@@ -106,7 +107,11 @@ namespace SwitchGameManager
             ToolStripMenuItem subMenuItem;
             foreach (ToolStripMenuItem menuItem in gameManagementToolStripMenuItem.DropDownItems)
             {
-                newMenuItem = new ToolStripMenuItem(menuItem.Text, null, onClick: ToolStripManagement);
+                if (menuItem.DropDownItems.Count > 0)
+                    newMenuItem = new ToolStripMenuItem(menuItem.Text);
+                else
+                    newMenuItem = new ToolStripMenuItem(menuItem.Text, null, onClick: ToolStripManagement);
+
                 if (newMenuItem.Text.Contains("SD"))
                 {
                     foreach (ToolStripMenuItem subItem in menuItem.DropDownItems)
@@ -211,6 +216,8 @@ namespace SwitchGameManager
             ToolStripItem clicked = sender as ToolStripItem;
             int toolIndex = olvLocal.ContextMenuStrip.Items.IndexOf(clicked);
 
+            Debug.Assert(toolIndex > 0, "toolIndex should be > 0");
+
             if (!IsListIndexUsable()) return;
 
             XciItem xci;
@@ -218,13 +225,13 @@ namespace SwitchGameManager
             int failure = 0;
             string action = "";
 
+            if (toolIndex == 2) action = "delete";
+            if (toolIndex == 3) action = "trim";
+            if (toolIndex == 4) action = "rename";
+            if (toolIndex == 5) action = "show certs for";
+
             if (olvLocal.SelectedIndices.Count > 1)
             {
-                if (toolIndex == 2) action = "delete";
-                if (toolIndex == 3) action = "trim";
-                if (toolIndex == 4) action = "rename";
-                if (toolIndex == 5) action = "show certs for";
-
                 if (MessageBox.Show($"Are you sure you want to {action} {olvLocal.SelectedObjects.Count} games?", $"Confirm {action.ToUpperInvariant()}", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
                     return;
 
@@ -240,6 +247,10 @@ namespace SwitchGameManager
             } else
             {
                 xci = (XciItem)olvLocal.GetItem(olvLocal.SelectedIndex).RowObject;
+
+                if (MessageBox.Show($"Are you sure you want to {action} {xci.gameName}?", $"Confirm {action.ToUpperInvariant()}", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
+                    return;
+
                 ProcessManagementAction(xci, toolIndex);
             }
 
