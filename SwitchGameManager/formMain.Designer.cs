@@ -41,6 +41,8 @@ namespace SwitchGameManager
             this.olvColumnGameUsedSize = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvColumnGameCertEmpty = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvColumnisXciTrimmed = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.olvColumnLocalGame = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.olvColumnSdGame = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvColumnXciPath = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.textBoxFilter = new System.Windows.Forms.TextBox();
             this.menuStrip = new System.Windows.Forms.MenuStrip();
@@ -82,8 +84,6 @@ namespace SwitchGameManager
             this.toolStripSpring = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressBar = new System.Windows.Forms.ToolStripProgressBar();
-            this.olvColumnLocalGame = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.olvColumnSdGame = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             ((System.ComponentModel.ISupportInitialize)(this.olvLocal)).BeginInit();
             this.menuStrip.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -114,7 +114,7 @@ namespace SwitchGameManager
             this.olvColumnDeveloper,
             this.olvColumnTitleID,
             this.olvColumnProductCode,
-            this.olvColumnGameUsedSize,
+            this.olvColumnGameSize,
             this.olvColumnGameCertEmpty,
             this.olvColumnisXciTrimmed,
             this.olvColumnLocalGame,
@@ -134,10 +134,12 @@ namespace SwitchGameManager
             this.olvLocal.Size = new System.Drawing.Size(930, 381);
             this.olvLocal.TabIndex = 0;
             this.olvLocal.TileSize = new System.Drawing.Size(300, 50);
+            this.olvLocal.TintSortColumn = true;
             this.olvLocal.UseCompatibleStateImageBehavior = false;
-            this.olvLocal.UseExplorerTheme = true;
             this.olvLocal.UseFiltering = true;
+            this.olvLocal.UseHotControls = false;
             this.olvLocal.UseHotItem = true;
+            this.olvLocal.UseNotifyPropertyChanged = true;
             this.olvLocal.UseTranslucentHotItem = true;
             this.olvLocal.UseTranslucentSelection = true;
             this.olvLocal.View = System.Windows.Forms.View.Details;
@@ -152,7 +154,7 @@ namespace SwitchGameManager
             this.olvColumnXciName.IsEditable = false;
             this.olvColumnXciName.IsTileViewColumn = true;
             this.olvColumnXciName.MinimumWidth = 125;
-            this.olvColumnXciName.Text = "Game Name";
+            this.olvColumnXciName.Text = "Game";
             this.olvColumnXciName.UseInitialLetterForGroup = true;
             this.olvColumnXciName.Width = 150;
             this.olvColumnXciName.WordWrap = true;
@@ -173,6 +175,7 @@ namespace SwitchGameManager
             this.olvColumnTitleID.IsTileViewColumn = true;
             this.olvColumnTitleID.MinimumWidth = 75;
             this.olvColumnTitleID.Text = "Title ID";
+            this.olvColumnTitleID.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.olvColumnTitleID.UseInitialLetterForGroup = true;
             this.olvColumnTitleID.Width = 100;
             // 
@@ -182,6 +185,7 @@ namespace SwitchGameManager
             this.olvColumnProductCode.IsEditable = false;
             this.olvColumnProductCode.MinimumWidth = 50;
             this.olvColumnProductCode.Text = "Product Code";
+            this.olvColumnProductCode.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.olvColumnProductCode.Width = 85;
             // 
             // olvColumnPackageId
@@ -191,6 +195,7 @@ namespace SwitchGameManager
             this.olvColumnPackageId.IsVisible = false;
             this.olvColumnPackageId.MinimumWidth = 75;
             this.olvColumnPackageId.Text = "PackageID";
+            this.olvColumnPackageId.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.olvColumnPackageId.Width = 125;
             // 
             // olvColumnGameCardCapacity
@@ -201,25 +206,27 @@ namespace SwitchGameManager
             this.olvColumnGameCardCapacity.IsVisible = false;
             this.olvColumnGameCardCapacity.MinimumWidth = 50;
             this.olvColumnGameCardCapacity.Text = "Game Card Capacity";
+            this.olvColumnGameCardCapacity.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // olvColumnGameSize
             // 
             this.olvColumnGameSize.AspectName = "gameSize";
-            this.olvColumnGameSize.DisplayIndex = 5;
             this.olvColumnGameSize.IsEditable = false;
-            this.olvColumnGameSize.IsVisible = false;
             this.olvColumnGameSize.MinimumWidth = 50;
-            this.olvColumnGameSize.Searchable = false;
             this.olvColumnGameSize.Text = "Game Size";
+            this.olvColumnGameSize.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.olvColumnGameSize.Width = 68;
             // 
             // olvColumnGameUsedSize
             // 
             this.olvColumnGameUsedSize.AspectName = "gameUsedSize";
+            this.olvColumnGameUsedSize.DisplayIndex = 4;
             this.olvColumnGameUsedSize.IsEditable = false;
+            this.olvColumnGameUsedSize.IsVisible = false;
             this.olvColumnGameUsedSize.MinimumWidth = 50;
             this.olvColumnGameUsedSize.Searchable = false;
             this.olvColumnGameUsedSize.Text = "Used Size";
-            this.olvColumnGameUsedSize.UseFiltering = false;
+            this.olvColumnGameUsedSize.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.olvColumnGameUsedSize.Width = 65;
             // 
             // olvColumnGameCertEmpty
@@ -231,6 +238,7 @@ namespace SwitchGameManager
             this.olvColumnGameCertEmpty.MinimumWidth = 35;
             this.olvColumnGameCertEmpty.Searchable = false;
             this.olvColumnGameCertEmpty.Text = "Unique Cert";
+            this.olvColumnGameCertEmpty.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.olvColumnGameCertEmpty.UseFiltering = false;
             this.olvColumnGameCertEmpty.Width = 69;
             // 
@@ -246,6 +254,20 @@ namespace SwitchGameManager
             this.olvColumnisXciTrimmed.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.olvColumnisXciTrimmed.UseFiltering = false;
             // 
+            // olvColumnLocalGame
+            // 
+            this.olvColumnLocalGame.AspectName = "isGameOnPc";
+            this.olvColumnLocalGame.Text = "Game On PC";
+            this.olvColumnLocalGame.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.olvColumnLocalGame.Width = 74;
+            // 
+            // olvColumnSdGame
+            // 
+            this.olvColumnSdGame.AspectName = "isGameOnSd";
+            this.olvColumnSdGame.Text = "Game on SD";
+            this.olvColumnSdGame.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.olvColumnSdGame.Width = 76;
+            // 
             // olvColumnXciPath
             // 
             this.olvColumnXciPath.AspectName = "xciFilePath";
@@ -253,12 +275,12 @@ namespace SwitchGameManager
             this.olvColumnXciPath.IsEditable = false;
             this.olvColumnXciPath.IsTileViewColumn = true;
             this.olvColumnXciPath.MinimumWidth = 125;
-            this.olvColumnXciPath.Text = "XCI Location";
+            this.olvColumnXciPath.Text = "Local File";
             this.olvColumnXciPath.Width = 125;
             // 
             // textBoxFilter
             // 
-            this.textBoxFilter.Location = new System.Drawing.Point(752, 10);
+            this.textBoxFilter.Location = new System.Drawing.Point(804, 11);
             this.textBoxFilter.Name = "textBoxFilter";
             this.textBoxFilter.Size = new System.Drawing.Size(138, 20);
             this.textBoxFilter.TabIndex = 3;
@@ -567,18 +589,6 @@ namespace SwitchGameManager
             this.toolStripProgressBar.Name = "toolStripProgressBar";
             this.toolStripProgressBar.Size = new System.Drawing.Size(100, 16);
             // 
-            // olvColumnLocalGame
-            // 
-            this.olvColumnLocalGame.AspectName = "isGameOnPc";
-            this.olvColumnLocalGame.Text = "Game On PC";
-            this.olvColumnLocalGame.Width = 74;
-            // 
-            // olvColumnSdGame
-            // 
-            this.olvColumnSdGame.AspectName = "isGameOnSd";
-            this.olvColumnSdGame.Text = "Game on SD";
-            this.olvColumnSdGame.Width = 76;
-            // 
             // formMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -603,8 +613,6 @@ namespace SwitchGameManager
         }
 
         #endregion
-
-        private BrightIdeasSoftware.ObjectListView olvLocal;
         private BrightIdeasSoftware.OLVColumn olvColumnXciName;
         private BrightIdeasSoftware.OLVColumn olvColumnDeveloper;
         private BrightIdeasSoftware.OLVColumn olvColumnisXciTrimmed;
@@ -642,7 +650,6 @@ namespace SwitchGameManager
         private System.Windows.Forms.ToolStripMenuItem selectImageToolStripMenuItem;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatus;
-        private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar;
         private System.Windows.Forms.ToolStripStatusLabel toolStripSpring;
         private System.Windows.Forms.ToolStripStatusLabel toolStripProgressLabel;
         private System.Windows.Forms.ToolStripMenuItem iconSizeToolStripMenuItem;
@@ -658,6 +665,8 @@ namespace SwitchGameManager
         private System.Windows.Forms.ToolStripMenuItem moveToPCToolStripMenuItem;
         private BrightIdeasSoftware.OLVColumn olvColumnLocalGame;
         private BrightIdeasSoftware.OLVColumn olvColumnSdGame;
+        public BrightIdeasSoftware.ObjectListView olvLocal;
+        public System.Windows.Forms.ToolStripProgressBar toolStripProgressBar;
     }
 }
 

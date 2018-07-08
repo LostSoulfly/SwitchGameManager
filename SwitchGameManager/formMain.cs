@@ -5,14 +5,15 @@ using System.Windows.Forms;
 using BrightIdeasSoftware;
 using System.IO;
 using SwitchGameManager.Helpers;
+using SwitchGameManager.Properties;
 
 namespace SwitchGameManager
 {
     public partial class formMain : Form
     {
 
-        public List<XciItem> localXcis = new List<XciItem>();
-        public List<XciItem> externalXcis = new List<XciItem>();
+        public List<XciItem> xciCache = new List<XciItem>();
+        public List<XciItem> xciList = new List<XciItem>();
 
         public formMain()
         {
@@ -21,18 +22,32 @@ namespace SwitchGameManager
 
         private void formMain_Load(object sender, EventArgs e)
         {
-            //BrightIdeasSoftware.ImageRenderer renderer = new BrightIdeasSoftware.ImageRenderer();
+
+            XciHelper.formMain = this;
+
             SetupObjectListView();
             
             this.Show();
+            UpdateToolStripLabel("Loading Cache file..");
+            Application.DoEvents();
 
             //Settings.LoadSettings
 
-            LoadAndDisplayLocalGames();
+            //Load the cache
+            xciCache = XciHelper.LoadXciCache("Cache.json");
 
+            xciList = XciHelper.LoadGamesFromPath(@"F:\Games\Emulation\Switch\Games\", recurse: true);
+
+            List<XciItem> xciOnSd = new List<XciItem>();
+
+            // SD card games are currently only in the root directory (for SX OS)
+            xciOnSd = XciHelper.LoadGamesFromPath(@"E:\", recurse: false, isSdCard: true);
+
+            xciList = XciHelper.CreateMasterXciList(xciList, xciOnSd);
+
+            olvLocal.SetObjects(xciList);
             /* todo
              * Check if Keys.txt exists, otherwise download it. Maybe procedurally generate the URL? brute force the key?
-             * Load XCIs from directory recursively
              * Load/store list status and program settings Save/Load olv state to byte array, save with settings
              * Add settings window/options for selecting game directories (allow multiple directories!)
              * Add SD card searching for /switch/ directory
@@ -42,49 +57,7 @@ namespace SwitchGameManager
              */
 
         }
-
-        private void LoadAndDisplayLocalGames()
-        {
-
-            UpdateToolStripLabel("Loading Games..");
-            olvLocal.EmptyListMsg = "Loading games..";
-
-            localXcis = XciHelper.LoadXciCache("test.json");
-
-            string path = @"F:\Games\Emulation\Switch\Games\";
-            toolStripProgressBar.Maximum = localXcis.Count;
-            toolStripProgressBar.Minimum = 0;
-            toolStripProgressBar.Visible = true;
-            ulong packageId;
-
-            int xciCount = Directory.GetFiles(path, "*.xci").Length;
-
-            if (localXcis.Count < xciCount)
-                toolStripProgressBar.Maximum = xciCount;
-
-            XciItem loadedXci;
-
-            foreach (var item in Directory.GetFiles(path, "*.xci"))
-            {
-                UpdateToolStripLabel("Processing " + item);
-                toolStripProgressBar.Value += 1;
-                packageId = XciHelper.GetPackageID(item);
-                if (XciHelper.GetXciItemFromCache(packageId, localXcis) == null)
-                {
-                    loadedXci = XciHelper.GetXciInfo(item);
-                    localXcis.Add(loadedXci);
-                }
-            }
-
-            toolStripProgressBar.Visible = false;
-            olvLocal.SetObjects(localXcis);
-            UpdateToolStripLabel();
-
-            olvLocal.EmptyListMsg = "No Switch games found!";
-
-            XciHelper.SaveXciCache("test.json", localXcis);
-        }
-
+        
         private void SetupObjectListView()
         {
             //initialize the image lists, big and small
@@ -119,6 +92,13 @@ namespace SwitchGameManager
                 }
                 return key;
             };
+            
+            /*
+            this.olvColumnisXciTrimmed.Renderer = new MappedImageRenderer(new Object[] {
+                "True", Resources.check,
+                "False", Resources.error
+            });
+            */
 
             //set up the right-click menu for the objectlistview without remaking it..
             ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
@@ -165,7 +145,7 @@ namespace SwitchGameManager
         {
             if (text.Length == 0 && textBoxFilter.Text.Length > 0)
             {
-                toolStripStatus.Text = $"Displaying {olvLocal.Items.Count} out of {localXcis.Count - 1} Switch games.";
+                toolStripStatus.Text = $"Displaying {olvLocal.Items.Count} out of {xciList.Count - 1} Switch games.";
             }
             else if (text.Length == 0)
             {
@@ -183,7 +163,6 @@ namespace SwitchGameManager
             
             olvLocal.AdditionalFilter = filter;
             UpdateToolStripLabel();
-
         }
 
 
@@ -230,7 +209,7 @@ namespace SwitchGameManager
         private void ToolStripManagement(object sender, EventArgs e)
         {
             ToolStripItem clicked = sender as ToolStripItem;
-            int displayIndex = olvLocal.ContextMenuStrip.Items.IndexOf(clicked);
+            int toolIndex = olvLocal.ContextMenuStrip.Items.IndexOf(clicked);
 
             if (!IsListIndexUsable()) return;
 
@@ -241,18 +220,18 @@ namespace SwitchGameManager
 
             if (olvLocal.SelectedIndices.Count > 1)
             {
-                if (displayIndex == 2) action = "delete";
-                if (displayIndex == 3) action = "trim";
-                if (displayIndex == 4) action = "rename";
-                if (displayIndex == 5) action = "show certs for";
+                if (toolIndex == 2) action = "delete";
+                if (toolIndex == 3) action = "trim";
+                if (toolIndex == 4) action = "rename";
+                if (toolIndex == 5) action = "show certs for";
 
-                if (MessageBox.Show($"Are you sure you want to {action.ToLowerInvariant()} {olvLocal.SelectedObjects.Count} games?", $"Confirm {action.ToUpperInvariant()}", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
+                if (MessageBox.Show($"Are you sure you want to {action} {olvLocal.SelectedObjects.Count} games?", $"Confirm {action.ToUpperInvariant()}", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
                     return;
 
                 foreach (Object obj in olvLocal.SelectedObjects)
                 {
                     xci = (XciItem)obj;
-                    if (ProcessManagementAction(xci, displayIndex))
+                    if (ProcessManagementAction(xci, toolIndex))
                         successful++;
                     else
                         failure++;
@@ -261,18 +240,19 @@ namespace SwitchGameManager
             } else
             {
                 xci = (XciItem)olvLocal.GetItem(olvLocal.SelectedIndex).RowObject;
-                ProcessManagementAction(xci, displayIndex);
+                ProcessManagementAction(xci, toolIndex);
             }
 
-            olvLocal.RefreshObject(localXcis);
+            olvLocal.RefreshObject(xciList);
 
         }
 
-        private bool ProcessManagementAction(XciItem xci, int displayIndex)
+        private bool ProcessManagementAction(XciItem xci, int toolIndex)
         {
-            switch (displayIndex)
+            switch (toolIndex)
             {
                 case 2: //Delete files
+
                     return true;
 
                 case 3: //trim games
@@ -290,12 +270,12 @@ namespace SwitchGameManager
                         xci = XciHelper.GetXciInfo(xci.xciFilePath);
 
                         //Could probably just update the old xciCache item
-                        XciItem oldXci = XciHelper.GetXciItemFromCache(xci.packageId, localXcis);
-                        localXcis.Remove(oldXci);
+                        XciItem oldXci = XciHelper.GetXciItemByPackageId(xci.packageId, xciList);
+                        xciList.Remove(oldXci);
 
-                        localXcis.Add(xci);
+                        xciList.Add(xci);
 
-                        olvLocal.RefreshObject(localXcis);
+                        olvLocal.RefreshObject(xciList);
                         return trim;
                     }
                     else
@@ -305,11 +285,11 @@ namespace SwitchGameManager
                     }
 
                 case 4: //Rename files
-                    return true; ;
+                    return true;
 
                 case 5: //show XCI Cert
                     XciHelper.ShowXciCert(xci);
-                    return true; ;
+                    return true;
 
                 default:
                     return false;
@@ -383,14 +363,12 @@ namespace SwitchGameManager
                     olvLocal.TileSize = new Size(100, 16);
                     break;
             }
-
-            //olvLocal.TileSize = new Size(300, olvLocal.LargeImageList.ImageSize.Height);
-
+            
             olvLocal.LargeImageList.ImageSize = largeSize;
             olvLocal.SmallImageList.ImageSize = smallSize;
 
             olvLocal.ClearObjects();
-            olvLocal.SetObjects(localXcis);
+            olvLocal.SetObjects(xciList);
 
         }
 

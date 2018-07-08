@@ -347,8 +347,8 @@ namespace XCI_Explorer
                             }
                             try
                             {
-                                //File.Delete("meta");
-                                //Directory.Delete("data", true);
+                                File.Delete("meta");
+                                Directory.Delete("data", true);
                             }
                             catch { }
 

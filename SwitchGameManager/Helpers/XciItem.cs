@@ -14,12 +14,6 @@ namespace SwitchGameManager.Helpers
 {
     public class XciItem
     {
-        public XciItem(string filePath)
-        {
-            this.xciFilePath = filePath;
-            
-        } 
-
         /*
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -30,6 +24,17 @@ namespace SwitchGameManager.Helpers
         }
         */
 
+        public XciItem(string filePath)
+        {
+            this.xciFilePath = filePath;
+        }
+
+        public XciItem()
+        {
+
+        }
+
+        //Can't serialize a Bitmap.. so we convert it to and from a Byte array on the fly
         internal Bitmap gameIcon
         {
             get
@@ -45,11 +50,12 @@ namespace SwitchGameManager.Helpers
             {
                 using (var stream = new MemoryStream())
                 {
-                    value.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                    value.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
                     this.gameIconBytes = stream.ToArray();
                 }
             }
         }
+
         public byte[] gameIconBytes;
         public string gameName;
         public string gameDeveloper;
@@ -63,13 +69,16 @@ namespace SwitchGameManager.Helpers
         public long xciFileSize;
         public string productCode;
         public byte[] gameCert;
+        [JsonIgnore]
         public bool isXciTrimmed;
         public string xciFilePath;
+        public string xciSdFilePath;
         public ulong packageId;
         public bool isUniqueCert;
         [JsonIgnore]
         public bool isGameOnSd;
         [JsonIgnore]
         public bool isGameOnPc;
+
     }
 }

@@ -15,6 +15,7 @@ namespace SwitchGameManager.Helpers
     {
 
         private static hacbuild.XCI hac = new hacbuild.XCI();
+        public static formMain formMain;
 
         public static List<XciItem> LoadXciCache(string fileName, bool localGames = true)
         {
@@ -24,17 +25,131 @@ namespace SwitchGameManager.Helpers
                 return xciCache;
 
             xciCache = JsonConvert.DeserializeObject<IEnumerable<XciItem>>(File.ReadAllText(fileName)).ToList<XciItem>();
+            
+            return xciCache;
+        }
 
-            //Verify that the files exist, otherwise remove them from the cache
-            for (int index = xciCache.Count - 1; index >= 0; index--)
+        public static List<XciItem> LoadGamesFromPath(string dirPath, bool recurse = true, bool isSdCard = false)
+        {
+
+            List<XciItem> xciList = new List<XciItem>();
+            ulong packageId;
+            XciItem xciTemp;
+
+            formMain.UpdateToolStripLabel("Loading Games..");
+            formMain.olvLocal.EmptyListMsg = "Loading games..";
+
+            formMain.toolStripProgressBar.Minimum = 0;
+            formMain.toolStripProgressBar.Value = 0;
+            formMain.toolStripProgressBar.Visible = true;
+            
+            //Make a list of all XCI files recursively
+            List<string> xciFileList = FindAllFiles(dirPath, "*.xci", recurse);
+
+            //set our progressbar to the maximum
+            formMain.toolStripProgressBar.Maximum = xciFileList.Count;
+            
+            foreach (var item in xciFileList)
             {
-                if (!File.Exists(xciCache[index].xciFilePath))
-                    xciCache.RemoveAt(index);
-                else
-                    xciCache[index].isGameOnPc = true;
+                formMain.UpdateToolStripLabel("Processing " + item);
+                formMain.toolStripProgressBar.Value += 1;
+                Application.DoEvents();
+                if (File.Exists(item))
+                {
+                    packageId = XciHelper.GetPackageID(item);
+
+                    xciTemp = XciHelper.GetXciItemByPackageId(packageId, formMain.xciCache);    // Check if this game is in the Cache
+                    if (xciTemp == null)  
+                    {
+                        xciTemp = XciHelper.GetXciInfo(item);   // retrieve game info
+                        formMain.xciCache.Add(xciTemp);         // add it to the CACHE
+                    }
+
+                    if (isSdCard)
+                        xciTemp.xciSdFilePath = item; //set this game's file path
+                    else
+                        xciTemp.xciFilePath = item; //set this game's file path
+
+                    xciList.Add(xciTemp);   //add the game to the return list
+                }
             }
 
-            return xciCache;
+            formMain.toolStripProgressBar.Visible = false;
+            formMain.olvLocal.SetObjects(formMain.xciList);
+            formMain.UpdateToolStripLabel();
+
+            formMain.olvLocal.EmptyListMsg = "No Switch games found!";
+
+            return xciList;
+        }
+
+        internal static List<XciItem> CreateMasterXciList(List<XciItem> xciList, List<XciItem> xciOnSd)
+        {
+
+            List<XciItem> masterList = new List<XciItem>();
+            XciItem xciTemp;
+
+            for (int i = xciList.Count-1; i >= 0; i--)
+            {
+                xciTemp = GetXciItemByPackageId(xciList[i].packageId, xciOnSd);
+                if (xciTemp == null)
+                {
+                    xciList[i].isGameOnSd = false;
+                    xciList[i].isGameOnPc = true;
+                }
+                else
+                {
+                    xciList[i].isGameOnPc = true;
+                    xciList[i].isGameOnSd = true;
+                    xciList[i].xciSdFilePath = xciTemp.xciFilePath;
+                    xciOnSd.Remove(xciTemp);
+                }
+                masterList.Add(xciList[i]);
+            }
+
+            for (int i = xciOnSd.Count - 1; i >= 0; i--)
+            {
+                xciTemp = GetXciItemByPackageId(xciOnSd[i].packageId, masterList);
+                if (xciTemp == null)
+                {
+                    xciOnSd[i].isGameOnSd = true;
+                    xciOnSd[i].isGameOnPc = false;
+                    xciOnSd[i].xciSdFilePath = xciOnSd[i].xciFilePath;
+                    xciOnSd[i].xciFilePath = string.Empty;
+                    masterList.Add(xciOnSd[i]);
+                }
+                else
+                {
+                    masterList[i].isGameOnPc = true;
+                    masterList[i].isGameOnSd = true;
+                    xciOnSd[i].xciSdFilePath = xciOnSd[i].xciFilePath;
+                    xciOnSd[i].xciFilePath = xciTemp.xciFilePath;
+                }
+            }
+
+            return masterList;
+
+        }
+
+        public static List<string> FindAllFiles(string startDir, string filter, bool recurse = true)
+        {
+            List<string> files = new List<string>();
+
+            if (recurse)
+            {
+                if (!Directory.Exists(startDir))
+                    return files;
+
+                foreach (var folder in Directory.GetDirectories(startDir))
+                {
+                    files.AddRange(FindAllFiles(folder, filter, recurse));
+                }
+            }
+
+            files.AddRange(Directory.GetFiles(startDir, filter).ToList());
+
+            return files;
+
         }
 
         public static void SaveXciCache(string fileName, List<XciItem> xciCache)
@@ -42,7 +157,7 @@ namespace SwitchGameManager.Helpers
             File.WriteAllText(fileName, JsonConvert.SerializeObject(xciCache, Formatting.Indented));
         }
 
-        public static XciItem GetXciItemFromCache(ulong packageId, List<XciItem> xciCache)
+        public static XciItem GetXciItemByPackageId(ulong packageId, List<XciItem> xciCache)
         {
             XciItem xci;
             try
