@@ -78,6 +78,8 @@ namespace SwitchGameManager.Helpers
             formMain.olvLocal.SetObjects(formMain.xciList);
             formMain.UpdateToolStripLabel();
 
+            SaveXciCache("Cache.json", formMain.xciCache);
+
             formMain.olvLocal.EmptyListMsg = "No Switch games found!";
 
             return xciList;

@@ -30,13 +30,14 @@
         {
             this.listBoxFolders = new System.Windows.Forms.ListBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.comboBoxDriveLetters = new System.Windows.Forms.ComboBox();
-            this.sdRootLabel = new System.Windows.Forms.Label();
             this.textBoxDriveInfo = new System.Windows.Forms.TextBox();
+            this.sdRootLabel = new System.Windows.Forms.Label();
+            this.comboBoxDriveLetters = new System.Windows.Forms.ComboBox();
             this.buttonSave = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.buttonAddFolder = new System.Windows.Forms.Button();
+            this.buttonRemoveFolder = new System.Windows.Forms.Button();
+            this.buttonLocateSwitchSd = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -45,29 +46,29 @@
             this.listBoxFolders.FormattingEnabled = true;
             this.listBoxFolders.Location = new System.Drawing.Point(12, 12);
             this.listBoxFolders.Name = "listBoxFolders";
-            this.listBoxFolders.Size = new System.Drawing.Size(352, 95);
+            this.listBoxFolders.Size = new System.Drawing.Size(376, 95);
             this.listBoxFolders.TabIndex = 0;
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.buttonLocateSwitchSd);
             this.groupBox1.Controls.Add(this.textBoxDriveInfo);
             this.groupBox1.Controls.Add(this.sdRootLabel);
             this.groupBox1.Controls.Add(this.comboBoxDriveLetters);
             this.groupBox1.Location = new System.Drawing.Point(12, 113);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(260, 176);
+            this.groupBox1.Size = new System.Drawing.Size(295, 161);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "SD Card";
             // 
-            // comboBoxDriveLetters
+            // textBoxDriveInfo
             // 
-            this.comboBoxDriveLetters.FormattingEnabled = true;
-            this.comboBoxDriveLetters.Location = new System.Drawing.Point(65, 19);
-            this.comboBoxDriveLetters.Name = "comboBoxDriveLetters";
-            this.comboBoxDriveLetters.Size = new System.Drawing.Size(189, 21);
-            this.comboBoxDriveLetters.TabIndex = 2;
-            this.comboBoxDriveLetters.SelectedIndexChanged += new System.EventHandler(this.comboBoxDriveLetters_SelectedIndexChanged);
+            this.textBoxDriveInfo.Location = new System.Drawing.Point(6, 46);
+            this.textBoxDriveInfo.Multiline = true;
+            this.textBoxDriveInfo.Name = "textBoxDriveInfo";
+            this.textBoxDriveInfo.Size = new System.Drawing.Size(283, 109);
+            this.textBoxDriveInfo.TabIndex = 4;
             // 
             // sdRootLabel
             // 
@@ -78,61 +79,76 @@
             this.sdRootLabel.TabIndex = 3;
             this.sdRootLabel.Text = "SD Drive:";
             // 
-            // textBoxDriveInfo
+            // comboBoxDriveLetters
             // 
-            this.textBoxDriveInfo.Location = new System.Drawing.Point(6, 46);
-            this.textBoxDriveInfo.Multiline = true;
-            this.textBoxDriveInfo.Name = "textBoxDriveInfo";
-            this.textBoxDriveInfo.Size = new System.Drawing.Size(248, 119);
-            this.textBoxDriveInfo.TabIndex = 4;
+            this.comboBoxDriveLetters.FormattingEnabled = true;
+            this.comboBoxDriveLetters.Location = new System.Drawing.Point(65, 19);
+            this.comboBoxDriveLetters.Name = "comboBoxDriveLetters";
+            this.comboBoxDriveLetters.Size = new System.Drawing.Size(142, 21);
+            this.comboBoxDriveLetters.TabIndex = 2;
+            this.comboBoxDriveLetters.SelectedIndexChanged += new System.EventHandler(this.comboBoxDriveLetters_SelectedIndexChanged);
             // 
             // buttonSave
             // 
             this.buttonSave.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.buttonSave.Location = new System.Drawing.Point(289, 262);
+            this.buttonSave.Location = new System.Drawing.Point(313, 250);
             this.buttonSave.Name = "buttonSave";
             this.buttonSave.Size = new System.Drawing.Size(75, 23);
             this.buttonSave.TabIndex = 3;
             this.buttonSave.Text = "Save";
             this.buttonSave.UseVisualStyleBackColor = true;
+            this.buttonSave.Click += new System.EventHandler(this.buttonSave_Click);
             // 
             // buttonCancel
             // 
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonCancel.Location = new System.Drawing.Point(289, 233);
+            this.buttonCancel.Location = new System.Drawing.Point(313, 221);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(75, 23);
             this.buttonCancel.TabIndex = 4;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
+            this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
             // 
-            // button1
+            // buttonAddFolder
             // 
-            this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button1.Location = new System.Drawing.Point(337, 113);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(27, 28);
-            this.button1.TabIndex = 5;
-            this.button1.Text = "+";
-            this.button1.UseVisualStyleBackColor = true;
+            this.buttonAddFolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonAddFolder.Location = new System.Drawing.Point(361, 113);
+            this.buttonAddFolder.Name = "buttonAddFolder";
+            this.buttonAddFolder.Size = new System.Drawing.Size(27, 28);
+            this.buttonAddFolder.TabIndex = 5;
+            this.buttonAddFolder.Text = "+";
+            this.buttonAddFolder.UseVisualStyleBackColor = true;
+            this.buttonAddFolder.Click += new System.EventHandler(this.buttonAddFolder_Click);
             // 
-            // button2
+            // buttonRemoveFolder
             // 
-            this.button2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button2.Location = new System.Drawing.Point(304, 113);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(27, 28);
-            this.button2.TabIndex = 6;
-            this.button2.Text = "-";
-            this.button2.UseVisualStyleBackColor = true;
+            this.buttonRemoveFolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonRemoveFolder.Location = new System.Drawing.Point(328, 113);
+            this.buttonRemoveFolder.Name = "buttonRemoveFolder";
+            this.buttonRemoveFolder.Size = new System.Drawing.Size(27, 28);
+            this.buttonRemoveFolder.TabIndex = 6;
+            this.buttonRemoveFolder.Text = "-";
+            this.buttonRemoveFolder.UseVisualStyleBackColor = true;
+            this.buttonRemoveFolder.Click += new System.EventHandler(this.buttonRemoveFolder_Click);
+            // 
+            // buttonLocateSwitchSd
+            // 
+            this.buttonLocateSwitchSd.Location = new System.Drawing.Point(214, 19);
+            this.buttonLocateSwitchSd.Name = "buttonLocateSwitchSd";
+            this.buttonLocateSwitchSd.Size = new System.Drawing.Size(75, 23);
+            this.buttonLocateSwitchSd.TabIndex = 5;
+            this.buttonLocateSwitchSd.Text = "Auto Find";
+            this.buttonLocateSwitchSd.UseVisualStyleBackColor = true;
+            this.buttonLocateSwitchSd.Click += new System.EventHandler(this.buttonLocateSwitchSd_Click);
             // 
             // formFolderList
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(376, 297);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
+            this.ClientSize = new System.Drawing.Size(400, 285);
+            this.Controls.Add(this.buttonRemoveFolder);
+            this.Controls.Add(this.buttonAddFolder);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonSave);
             this.Controls.Add(this.groupBox1);
@@ -140,6 +156,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "formFolderList";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Game Locations";
             this.Load += new System.EventHandler(this.formFolderList_Load);
             this.groupBox1.ResumeLayout(false);
@@ -157,7 +174,8 @@
         private System.Windows.Forms.TextBox textBoxDriveInfo;
         private System.Windows.Forms.Button buttonSave;
         private System.Windows.Forms.Button buttonCancel;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button buttonAddFolder;
+        private System.Windows.Forms.Button buttonRemoveFolder;
+        private System.Windows.Forms.Button buttonLocateSwitchSd;
     }
 }

@@ -15,6 +15,7 @@ namespace SwitchGameManager
 
         public List<XciItem> xciCache = new List<XciItem>();
         public List<XciItem> xciList = new List<XciItem>();
+        ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
 
         public formMain()
         {
@@ -27,38 +28,68 @@ namespace SwitchGameManager
             XciHelper.formMain = this;
 
             SetupObjectListView();
-            
-            this.Show();
-            UpdateToolStripLabel("Loading Cache file..");
-            Application.DoEvents();
-
-            Helpers.Settings.LoadSettings("");
 
             //Load the cache
+            UpdateToolStripLabel("Loading Cache file..");
             xciCache = XciHelper.LoadXciCache("Cache.json");
 
-            xciList = XciHelper.LoadGamesFromPath(@"F:\Games\Emulation\Switch\Games\", recurse: true);
+            //Load the settings
+            if (Helpers.Settings.LoadSettings("Config.json") == false)
+                manageXciLocToolStripMenuItem_Click(null, null);
 
-            List<XciItem> xciOnSd = new List<XciItem>();
+            if (Helpers.Settings.config.sdDriveLetter.Length > 0 && !Directory.Exists(Helpers.Settings.config.sdDriveLetter))
+                manageXciLocToolStripMenuItem_Click(null, null);
 
-            // SD card games are currently only in the root directory (for SX OS)
-            xciOnSd = XciHelper.LoadGamesFromPath(@"E:\", recurse: false, isSdCard: true);
+            //Setup the OLV with the saved state (if it was saved)
+            if (Helpers.Settings.config.olvState != null)
+                olvLocal.RestoreState(Helpers.Settings.config.olvState);
 
-            xciList = XciHelper.CreateMasterXciList(xciList, xciOnSd);
+            if (Helpers.Settings.config.formHeight > 0)
+                this.Height = Helpers.Settings.config.formHeight;
 
-            olvLocal.SetObjects(xciList);
+            if (Helpers.Settings.config.formWidth > 0)
+                this.Width = Helpers.Settings.config.formWidth;
+
+
+            //todo Lazy update. Do this stuff in the background
+            this.Show();
+            Application.DoEvents();
+
+            PopulateXciList();
+            
             /* todo
              * Check if Keys.txt exists, otherwise download it. Maybe procedurally generate the URL? brute force the key?
              * Load/store list status and program settings Save/Load olv state to byte array, save with settings
-             * Add settings window/options for selecting game directories (allow multiple directories!)
-             * Add SD card searching for /switch/ directory
              * Menu option to refresh library (warn that this will be slow)
              * Add red X or green check for Game cert, either use a Resource img or system image?
              * Rom Renaming
              */
 
         }
-        
+
+        public void PopulateXciList()
+        {
+            xciList = new List<XciItem>();
+
+            foreach (string path in Helpers.Settings.config.localXciFolders)
+            {
+                xciList.AddRange(XciHelper.LoadGamesFromPath(path, recurse: true, isSdCard: false));
+            }
+
+            if (Directory.Exists(Helpers.Settings.config.sdDriveLetter))
+            {
+
+                List<XciItem> xciOnSd = new List<XciItem>();
+
+                // SD card games are currently only in the root directory (for SX OS)
+                xciOnSd = XciHelper.LoadGamesFromPath(Helpers.Settings.config.sdDriveLetter, recurse: false, isSdCard: true);
+
+                xciList = XciHelper.CreateMasterXciList(xciList, xciOnSd);
+            }
+            olvLocal.SetObjects(xciList);
+            UpdateToolStripLabel();
+        }
+
         private void SetupObjectListView()
         {
             //initialize the image lists, big and small
@@ -102,7 +133,6 @@ namespace SwitchGameManager
             */
 
             //set up the right-click menu for the objectlistview without remaking it..
-            ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
             ToolStripMenuItem newMenuItem;
             ToolStripMenuItem subMenuItem;
             foreach (ToolStripMenuItem menuItem in gameManagementToolStripMenuItem.DropDownItems)
@@ -143,7 +173,11 @@ namespace SwitchGameManager
 
         private void ToolStripSdManagement(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            ToolStripItem clicked = sender as ToolStripItem;
+            int toolIndex = olvLocal.ContextMenuStrip.Items.IndexOf(sdToolStripMenuItem);
+
+            if (toolIndex < 0)
+                toolIndex = sdToolStripMenuItem.DropDownItems.IndexOf(clicked);
         }
         
         public void UpdateToolStripLabel(string text = "")
@@ -216,7 +250,10 @@ namespace SwitchGameManager
             ToolStripItem clicked = sender as ToolStripItem;
             int toolIndex = olvLocal.ContextMenuStrip.Items.IndexOf(clicked);
 
-            Debug.Assert(toolIndex > 0, "toolIndex should be > 0");
+            if (toolIndex < 0)
+                toolIndex = gameManagementToolStripMenuItem.DropDownItems.IndexOf(clicked);
+
+            //Debug.Assert(toolIndex > 0, "toolIndex should be > 0");
 
             if (!IsListIndexUsable()) return;
 
@@ -324,9 +361,15 @@ namespace SwitchGameManager
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //TODO save settings before exiting
-            //Save cache before exiting?
             Application.Exit();
+        }
+
+        private void SaveSettings()
+        {
+            //save the OLV state to olvState byte array (column positions, etc)
+            Helpers.Settings.config.olvState = olvLocal.SaveState();
+
+            Helpers.Settings.SaveSettings("Config.json");
         }
 
         private void ChangeIconSize(object sender, EventArgs e)
@@ -386,7 +429,33 @@ namespace SwitchGameManager
         private void manageXciLocToolStripMenuItem_Click(object sender, EventArgs e)
         {
             formFolderList form = new formFolderList();
-            form.ShowDialog();
+            DialogResult result = form.ShowDialog();
+
+            if (result == DialogResult.OK)
+            {
+                Helpers.Settings.config.localXciFolders = form.localFolders;
+                Helpers.Settings.config.sdDriveLetter = form.sdDriveLetter;
+                PopulateXciList();
+            }
+        }
+
+        private void olvLocal_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                contextMenuStrip.Show(e.X, e.Y);
+            }
+        }
+
+        private void formMain_Resize(object sender, EventArgs e)
+        {
+            Helpers.Settings.config.formHeight = this.Height;
+            Helpers.Settings.config.formWidth = this.Width;
+        }
+
+        private void formMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            SaveSettings();
         }
     }
 }

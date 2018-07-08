@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Newtonsoft.Json;
 
 namespace SwitchGameManager.Helpers
@@ -13,11 +14,13 @@ namespace SwitchGameManager.Helpers
     public class Config
     {
         public List<string> localXciFolders = new List<string>();
-        public string sdDriveLetter;
+        public string sdDriveLetter = string.Empty;
         public byte[] olvState;
         public int olvIconSize;
         public bool confirmMultiActions;
         public bool encryptCertificates;
+        public int formHeight;
+        public int formWidth;
 
         [JsonIgnore]
         public SecureString encryptPassword;
@@ -29,21 +32,35 @@ namespace SwitchGameManager.Helpers
         public static Config config;
 
         
-        public static void LoadSettings(string filename)
+        public static bool LoadSettings(string fileName)
         {
             Settings.config = new Config();
 
-            config.confirmMultiActions = true;
-            config.encryptCertificates = false;
-            //config.encryptPassword = "";
-            config.localXciFolders.Add(@"F:\Games\Emulation\Switch\Games");
-            config.localXciFolders.Add(@"F:\Games\Emulation\Switch\MINE");
-            config.sdDriveLetter = @"E:\";
+            try
+            {
+                config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(fileName));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Unable to load {fileName}: {ex.Message}");
+            }
+
+            return false;
         }
 
-        public static List<string> DiscoverExternalStorage()
+        public static bool SaveSettings(string fileName)
         {
-            throw new NotImplementedException();
+            try
+            {
+                File.WriteAllText(fileName, JsonConvert.SerializeObject(config, formatting: Formatting.Indented));
+                return true;
+            } catch (Exception ex)
+            {
+                MessageBox.Show($"Unable to save {fileName}: {ex.Message}");
+            }
+
+            return false;
         }
 
     }

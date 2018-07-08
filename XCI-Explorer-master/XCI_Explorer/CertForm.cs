@@ -86,7 +86,7 @@ namespace XCI_Explorer
             this.Controls.Add(this.hbxHexView);
             this.Name = "CertForm";
             this.ShowIcon = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "cert data";
             this.ResumeLayout(false);
 
