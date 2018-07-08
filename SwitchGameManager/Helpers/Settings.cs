@@ -9,9 +9,9 @@ using Newtonsoft.Json;
 
 namespace SwitchGameManager.Helpers
 {
-    public class Settings
-    {
 
+    public class Config
+    {
         public List<string> localXciFolders = new List<string>();
         public string sdDriveLetter;
         public byte[] olvState;
@@ -21,10 +21,24 @@ namespace SwitchGameManager.Helpers
 
         [JsonIgnore]
         public SecureString encryptPassword;
+    }
+
+    public class Settings
+    {
+
+        public static Config config;
+
         
-        public static Settings LoadSettings(string filename)
+        public static void LoadSettings(string filename)
         {
-            throw new NotImplementedException();
+            Settings.config = new Config();
+
+            config.confirmMultiActions = true;
+            config.encryptCertificates = false;
+            //config.encryptPassword = "";
+            config.localXciFolders.Add(@"F:\Games\Emulation\Switch\Games");
+            config.localXciFolders.Add(@"F:\Games\Emulation\Switch\MINE");
+            config.sdDriveLetter = @"E:\";
         }
 
         public static List<string> DiscoverExternalStorage()
@@ -32,7 +46,5 @@ namespace SwitchGameManager.Helpers
             throw new NotImplementedException();
         }
 
-
-        
     }
 }

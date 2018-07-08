@@ -52,6 +52,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="formFolderList.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formFolderList.Designer.cs">
+      <DependentUpon>formFolderList.cs</DependentUpon>
+    </Compile>
     <Compile Include="formMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -63,6 +69,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Helpers\XciHelper.cs" />
     <Compile Include="Helpers\XciItem.cs" />
+    <EmbeddedResource Include="formFolderList.resx">
+      <DependentUpon>formFolderList.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="formMain.resx">
       <DependentUpon>formMain.cs</DependentUpon>
     </EmbeddedResource>

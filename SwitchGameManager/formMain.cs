@@ -32,7 +32,7 @@ namespace SwitchGameManager
             UpdateToolStripLabel("Loading Cache file..");
             Application.DoEvents();
 
-            //Settings.LoadSettings
+            Helpers.Settings.LoadSettings("");
 
             //Load the cache
             xciCache = XciHelper.LoadXciCache("Cache.json");
@@ -383,5 +383,10 @@ namespace SwitchGameManager
 
         }
 
+        private void manageXciLocToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            formFolderList form = new formFolderList();
+            form.ShowDialog();
+        }
     }
 }
