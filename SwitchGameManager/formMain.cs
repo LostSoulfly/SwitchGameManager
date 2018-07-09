@@ -40,21 +40,23 @@ namespace SwitchGameManager
             Settings.xciCache = XciHelper.LoadXciCache();
 
             //Load the settings
-            if (Helpers.Settings.LoadSettings("Config.json") == false)
+            if (Settings.LoadSettings("Config.json") == false)
                 manageXciLocToolStripMenuItem_Click(null, null);
 
-            if (Helpers.Settings.config.sdDriveLetter.Length > 0 && !Directory.Exists(Helpers.Settings.config.sdDriveLetter))
+            /*
+            if (Settings.config.sdDriveLetter != null && !Directory.Exists(Settings.config.sdDriveLetter))
                 manageXciLocToolStripMenuItem_Click(null, null);
+            */
 
             //Setup the OLV with the saved state (if it was saved)
-            if (Helpers.Settings.config.olvState != null)
-                olvLocal.RestoreState(Helpers.Settings.config.olvState);
+            if (Settings.config.olvState != null)
+                olvLocal.RestoreState(Settings.config.olvState);
 
-            if (Helpers.Settings.config.formHeight > 0)
-                this.Height = Helpers.Settings.config.formHeight;
+            if (Settings.config.formHeight > 0)
+                this.Height = Settings.config.formHeight;
 
-            if (Helpers.Settings.config.formWidth > 0)
-                this.Width = Helpers.Settings.config.formWidth;
+            if (Settings.config.formWidth > 0)
+                this.Width = Settings.config.formWidth;
 
             
 
@@ -89,8 +91,8 @@ namespace SwitchGameManager
 
             if (result == DialogResult.OK)
             {
-                Helpers.Settings.config.localXciFolders = form.localFolders;
-                Helpers.Settings.config.sdDriveLetter = form.sdDriveLetter;
+                Settings.config.localXciFolders = form.localFolders;
+                Settings.config.sdDriveLetter = form.sdDriveLetter;
                 PopulateXciList();
             }
         }
@@ -150,9 +152,9 @@ namespace SwitchGameManager
         public void SaveSettings()
         {
             //save the OLV state to olvState byte array (column positions, etc)
-            Helpers.Settings.config.olvState = olvLocal.SaveState();
-            Helpers.XciHelper.SaveXciCache();
-            Helpers.Settings.SaveSettings();
+            Settings.config.olvState = olvLocal.SaveState();
+            XciHelper.SaveXciCache();
+            Settings.SaveSettings();
         }
 
         private void SetupDelegates()
@@ -181,8 +183,8 @@ namespace SwitchGameManager
 
             this.ResizeEnd += delegate (object s, EventArgs e)
             {
-                Helpers.Settings.config.formHeight = this.Height;
-                Helpers.Settings.config.formWidth = this.Width;
+                Settings.config.formHeight = this.Height;
+                Settings.config.formWidth = this.Width;
             };
 
             cancelTransfersToolStripMenuItem.Click += delegate (object s, EventArgs e) { FileHelper.StopTransfers(); };
@@ -425,17 +427,17 @@ namespace SwitchGameManager
         {
             xciList = new List<XciItem>();
 
-            foreach (string path in Helpers.Settings.config.localXciFolders)
+            foreach (string path in Settings.config.localXciFolders)
             {
                 xciList.AddRange(XciHelper.LoadGamesFromPath(path, recurse: true, isSdCard: false));
             }
 
-            if (Directory.Exists(Helpers.Settings.config.sdDriveLetter))
+            if (Directory.Exists(Settings.config.sdDriveLetter))
             {
                 List<XciItem> xciOnSd = new List<XciItem>();
 
                 // SD card games are currently only in the root directory (for SX OS)
-                xciOnSd = XciHelper.LoadGamesFromPath(Helpers.Settings.config.sdDriveLetter, recurse: false, isSdCard: true);
+                xciOnSd = XciHelper.LoadGamesFromPath(Settings.config.sdDriveLetter, recurse: false, isSdCard: true);
 
                 xciList = XciHelper.CreateMasterXciList(xciList, xciOnSd);
             }
