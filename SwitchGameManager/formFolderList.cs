@@ -1,20 +1,14 @@
 ﻿using SwitchGameManager.Helpers;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SwitchGameManager
 {
     public partial class formFolderList : Form
     {
-
         public List<string> localFolders = new List<string>();
         public string sdDriveLetter;
 
@@ -23,58 +17,57 @@ namespace SwitchGameManager
             InitializeComponent();
         }
 
-        private void formFolderList_Load(object sender, EventArgs e)
+        private void buttonAddFolder_Click(object sender, EventArgs e)
         {
-            foreach (var item in Settings.config.localXciFolders)
-            {
-                listBoxFolders.Items.Add(item);
-            }
+            FolderBrowserDialog folderBrowser = new FolderBrowserDialog();
+            folderBrowser.Description = "Please select a folder containing Switch XCI games..";
+            DialogResult result = folderBrowser.ShowDialog();
 
-            foreach (var item in getAvailableDriveLetters())
+            if (result == DialogResult.OK)
             {
-                comboBoxDriveLetters.Items.Add(item);
+                if (!Directory.Exists(folderBrowser.SelectedPath))
+                    MessageBox.Show("The folder you've selected cannot be found.");
+
+                listBoxFolders.Items.Add(folderBrowser.SelectedPath);
             }
-            
-            if (Settings.config.sdDriveLetter.Length == 0 || !Directory.Exists(Settings.config.sdDriveLetter))
+        }
+
+        private void buttonCancel_Click(object sender, EventArgs e)
+        {
+            this.Visible = false;
+        }
+
+        private void buttonLocateSwitchSd_Click(object sender, EventArgs e)
+        {
+            DriveInfo[] driveInfo = DriveInfo.GetDrives();
+
+            foreach (DriveInfo item in driveInfo)
             {
-                buttonLocateSwitchSd_Click(null, null);
-                SetComboboxToDriveLetter(Settings.config.sdDriveLetter);
-            }
-            else
-            {
-                if (Settings.config.sdDriveLetter.Length > 0)
+                if (item.DriveType == DriveType.Removable && (item.DriveFormat.ToLower() == "exfat" || item.DriveFormat.ToLower() == "fat32"))
                 {
-                    SetComboboxToDriveLetter(Settings.config.sdDriveLetter);
+                    if (Directory.GetFiles(item.RootDirectory.ToString(), "*.xci").ToList<string>().Count > 0)
+                    {
+                        SetComboboxToDriveLetter(item.RootDirectory.ToString());
+                        break;
+                    }
                 }
             }
         }
 
-        public List<string> getAvailableDriveLetters()
+        private void buttonRemoveFolder_Click(object sender, EventArgs e)
         {
-            DriveInfo[] driveInfo = DriveInfo.GetDrives();
-            List<string> drives = new List<string>();
-
-            foreach (DriveInfo item in driveInfo)
-            {
-                if (item.VolumeLabel.Length > 0)
-                    drives.Add($"{item.RootDirectory.ToString()} {item.VolumeLabel} [{item.DriveType}]");
-                else
-                    drives.Add($"{item.RootDirectory.ToString()} ({item.DriveFormat}) [{item.DriveType}]");
-            }
-
-            return drives;
+            if (listBoxFolders.SelectedIndex > -1)
+                listBoxFolders.Items.RemoveAt(listBoxFolders.SelectedIndex);
         }
 
-        private void SetComboboxToDriveLetter(string drive)
+        private void buttonSave_Click(object sender, EventArgs e)
         {
-            if (drive.Length == 0)
-                return;
-
-            for (int i = 0; i < comboBoxDriveLetters.Items.Count; i++)
+            foreach (string folder in listBoxFolders.Items)
             {
-                if (comboBoxDriveLetters.Items[i].ToString().Substring(0, 1).ToUpper() == drive.ToUpper().Substring(0, 1))
-                    comboBoxDriveLetters.SelectedIndex = i;
+                localFolders.Add(folder);
             }
+
+            this.Visible = false;
         }
 
         private void comboBoxDriveLetters_SelectedIndexChanged(object sender, EventArgs e)
@@ -97,62 +90,60 @@ namespace SwitchGameManager
             {
                 textBoxDriveInfo.Text += item + Environment.NewLine;
             }
-
         }
 
-        private void buttonCancel_Click(object sender, EventArgs e)
+        private void formFolderList_Load(object sender, EventArgs e)
         {
-            this.Visible = false;
-        }
-
-        private void buttonSave_Click(object sender, EventArgs e)
-        {
-            foreach (string folder in listBoxFolders.Items)
+            foreach (var item in Settings.config.localXciFolders)
             {
-                localFolders.Add(folder);
+                listBoxFolders.Items.Add(item);
             }
-            
-            this.Visible = false;
-        }
 
-
-        private void buttonAddFolder_Click(object sender, EventArgs e)
-        {
-            FolderBrowserDialog folderBrowser = new FolderBrowserDialog();
-            folderBrowser.Description = "Please select a folder containing Switch XCI games..";
-            DialogResult result = folderBrowser.ShowDialog();
-
-            if (result == DialogResult.OK)
+            foreach (var item in getAvailableDriveLetters())
             {
-                if (!Directory.Exists(folderBrowser.SelectedPath))
-                    MessageBox.Show("The folder you've selected cannot be found.");
+                comboBoxDriveLetters.Items.Add(item);
+            }
 
-                listBoxFolders.Items.Add(folderBrowser.SelectedPath);
+            if (Settings.config.sdDriveLetter.Length == 0 || !Directory.Exists(Settings.config.sdDriveLetter))
+            {
+                buttonLocateSwitchSd_Click(null, null);
+                SetComboboxToDriveLetter(Settings.config.sdDriveLetter);
+            }
+            else
+            {
+                if (Settings.config.sdDriveLetter.Length > 0)
+                {
+                    SetComboboxToDriveLetter(Settings.config.sdDriveLetter);
+                }
             }
         }
 
-        private void buttonRemoveFolder_Click(object sender, EventArgs e)
+        private void SetComboboxToDriveLetter(string drive)
         {
-            if (listBoxFolders.SelectedIndex > -1)
-                listBoxFolders.Items.RemoveAt(listBoxFolders.SelectedIndex);
+            if (drive.Length == 0)
+                return;
+
+            for (int i = 0; i < comboBoxDriveLetters.Items.Count; i++)
+            {
+                if (comboBoxDriveLetters.Items[i].ToString().Substring(0, 1).ToUpper() == drive.ToUpper().Substring(0, 1))
+                    comboBoxDriveLetters.SelectedIndex = i;
+            }
         }
 
-        private void buttonLocateSwitchSd_Click(object sender, EventArgs e)
+        public List<string> getAvailableDriveLetters()
         {
             DriveInfo[] driveInfo = DriveInfo.GetDrives();
+            List<string> drives = new List<string>();
 
             foreach (DriveInfo item in driveInfo)
             {
-                if (item.DriveType == DriveType.Removable && (item.DriveFormat.ToLower() == "exfat" || item.DriveFormat.ToLower() == "fat32"))
-                {
-                    if (Directory.GetFiles(item.RootDirectory.ToString(), "*.xci").ToList<string>().Count > 0)
-                    {
-                        SetComboboxToDriveLetter(item.RootDirectory.ToString());
-                        break;
-                    }
-                }
+                if (item.VolumeLabel.Length > 0)
+                    drives.Add($"{item.RootDirectory.ToString()} {item.VolumeLabel} [{item.DriveType}]");
+                else
+                    drives.Add($"{item.RootDirectory.ToString()} ({item.DriveFormat}) [{item.DriveType}]");
             }
 
+            return drives;
         }
     }
 }

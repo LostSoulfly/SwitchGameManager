@@ -11,15 +11,32 @@ namespace SwitchGameManager
 {
     public partial class formMain : Form
     {
-        [DllImport("user32.dll")]
-        private static extern IntPtr SendMessage(IntPtr hWnd, int Msg, int wParam, [MarshalAs(UnmanagedType.LPWStr)] string lParam);
-
         private ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
+
         public List<XciItem> xciList = new List<XciItem>();
 
         public formMain()
         {
             InitializeComponent();
+        }
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr SendMessage(IntPtr hWnd, int Msg, int wParam, [MarshalAs(UnmanagedType.LPWStr)] string lParam);
+
+        private void ChangeIconSize(object sender, EventArgs e)
+        {
+            ToolStripItem clicked = sender as ToolStripItem;
+            int displayIndex = iconSizeToolStripMenuItem.DropDownItems.IndexOf(clicked);
+            foreach (ToolStripMenuItem item in iconSizeToolStripMenuItem.DropDownItems)
+            {
+                if (item == clicked)
+                    item.Checked = true;
+                else
+                    item.Checked = false;
+            }
+
+            Settings.config.listIconSize = displayIndex;
+            ProcessChangeIconSize(displayIndex);
         }
 
         private void formMain_Load(object sender, EventArgs e)
@@ -40,7 +57,7 @@ namespace SwitchGameManager
             Settings.xciCache = XciHelper.LoadXciCache();
 
             //Load the settings
-            if (Settings.LoadSettings("Config.json") == false)
+            if (Settings.LoadSettings() == false)
                 manageXciLocToolStripMenuItem_Click(null, null);
 
             /*
@@ -57,8 +74,6 @@ namespace SwitchGameManager
 
             if (Settings.config.formWidth > 0)
                 this.Width = Settings.config.formWidth;
-
-            
 
             PopulateXciList();
 
@@ -149,14 +164,6 @@ namespace SwitchGameManager
             }
         }
 
-        public void SaveSettings()
-        {
-            //save the OLV state to olvState byte array (column positions, etc)
-            Settings.config.olvState = olvLocal.SaveState();
-            XciHelper.SaveXciCache();
-            Settings.SaveSettings();
-        }
-
         private void SetupDelegates()
         {
             textBoxFilter.TextChanged += delegate (object o, EventArgs e)
@@ -183,19 +190,20 @@ namespace SwitchGameManager
 
             this.ResizeEnd += delegate (object s, EventArgs e)
             {
-                Settings.config.formHeight = this.Height;
-                Settings.config.formWidth = this.Width;
+                if (this.WindowState != FormWindowState.Maximized)
+                {
+                    Settings.config.formHeight = this.Height;
+                    Settings.config.formWidth = this.Width;
+                }
             };
 
             cancelTransfersToolStripMenuItem.Click += delegate (object s, EventArgs e) { FileHelper.StopTransfers(); };
             cancelTransfersToolStripMenuItem1.Click += delegate (object s, EventArgs e) { FileHelper.StopTransfers(); };
-
+            rebuildCachetoolStripMenuItem.Click += delegate (object s, EventArgs e) { Settings.RebuildCache(); };
         }
-
 
         private void SetupObjectListView()
         {
-
             SendMessage(textBoxFilter.Handle, 0x1501, 1, "Filter Library..");
 
             //initialize the image lists, big and small
@@ -423,6 +431,12 @@ namespace SwitchGameManager
             olvLocal.RefreshObject(xciList);
         }
 
+        public void HideProgressElements()
+        {
+            toolStripProgressBar.Visible = false;
+            toolStripProgressLabel.Visible = false;
+        }
+
         public void PopulateXciList()
         {
             xciList = new List<XciItem>();
@@ -443,22 +457,6 @@ namespace SwitchGameManager
             }
             olvLocal.SetObjects(xciList);
             UpdateToolStripLabel();
-        }
-
-        private void ChangeIconSize(object sender, EventArgs e)
-        {
-            ToolStripItem clicked = sender as ToolStripItem;
-            int displayIndex = iconSizeToolStripMenuItem.DropDownItems.IndexOf(clicked);
-            foreach (ToolStripMenuItem item in iconSizeToolStripMenuItem.DropDownItems)
-            {
-                if (item == clicked)
-                    item.Checked = true;
-                else
-                    item.Checked = false;
-            }
-
-            Settings.config.listIconSize = displayIndex;
-            ProcessChangeIconSize(displayIndex);
         }
 
         public void ProcessChangeIconSize(int displayIndex)
@@ -573,9 +571,16 @@ namespace SwitchGameManager
             return true;
         }
 
+        public void SaveSettings()
+        {
+            //save the OLV state to olvState byte array (column positions, etc)
+            Settings.config.olvState = olvLocal.SaveState();
+            XciHelper.SaveXciCache();
+            Settings.SaveSettings();
+        }
+
         public void SetupProgressBar(int min, int max, int initial)
         {
-
             if (statusStrip1.InvokeRequired)
             {
                 statusStrip1.Invoke(new MethodInvoker(delegate { SetupProgressBar(min, max, initial); }));
@@ -603,13 +608,6 @@ namespace SwitchGameManager
                 }
                 catch { }
             }
-            
-        }
-
-        public void HideProgressElements()
-        {
-            toolStripProgressBar.Visible = false;
-            toolStripProgressLabel.Visible = false;
         }
 
         public void UpdateProgressLabel(string text)

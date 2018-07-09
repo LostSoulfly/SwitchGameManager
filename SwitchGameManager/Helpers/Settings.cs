@@ -1,41 +1,52 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Newtonsoft.Json;
 
 namespace SwitchGameManager.Helpers
 {
-
     public class Config
     {
-        public List<string> localXciFolders = new List<string>();
-        public string sdDriveLetter = string.Empty;
-        public byte[] olvState;
+        [JsonIgnore]
+        public string cacheFileName = "Cache.json";
+
+        [JsonIgnore]
+        public string configFileName = "Config.json";
+
         //public bool confirmMultiActions;
         public bool encryptCertificates;
-        public int formHeight = 475;
-        public int formWidth = 975;
-        public int listIconSize = 1;
-        //public int listDisplayMode = 4;
 
         [JsonIgnore]
         public SecureString encryptPassword;
+
+        public int formHeight = 475;
+        public int formWidth = 975;
+        public int listIconSize = 1;
+        public List<string> localXciFolders = new List<string>();
+        public byte[] olvState;
+        public string sdDriveLetter = string.Empty;
+        //public int listDisplayMode = 4;
     }
 
     public class Settings
     {
-
         public static Config config;
         public static List<XciItem> xciCache = new List<XciItem>();
 
-        public static bool LoadSettings(string fileName)
+        internal static void RebuildCache()
+        {
+            File.Delete(config.cacheFileName);
+            XciHelper.formMain.PopulateXciList();
+        }
+
+        public static bool LoadSettings(string fileName = "")
         {
             Settings.config = new Config();
+
+            if (fileName.Length == 0)
+                fileName = config.configFileName;
 
             try
             {
@@ -55,17 +66,17 @@ namespace SwitchGameManager.Helpers
             try
             {
                 if (fileName.Length == 0)
-                    fileName = "Config.json";
+                    fileName = config.configFileName;
 
                 File.WriteAllText(fileName, JsonConvert.SerializeObject(config, formatting: Formatting.Indented));
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show($"Unable to save {fileName}: {ex.Message}");
             }
 
             return false;
         }
-
     }
 }

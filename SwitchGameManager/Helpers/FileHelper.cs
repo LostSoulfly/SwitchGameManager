@@ -3,30 +3,105 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SwitchGameManager.Helpers
 {
     public static class FileHelper
     {
-        private static BackgroundWorker transferWorker;
         private static CustomFileCopy customCopy;
-
-        private static List<Tuple<string, string, bool>> xciTransfers = new List<Tuple<string, string, bool>>();
         private static object lockObject = new object();
-
-
         private static int totalFiles = 0;
         private static int transferredFiles = 0;
-
+        private static BackgroundWorker transferWorker;
+        private static List<Tuple<string, string, bool>> xciTransfers = new List<Tuple<string, string, bool>>();
         public static formMain formMain;
+
+        private static void CustomCopy_OnComplete(bool Canceled)
+        {
+        }
+
+        private static void CustomCopy_OnProgressChanged(double Percentage, ref bool Cancel)
+        {
+            Cancel = transferWorker.CancellationPending;
+            transferWorker.ReportProgress((int)Percentage);
+        }
+
+        private static void TransferWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            //todo check if enough space on destination for transfer
+            formMain.SetupProgressBar(0, 100, 0);
+
+            Tuple<string, string, bool> action;
+
+            totalFiles = xciTransfers.Count();
+            transferredFiles = 0;
+
+            while (xciTransfers.Count > 0)
+            {
+                lock (lockObject)
+                    action = xciTransfers.First();
+
+                customCopy = new CustomFileCopy(action.Item1, action.Item2);
+
+                customCopy.OnProgressChanged += CustomCopy_OnProgressChanged;
+                customCopy.OnComplete += CustomCopy_OnComplete;
+
+                formMain.UpdateProgressLabel($"Copying {Path.GetFileName(action.Item1)} [{transferredFiles}/{totalFiles}]");
+
+                customCopy.Copy();
+
+                //if file is set to be moved, and we didn't cancel, delete the source file
+                if (action.Item3 && !transferWorker.CancellationPending)
+                    File.Delete(action.Item1);
+
+                transferredFiles++;
+
+                lock (lockObject)
+                {
+                    xciTransfers.Remove(action);
+                }
+
+                if (transferWorker.CancellationPending)
+                {
+                    File.Delete(action.Item2); //delete the destination if we cancelled early
+                    e.Cancel = true;
+                    return;
+                }
+            }
+        }
+
+        private static void TransferWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            formMain.UpdateProgressBar(e.ProgressPercentage);
+        }
+
+        private static void TransferWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            //needs error reporting
+            formMain.HideProgressElements();
+
+            if (transferWorker.CancellationPending)
+                formMain.UpdateProgressLabel($"Transfer cancelled; [{transferredFiles}/{totalFiles}] transferred.");
+
+            if (e.Cancelled)
+                MessageBox.Show("File transfers were canceled.");
+            else
+                MessageBox.Show("All files transferred.");
+
+            //refresh the xciList and OLV
+            formMain.PopulateXciList();
+        }
+
+        public static void StopTransfers()
+        {
+            if (transferWorker.IsBusy)
+                transferWorker.CancelAsync();
+        }
 
         public static bool TransferXci(XciItem xci, bool moveXci = false, bool copyToPc = false, bool copyToSd = false)
         {
-
-            if (transferWorker != null &&!transferWorker.IsBusy && transferWorker.CancellationPending)
+            if (transferWorker != null && !transferWorker.IsBusy && transferWorker.CancellationPending)
             {
                 transferWorker.Dispose();
                 transferWorker = null;
@@ -87,91 +162,6 @@ namespace SwitchGameManager.Helpers
             }
 
             return true;
-        }
-
-        private static void TransferWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-
-            formMain.UpdateProgressBar(e.ProgressPercentage);
-        }
-
-        public static void StopTransfers()
-        {
-            if (transferWorker.IsBusy)
-                transferWorker.CancelAsync();
-        }
-        
-        private static void TransferWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            //needs error reporting
-            formMain.HideProgressElements();
-
-            if (transferWorker.CancellationPending)
-               formMain.UpdateProgressLabel($"Transfer cancelled; [{transferredFiles}/{totalFiles}] transferred.");
-
-            if (e.Cancelled)
-                MessageBox.Show("File transfers were canceled.");
-            else
-                MessageBox.Show("All files transferred.");
-
-            //refresh the xciList and OLV
-            formMain.PopulateXciList();
-
-        }
-
-        private static void TransferWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            //todo check if enough space on destination for transfer
-            formMain.SetupProgressBar(0, 100, 0);
-
-            Tuple<string, string, bool> action;
-
-            totalFiles = xciTransfers.Count();
-            transferredFiles = 0;
-
-            while (xciTransfers.Count > 0)
-            {
-                lock (lockObject)
-                    action = xciTransfers.First();
-
-                customCopy = new CustomFileCopy(action.Item1, action.Item2);
-
-                customCopy.OnProgressChanged += CustomCopy_OnProgressChanged;
-                customCopy.OnComplete += CustomCopy_OnComplete;
-
-                formMain.UpdateProgressLabel($"Copying {Path.GetFileName(action.Item1)} [{transferredFiles}/{totalFiles}]");
-
-                customCopy.Copy();
-
-                //if file is set to be moved, and we didn't cancel, delete the source file
-                if (action.Item3 && !transferWorker.CancellationPending)
-                    File.Delete(action.Item1);
-
-                transferredFiles++;
-
-                lock (lockObject)
-                {
-                    xciTransfers.Remove(action);
-                }
-
-                if (transferWorker.CancellationPending)
-                {
-                    File.Delete(action.Item2); //delete the destination if we cancelled early
-                    e.Cancel = true;
-                    return;
-                }
-            }
-        }
-
-        private static void CustomCopy_OnComplete(bool Canceled)
-        {
-            
-        }
-
-        private static void CustomCopy_OnProgressChanged(double Percentage, ref bool Cancel)
-        {
-            Cancel = transferWorker.CancellationPending;
-            transferWorker.ReportProgress((int)Percentage);
         }
     }
 }

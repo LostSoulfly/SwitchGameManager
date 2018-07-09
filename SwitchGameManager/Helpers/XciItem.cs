@@ -1,14 +1,6 @@
-﻿using BrightIdeasSoftware;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using Newtonsoft.Json;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace SwitchGameManager.Helpers
 {
@@ -24,17 +16,52 @@ namespace SwitchGameManager.Helpers
         }
         */
 
-        public XciItem(string filePath)
-        {
-            this.xciFilePath = filePath;
-        }
+        public string gameCardCapacity;
 
-        public XciItem()
-        {
+        public byte[] gameCert;
 
-        }
+        public string gameDeveloper;
 
-        //Can't serialize a Bitmap.. so we convert it to and from a Byte array on the fly
+        public byte[] gameIconBytes;
+
+        public string gameName;
+
+        public string gameRevision;
+
+        public double gameSize;
+
+        public double gameUsedSize;
+
+        public bool isCertEncrypted;
+
+        [JsonIgnore]
+        public bool isGameOnPc;
+
+        [JsonIgnore]
+        public bool isGameOnSd;
+
+        public bool isUniqueCert;
+
+        [JsonIgnore]
+        public bool isXciTrimmed;
+
+        public string masterKeyRevision;
+
+        public ulong packageId;
+
+        public string productCode;
+
+        public string sdkVersion;
+
+        public string titleId;
+
+        public string xciFilePath;
+
+        public long xciFileSize;
+
+        public string xciSdFilePath;
+
+        //Can't serialize a Bitmap object.. so we convert it to and from a Byte array on the fly
         internal Bitmap gameIcon
         {
             get
@@ -56,30 +83,13 @@ namespace SwitchGameManager.Helpers
             }
         }
 
-        public byte[] gameIconBytes;
-        public string gameName;
-        public string gameDeveloper;
-        public string gameRevision;
-        public string masterKeyRevision;
-        public string sdkVersion;
-        public string gameCardCapacity;
-        public string titleId;
-        public double gameSize;
-        public double gameUsedSize;
-        public long xciFileSize;
-        public string productCode;
-        public byte[] gameCert;
-        public bool isCertEncrypted;
-        public string xciFilePath;
-        public string xciSdFilePath;
-        public ulong packageId;
-        public bool isUniqueCert;
-        [JsonIgnore]
-        public bool isGameOnSd;
-        [JsonIgnore]
-        public bool isGameOnPc;
-        [JsonIgnore]
-        public bool isXciTrimmed;
+        public XciItem(string filePath)
+        {
+            this.xciFilePath = filePath;
+        }
 
+        public XciItem()
+        {
+        }
     }
 }

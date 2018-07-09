@@ -1,18 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 namespace SwitchGameManager.Helpers
 {
-    public delegate void ProgressChangeDelegate(double Percentage, ref bool Cancel);
     public delegate void Completedelegate(bool Canceled);
 
+    public delegate void ProgressChangeDelegate(double Percentage, ref bool Cancel);
+
     //https://stackoverflow.com/a/6055385
-    class CustomFileCopy
+    internal class CustomFileCopy
     {
+        public string DestFilePath { get; set; }
+
+        public string SourceFilePath { get; set; }
+
+        public event Completedelegate OnComplete;
+
+        public event ProgressChangeDelegate OnProgressChanged;
+
         public CustomFileCopy(string Source, string Dest)
         {
             this.SourceFilePath = Source;
@@ -53,11 +57,5 @@ namespace SwitchGameManager.Helpers
 
             OnComplete(cancelFlag);
         }
-
-        public string SourceFilePath { get; set; }
-        public string DestFilePath { get; set; }
-
-        public event ProgressChangeDelegate OnProgressChanged;
-        public event Completedelegate OnComplete;
     }
 }

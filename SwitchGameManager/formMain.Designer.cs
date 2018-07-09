@@ -51,6 +51,7 @@ namespace SwitchGameManager
             this.generalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.manageXciLocToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.rebuildCachetoolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -317,6 +318,8 @@ namespace SwitchGameManager
             // 
             this.generalToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.settingsToolStripMenuItem,
+            this.manageXciLocToolStripMenuItem,
+            this.rebuildCachetoolStripMenuItem,
             this.toolStripMenuItem1,
             this.aboutToolStripMenuItem,
             this.exitToolStripMenuItem});
@@ -326,34 +329,38 @@ namespace SwitchGameManager
             // 
             // settingsToolStripMenuItem
             // 
-            this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.manageXciLocToolStripMenuItem});
+            this.settingsToolStripMenuItem.Enabled = false;
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
             this.settingsToolStripMenuItem.Text = "Settings";
             // 
             // manageXciLocToolStripMenuItem
             // 
             this.manageXciLocToolStripMenuItem.Name = "manageXciLocToolStripMenuItem";
-            this.manageXciLocToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
-            this.manageXciLocToolStripMenuItem.Text = "Manage XCI Locations";
-            this.manageXciLocToolStripMenuItem.Click += new System.EventHandler(this.manageXciLocToolStripMenuItem_Click);
+            this.manageXciLocToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+            this.manageXciLocToolStripMenuItem.Text = "Manage Game Folders";
+            // 
+            // rebuildCachetoolStripMenuItem
+            // 
+            this.rebuildCachetoolStripMenuItem.Name = "rebuildCachetoolStripMenuItem";
+            this.rebuildCachetoolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+            this.rebuildCachetoolStripMenuItem.Text = "Rebuild Game Database";
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(113, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(196, 6);
             // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
             this.aboutToolStripMenuItem.Text = "&About";
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
             this.exitToolStripMenuItem.Text = "&Exit";
             // 
             // gameManagementToolStripMenuItem
@@ -383,28 +390,28 @@ namespace SwitchGameManager
             // sendToSDCardToolStripMenuItem
             // 
             this.sendToSDCardToolStripMenuItem.Name = "sendToSDCardToolStripMenuItem";
-            this.sendToSDCardToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.sendToSDCardToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.sendToSDCardToolStripMenuItem.Text = "Copy To SD Card";
             this.sendToSDCardToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
             // 
             // moveToSDCardToolStripMenuItem
             // 
             this.moveToSDCardToolStripMenuItem.Name = "moveToSDCardToolStripMenuItem";
-            this.moveToSDCardToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.moveToSDCardToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.moveToSDCardToolStripMenuItem.Text = "Move To SD Card";
             this.moveToSDCardToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
             // 
             // deleteFromSDToolStripMenuItem
             // 
             this.deleteFromSDToolStripMenuItem.Name = "deleteFromSDToolStripMenuItem";
-            this.deleteFromSDToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.deleteFromSDToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.deleteFromSDToolStripMenuItem.Text = "Delete From SD";
             this.deleteFromSDToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
             // 
             // cancelTransfersToolStripMenuItem
             // 
             this.cancelTransfersToolStripMenuItem.Name = "cancelTransfersToolStripMenuItem";
-            this.cancelTransfersToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.cancelTransfersToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.cancelTransfersToolStripMenuItem.Text = "Cancel Transfers";
             // 
             // pcToolStripMenuItem
@@ -421,28 +428,28 @@ namespace SwitchGameManager
             // sendToPCToolStripMenuItem
             // 
             this.sendToPCToolStripMenuItem.Name = "sendToPCToolStripMenuItem";
-            this.sendToPCToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this.sendToPCToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.sendToPCToolStripMenuItem.Text = "Copy To PC";
             this.sendToPCToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
             // 
             // moveToPCToolStripMenuItem
             // 
             this.moveToPCToolStripMenuItem.Name = "moveToPCToolStripMenuItem";
-            this.moveToPCToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this.moveToPCToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.moveToPCToolStripMenuItem.Text = "Move To PC";
             this.moveToPCToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
             // 
             // deleteFromPCToolStripMenuItem
             // 
             this.deleteFromPCToolStripMenuItem.Name = "deleteFromPCToolStripMenuItem";
-            this.deleteFromPCToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this.deleteFromPCToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.deleteFromPCToolStripMenuItem.Text = "Delete From PC";
             this.deleteFromPCToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
             // 
             // cancelTransfersToolStripMenuItem1
             // 
             this.cancelTransfersToolStripMenuItem1.Name = "cancelTransfersToolStripMenuItem1";
-            this.cancelTransfersToolStripMenuItem1.Size = new System.Drawing.Size(160, 22);
+            this.cancelTransfersToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.cancelTransfersToolStripMenuItem1.Text = "Cancel Transfers";
             // 
             // deleteGameToolStripMenuItem
@@ -461,6 +468,7 @@ namespace SwitchGameManager
             // 
             // renameXCIFilesToolStripMenuItem
             // 
+            this.renameXCIFilesToolStripMenuItem.Enabled = false;
             this.renameXCIFilesToolStripMenuItem.Name = "renameXCIFilesToolStripMenuItem";
             this.renameXCIFilesToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
             this.renameXCIFilesToolStripMenuItem.Text = "Rename XCI File(s)";
@@ -493,7 +501,7 @@ namespace SwitchGameManager
             this.detailsToolStripMenuItem,
             this.iconsOnlyToolStripMenuItem});
             this.displayStyleToolStripMenuItem.Name = "displayStyleToolStripMenuItem";
-            this.displayStyleToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.displayStyleToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.displayStyleToolStripMenuItem.Text = "List Display Style";
             // 
             // smallIconsToolStripMenuItem
@@ -546,7 +554,7 @@ namespace SwitchGameManager
             this.small64x64ToolStripMenuItem,
             this.smallest32x32ToolStripMenuItem});
             this.iconSizeToolStripMenuItem.Name = "iconSizeToolStripMenuItem";
-            this.iconSizeToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.iconSizeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.iconSizeToolStripMenuItem.Text = "Icon Size";
             // 
             // biggestToolStripMenuItem
@@ -583,7 +591,7 @@ namespace SwitchGameManager
             this.backgroundImageToolStripMenuItem});
             this.themesToolStripMenuItem.Enabled = false;
             this.themesToolStripMenuItem.Name = "themesToolStripMenuItem";
-            this.themesToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.themesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.themesToolStripMenuItem.Text = "Themes";
             // 
             // backgroundImageToolStripMenuItem
@@ -724,12 +732,13 @@ namespace SwitchGameManager
         private BrightIdeasSoftware.OLVColumn olvColumnSdGame;
         public BrightIdeasSoftware.ObjectListView olvLocal;
         public System.Windows.Forms.ToolStripProgressBar toolStripProgressBar;
-        private System.Windows.Forms.ToolStripMenuItem manageXciLocToolStripMenuItem;
         private BrightIdeasSoftware.OLVColumn olvColumnSdFilePath;
         private System.Windows.Forms.ToolStripMenuItem cancelTransfersToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem cancelTransfersToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem deleteFromSDToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem deleteFromPCToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem manageXciLocToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem rebuildCachetoolStripMenuItem;
     }
 }
 
