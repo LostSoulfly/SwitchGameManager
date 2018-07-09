@@ -64,6 +64,7 @@
     <Compile Include="formMain.Designer.cs">
       <DependentUpon>formMain.cs</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\CustomFileCopy.cs" />
     <Compile Include="Helpers\FileHelpers.cs" />
     <Compile Include="Helpers\Settings.cs" />
     <Compile Include="Program.cs" />

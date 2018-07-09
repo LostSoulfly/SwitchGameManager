@@ -28,8 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(formFolderList));
             this.listBoxFolders = new System.Windows.Forms.ListBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.buttonLocateSwitchSd = new System.Windows.Forms.Button();
             this.textBoxDriveInfo = new System.Windows.Forms.TextBox();
             this.sdRootLabel = new System.Windows.Forms.Label();
             this.comboBoxDriveLetters = new System.Windows.Forms.ComboBox();
@@ -37,7 +39,6 @@
             this.buttonCancel = new System.Windows.Forms.Button();
             this.buttonAddFolder = new System.Windows.Forms.Button();
             this.buttonRemoveFolder = new System.Windows.Forms.Button();
-            this.buttonLocateSwitchSd = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -61,6 +62,16 @@
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "SD Card";
+            // 
+            // buttonLocateSwitchSd
+            // 
+            this.buttonLocateSwitchSd.Location = new System.Drawing.Point(214, 19);
+            this.buttonLocateSwitchSd.Name = "buttonLocateSwitchSd";
+            this.buttonLocateSwitchSd.Size = new System.Drawing.Size(75, 23);
+            this.buttonLocateSwitchSd.TabIndex = 5;
+            this.buttonLocateSwitchSd.Text = "Auto Find";
+            this.buttonLocateSwitchSd.UseVisualStyleBackColor = true;
+            this.buttonLocateSwitchSd.Click += new System.EventHandler(this.buttonLocateSwitchSd_Click);
             // 
             // textBoxDriveInfo
             // 
@@ -132,16 +143,6 @@
             this.buttonRemoveFolder.UseVisualStyleBackColor = true;
             this.buttonRemoveFolder.Click += new System.EventHandler(this.buttonRemoveFolder_Click);
             // 
-            // buttonLocateSwitchSd
-            // 
-            this.buttonLocateSwitchSd.Location = new System.Drawing.Point(214, 19);
-            this.buttonLocateSwitchSd.Name = "buttonLocateSwitchSd";
-            this.buttonLocateSwitchSd.Size = new System.Drawing.Size(75, 23);
-            this.buttonLocateSwitchSd.TabIndex = 5;
-            this.buttonLocateSwitchSd.Text = "Auto Find";
-            this.buttonLocateSwitchSd.UseVisualStyleBackColor = true;
-            this.buttonLocateSwitchSd.Click += new System.EventHandler(this.buttonLocateSwitchSd_Click);
-            // 
             // formFolderList
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -153,6 +154,7 @@
             this.Controls.Add(this.buttonSave);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.listBoxFolders);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "formFolderList";

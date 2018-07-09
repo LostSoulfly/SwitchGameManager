@@ -30,6 +30,7 @@ namespace SwitchGameManager
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(formMain));
             this.olvLocal = new BrightIdeasSoftware.ObjectListView();
             this.olvColumnXciName = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvColumnDeveloper = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
@@ -57,9 +58,11 @@ namespace SwitchGameManager
             this.sdToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sendToSDCardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.moveToSDCardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.cancelTransfersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.copyToPCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sendToPCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.moveToPCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.cancelTransfersToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteGameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.trimGameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.renameXCIFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -261,14 +264,14 @@ namespace SwitchGameManager
             // olvColumnLocalGame
             // 
             this.olvColumnLocalGame.AspectName = "isGameOnPc";
-            this.olvColumnLocalGame.Text = "Game On PC";
+            this.olvColumnLocalGame.Text = "On PC";
             this.olvColumnLocalGame.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.olvColumnLocalGame.Width = 74;
             // 
             // olvColumnSdGame
             // 
             this.olvColumnSdGame.AspectName = "isGameOnSd";
-            this.olvColumnSdGame.Text = "Game on SD";
+            this.olvColumnSdGame.Text = "On SD";
             this.olvColumnSdGame.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.olvColumnSdGame.Width = 76;
             // 
@@ -371,7 +374,8 @@ namespace SwitchGameManager
             // 
             this.sdToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.sendToSDCardToolStripMenuItem,
-            this.moveToSDCardToolStripMenuItem});
+            this.moveToSDCardToolStripMenuItem,
+            this.cancelTransfersToolStripMenuItem});
             this.sdToolStripMenuItem.Name = "sdToolStripMenuItem";
             this.sdToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
             this.sdToolStripMenuItem.Text = "SD Storage";
@@ -389,11 +393,19 @@ namespace SwitchGameManager
             this.moveToSDCardToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
             this.moveToSDCardToolStripMenuItem.Text = "Move To SD Card";
             // 
+            // cancelTransfersToolStripMenuItem
+            // 
+            this.cancelTransfersToolStripMenuItem.Name = "cancelTransfersToolStripMenuItem";
+            this.cancelTransfersToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.cancelTransfersToolStripMenuItem.Text = "Cancel Transfers";
+            this.cancelTransfersToolStripMenuItem.Click += new System.EventHandler(this.CancelFileTransfers);
+            // 
             // copyToPCToolStripMenuItem
             // 
             this.copyToPCToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.sendToPCToolStripMenuItem,
-            this.moveToPCToolStripMenuItem});
+            this.moveToPCToolStripMenuItem,
+            this.cancelTransfersToolStripMenuItem1});
             this.copyToPCToolStripMenuItem.Name = "copyToPCToolStripMenuItem";
             this.copyToPCToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
             this.copyToPCToolStripMenuItem.Text = "PC Storage";
@@ -401,15 +413,22 @@ namespace SwitchGameManager
             // sendToPCToolStripMenuItem
             // 
             this.sendToPCToolStripMenuItem.Name = "sendToPCToolStripMenuItem";
-            this.sendToPCToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
+            this.sendToPCToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.sendToPCToolStripMenuItem.Text = "Copy To PC";
             this.sendToPCToolStripMenuItem.Click += new System.EventHandler(this.ToolStripPcManagement);
             // 
             // moveToPCToolStripMenuItem
             // 
             this.moveToPCToolStripMenuItem.Name = "moveToPCToolStripMenuItem";
-            this.moveToPCToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
+            this.moveToPCToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.moveToPCToolStripMenuItem.Text = "Move To PC";
+            // 
+            // cancelTransfersToolStripMenuItem1
+            // 
+            this.cancelTransfersToolStripMenuItem1.Name = "cancelTransfersToolStripMenuItem1";
+            this.cancelTransfersToolStripMenuItem1.Size = new System.Drawing.Size(160, 22);
+            this.cancelTransfersToolStripMenuItem1.Text = "Cancel Transfers";
+            this.cancelTransfersToolStripMenuItem1.Click += new System.EventHandler(this.CancelFileTransfers);
             // 
             // deleteGameToolStripMenuItem
             // 
@@ -619,6 +638,7 @@ namespace SwitchGameManager
             this.Controls.Add(this.textBoxFilter);
             this.Controls.Add(this.olvLocal);
             this.Controls.Add(this.menuStrip);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip;
             this.Name = "formMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
@@ -693,6 +713,8 @@ namespace SwitchGameManager
         public System.Windows.Forms.ToolStripProgressBar toolStripProgressBar;
         private System.Windows.Forms.ToolStripMenuItem manageXciLocToolStripMenuItem;
         private BrightIdeasSoftware.OLVColumn olvColumnSdFilePath;
+        private System.Windows.Forms.ToolStripMenuItem cancelTransfersToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem cancelTransfersToolStripMenuItem1;
     }
 }
 

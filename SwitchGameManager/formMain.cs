@@ -26,6 +26,7 @@ namespace SwitchGameManager
         {
 
             XciHelper.formMain = this;
+            FileHelpers.formMain = this;
 
             SetupObjectListView();
 
@@ -141,7 +142,7 @@ namespace SwitchGameManager
                     newMenuItem = new ToolStripMenuItem(menuItem.Text);
                 else
                     newMenuItem = new ToolStripMenuItem(menuItem.Text, null, onClick: ToolStripManagement);
-
+                
                 if (newMenuItem.Text.Contains("SD"))
                 {
                     foreach (ToolStripMenuItem subItem in menuItem.DropDownItems)
@@ -174,10 +175,67 @@ namespace SwitchGameManager
         private void ToolStripSdManagement(object sender, EventArgs e)
         {
             ToolStripItem clicked = sender as ToolStripItem;
-            int toolIndex = olvLocal.ContextMenuStrip.Items.IndexOf(sdToolStripMenuItem);
+            ToolStripMenuItem toolStripMenu = (ToolStripMenuItem)contextMenuStrip.Items[0];
+            int toolIndex = toolStripMenu.DropDownItems.IndexOf(clicked);
 
             if (toolIndex < 0)
                 toolIndex = sdToolStripMenuItem.DropDownItems.IndexOf(clicked);
+
+            if (!IsListIndexUsable())
+                return;
+
+
+            XciItem xci;
+            string action = "";
+
+            if (toolIndex == 0) action = "copy";
+            if (toolIndex == 1) action = "move";
+
+            if (olvLocal.SelectedIndices.Count > 1)
+            {
+                if (MessageBox.Show($"Are you sure you want to {action} {olvLocal.SelectedObjects.Count} games to SD?", $"Confirm {action.ToUpperInvariant()}", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
+                    return;
+
+                foreach (Object obj in olvLocal.SelectedObjects)
+                {
+                    xci = (XciItem)obj;
+                    switch (toolIndex)
+                    {
+                        case 0: //copy
+                            FileHelpers.TransferXci(xci, copyToSd: true);
+                    break;
+
+                        case 1: //move
+
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                xci = (XciItem)olvLocal.GetItem(olvLocal.SelectedIndex).RowObject;
+
+                if (MessageBox.Show($"Are you sure you want to {action} {xci.gameName} to SD?", $"Confirm {action.ToUpperInvariant()}", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
+                    return;
+
+                switch (toolIndex)
+                {
+                    case 0: //copy
+                        FileHelpers.TransferXci(xci, copyToSd: true);
+                        break;
+
+                    case 1: //move
+
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            
         }
         
         public void UpdateToolStripLabel(string text = "")
@@ -456,6 +514,11 @@ namespace SwitchGameManager
         private void formMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             SaveSettings();
+        }
+        
+        private void CancelFileTransfers(object sender, EventArgs e)
+        {
+            FileHelpers.StopTransfers();
         }
     }
 }

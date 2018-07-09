@@ -10,15 +10,25 @@ namespace SwitchGameManager.Helpers
 {
     static class FileHelpers
     {
-        private static BackgroundWorker copyWorker = new BackgroundWorker();
-        private static BackgroundWorker moveWorker = new BackgroundWorker();
+        private static BackgroundWorker transferWorker;
 
-        private static List<Tuple<string, string>> xciToCopy = new List<Tuple<string, string>>();
-        private static List<Tuple<string, string>> xciToMove = new List<Tuple<string, string>>();
+        private static CustomFileCopy customCopy;
+
+        private static List<Tuple<string, string, bool>> xciTransfers = new List<Tuple<string, string, bool>>();
         private static object lockObject = new object();
 
-        public static bool CopyXci(XciItem xci, bool copyToPc = false, bool copyToSd = false)
+        public static formMain formMain;
+
+        public static bool TransferXci(XciItem xci, bool moveXci = false, bool copyToPc = false, bool copyToSd = false)
         {
+            if (transferWorker == null)
+            {
+                transferWorker = new BackgroundWorker();
+                transferWorker.DoWork += CopyWorker_DoWork;
+                transferWorker.WorkerSupportsCancellation = true;
+                transferWorker.RunWorkerCompleted += CopyWorker_RunWorkerCompleted;
+                transferWorker.ProgressChanged += CopyWorker_ProgressChanged;
+            }
 
             string source = string.Empty;
             string destination = string.Empty;
@@ -46,12 +56,72 @@ namespace SwitchGameManager.Helpers
 
             lock (lockObject)
             {
-                xciToCopy.Add(new Tuple<string, string>(source, destination));
+                xciTransfers.Add(new Tuple<string, string, bool>(source, destination, moveXci));
+            }
+
+            if (!transferWorker.IsBusy)
+            {
+                transferWorker.RunWorkerAsync();
             }
 
             return true;
         }
 
+        public static void StopTransfers()
+        {
+            if (transferWorker.IsBusy)
+                transferWorker.CancelAsync();
+            /*
+            if (moveWorker.IsBusy)
+                moveWorker.CancelAsync();
+            */
+        }
 
+        private static void CopyWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void CopyWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void CopyWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            while (xciTransfers.Count > 0)
+            {
+                Tuple<string, string, bool> action;
+
+                lock (lockObject)
+                {
+                    action = xciTransfers.First();
+                }
+                customCopy = new CustomFileCopy(action.Item1, action.Item2);
+
+                customCopy.OnProgressChanged += CustomCopy_OnProgressChanged;
+                customCopy.OnComplete += CustomCopy_OnComplete;
+
+                customCopy.Copy();
+
+                //File.Copy(action.Item1, action.Item2);
+                
+                if (transferWorker.CancellationPending)
+                {
+                    break;
+                }
+            }
+        }
+
+        private static void CustomCopy_OnComplete(bool Canceled)
+        {
+            
+        }
+
+        private static void CustomCopy_OnProgressChanged(double Percentage, ref bool Cancel)
+        {
+            Cancel = transferWorker.CancellationPending;
+            formMain.UpdateToolStripLabel("Progress: " + Percentage);
+        }
     }
 }
