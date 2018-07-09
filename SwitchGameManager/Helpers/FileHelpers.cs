@@ -5,24 +5,28 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace SwitchGameManager.Helpers
 {
     static class FileHelpers
     {
         private static BackgroundWorker transferWorker;
-
         private static CustomFileCopy customCopy;
 
         private static List<Tuple<string, string, bool>> xciTransfers = new List<Tuple<string, string, bool>>();
         private static object lockObject = new object();
+
+
+        private static int totalFiles = 0;
+        private static int transferredFiles = 0;
 
         public static formMain formMain;
 
         public static bool TransferXci(XciItem xci, bool moveXci = false, bool copyToPc = false, bool copyToSd = false)
         {
 
-            if (!transferWorker.IsBusy && transferWorker.CancellationPending)
+            if (transferWorker != null &&!transferWorker.IsBusy && transferWorker.CancellationPending)
             {
                 transferWorker.Dispose();
                 transferWorker = null;
@@ -33,7 +37,9 @@ namespace SwitchGameManager.Helpers
                 transferWorker = new BackgroundWorker();
                 transferWorker.DoWork += TransferWorker_DoWork;
                 transferWorker.WorkerSupportsCancellation = true;
+                transferWorker.WorkerReportsProgress = true;
                 transferWorker.RunWorkerCompleted += TransferWorker_RunWorkerCompleted;
+                transferWorker.ProgressChanged += TransferWorker_ProgressChanged;
             }
 
             string source = string.Empty;
@@ -60,9 +66,19 @@ namespace SwitchGameManager.Helpers
             if (source.Length == 0 || destination.Length == 0)
                 return false;
 
+            if (File.Exists(destination))
+            {
+                if (MessageBox.Show($"{destination} already exists. Overwrite it?", "Overwrite Destination File", MessageBoxButtons.YesNo) != DialogResult.Yes)
+                    return false;
+
+                File.Delete(destination);
+            }
+
             lock (lockObject)
             {
                 xciTransfers.Add(new Tuple<string, string, bool>(source, destination, moveXci));
+                totalFiles++;
+                formMain.UpdateProgressLabel($"Copying {Path.GetFileName(xciTransfers.First().Item1)} [{transferredFiles}/{totalFiles}]");
             }
 
             if (!transferWorker.IsBusy)
@@ -71,6 +87,12 @@ namespace SwitchGameManager.Helpers
             }
 
             return true;
+        }
+
+        private static void TransferWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+
+            formMain.UpdateProgressBar(e.ProgressPercentage);
         }
 
         public static void StopTransfers()
@@ -83,10 +105,14 @@ namespace SwitchGameManager.Helpers
         {
             //needs error reporting
             formMain.HideProgressElements();
+
+            if (transferWorker.CancellationPending)
+               formMain.UpdateProgressLabel($"Transfer cancelled; [{transferredFiles}/{totalFiles}] transferred.");
+
             if (e.Cancelled)
-                formMain.UpdateToolStripLabel("File transfers were canceled.");
+                MessageBox.Show("File transfers were canceled.");
             else
-                formMain.UpdateToolStripLabel("All files transferred.");
+                MessageBox.Show("All files transferred.");
 
             //refresh the xciList and OLV
             formMain.PopulateXciList();
@@ -97,17 +123,17 @@ namespace SwitchGameManager.Helpers
         {
             //todo check if enough space on destination for transfer
             formMain.SetupProgressBar(0, 100, 0);
+
+            Tuple<string, string, bool> action;
+
+            totalFiles = xciTransfers.Count();
+            transferredFiles = 0;
+
             while (xciTransfers.Count > 0)
             {
-                Tuple<string, string, bool> action;
-                int totalFiles = 0;
-                int transferredFiles = 0;
-
                 lock (lockObject)
-                {
                     action = xciTransfers.First();
-                    totalFiles = xciTransfers.Count();
-                }
+
                 customCopy = new CustomFileCopy(action.Item1, action.Item2);
 
                 customCopy.OnProgressChanged += CustomCopy_OnProgressChanged;
@@ -122,9 +148,18 @@ namespace SwitchGameManager.Helpers
                     File.Delete(action.Item1);
 
                 transferredFiles++;
-                                
+
+                lock (lockObject)
+                {
+                    xciTransfers.Remove(action);
+                }
+
                 if (transferWorker.CancellationPending)
-                    break;
+                {
+                    File.Delete(action.Item2); //delete the destination if we cancelled early
+                    e.Cancel = true;
+                    return;
+                }
             }
         }
 
@@ -136,7 +171,7 @@ namespace SwitchGameManager.Helpers
         private static void CustomCopy_OnProgressChanged(double Percentage, ref bool Cancel)
         {
             Cancel = transferWorker.CancellationPending;
-            formMain.UpdateProgressBar((int)Percentage);
+            transferWorker.ReportProgress((int)Percentage);
         }
     }
 }

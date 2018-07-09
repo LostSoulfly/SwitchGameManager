@@ -69,8 +69,7 @@ namespace SwitchGameManager.Helpers
         public long xciFileSize;
         public string productCode;
         public byte[] gameCert;
-        [JsonIgnore]
-        public bool isXciTrimmed;
+        public bool isCertEncrypted;
         public string xciFilePath;
         public string xciSdFilePath;
         public ulong packageId;
@@ -79,6 +78,8 @@ namespace SwitchGameManager.Helpers
         public bool isGameOnSd;
         [JsonIgnore]
         public bool isGameOnPc;
+        [JsonIgnore]
+        public bool isXciTrimmed;
 
     }
 }

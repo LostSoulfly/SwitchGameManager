@@ -16,11 +16,12 @@ namespace SwitchGameManager.Helpers
         public List<string> localXciFolders = new List<string>();
         public string sdDriveLetter = string.Empty;
         public byte[] olvState;
-        public int olvIconSize;
-        public bool confirmMultiActions;
+        //public bool confirmMultiActions;
         public bool encryptCertificates;
-        public int formHeight;
-        public int formWidth;
+        public int formHeight = 475;
+        public int formWidth = 975;
+        public int listIconSize = 1;
+        //public int listDisplayMode = 4;
 
         [JsonIgnore]
         public SecureString encryptPassword;
@@ -30,8 +31,8 @@ namespace SwitchGameManager.Helpers
     {
 
         public static Config config;
+        public static List<XciItem> xciCache = new List<XciItem>();
 
-        
         public static bool LoadSettings(string fileName)
         {
             Settings.config = new Config();
@@ -49,10 +50,13 @@ namespace SwitchGameManager.Helpers
             return false;
         }
 
-        public static bool SaveSettings(string fileName)
+        public static bool SaveSettings(string fileName = "")
         {
             try
             {
+                if (fileName.Length == 0)
+                    fileName = "Config.json";
+
                 File.WriteAllText(fileName, JsonConvert.SerializeObject(config, formatting: Formatting.Indented));
                 return true;
             } catch (Exception ex)

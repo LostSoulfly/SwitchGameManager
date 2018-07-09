@@ -46,15 +46,7 @@ namespace SwitchGameManager.Helpers
                         OnProgressChanged(percentage, ref cancelFlag);
 
                         if (cancelFlag == true)
-                        {
-                            try
-                            {
-                                File.Delete(this.DestFilePath);
-                            }
-                            catch { }
-
                             break;
-                        }
                     }
                 }
             }

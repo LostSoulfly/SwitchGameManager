@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using static hacbuild.XCIManager;
 using Newtonsoft.Json;
@@ -17,9 +15,12 @@ namespace SwitchGameManager.Helpers
         private static hacbuild.XCI hac = new hacbuild.XCI();
         public static formMain formMain;
 
-        public static List<XciItem> LoadXciCache(string fileName, bool localGames = true)
+        public static List<XciItem> LoadXciCache(string fileName = "")
         {
             List<XciItem> xciCache = new List<XciItem>();
+
+            if (fileName.Length == 0)
+                fileName = "Cache.json";
 
             if (!File.Exists(fileName))
                 return xciCache;
@@ -36,7 +37,7 @@ namespace SwitchGameManager.Helpers
             ulong packageId;
             XciItem xciTemp;
 
-            formMain.UpdateToolStripLabel("Loading Games..");
+            formMain.UpdateToolStripLabel("Loading games..");
             formMain.olvLocal.EmptyListMsg = "Loading games..";
 
             formMain.toolStripProgressBar.Minimum = 0;
@@ -58,18 +59,26 @@ namespace SwitchGameManager.Helpers
                 {
                     packageId = XciHelper.GetPackageID(item);
 
-                    xciTemp = XciHelper.GetXciItemByPackageId(packageId, formMain.xciCache);    // Check if this game is in the Cache
+                    xciTemp = Clone(XciHelper.GetXciItemByPackageId(packageId));    // Check if this game is in the Cache
                     if (xciTemp == null)  
                     {
                         xciTemp = XciHelper.GetXciInfo(item);   // retrieve game info
-                        formMain.xciCache.Add(xciTemp);         // add it to the CACHE
+                        xciTemp.xciFilePath = string.Empty;
+                        xciTemp.xciSdFilePath = string.Empty;
+                        Settings.xciCache.Add(Clone(xciTemp));         // add it to the CACHE
+
                     }
 
                     if (isSdCard)
+                    {
                         xciTemp.xciSdFilePath = item; //set this game's file path
+                        xciTemp.xciFilePath = string.Empty;
+                    }
                     else
+                    {
                         xciTemp.xciFilePath = item; //set this game's file path
-
+                        xciTemp.xciSdFilePath = string.Empty;
+                    }
                     xciList.Add(xciTemp);   //add the game to the return list
                 }
             }
@@ -78,7 +87,7 @@ namespace SwitchGameManager.Helpers
             formMain.olvLocal.SetObjects(formMain.xciList);
             formMain.UpdateToolStripLabel();
 
-            SaveXciCache("Cache.json", formMain.xciCache);
+            SaveXciCache();
 
             formMain.olvLocal.EmptyListMsg = "No Switch games found!";
 
@@ -103,7 +112,7 @@ namespace SwitchGameManager.Helpers
                 {
                     xciList[i].isGameOnPc = true;
                     xciList[i].isGameOnSd = true;
-                    xciList[i].xciSdFilePath = xciTemp.xciFilePath;
+                    xciList[i].xciSdFilePath = xciTemp.xciSdFilePath;
                     xciOnSd.Remove(xciTemp);
                 }
                 masterList.Add(xciList[i]);
@@ -116,7 +125,7 @@ namespace SwitchGameManager.Helpers
                 {
                     xciOnSd[i].isGameOnSd = true;
                     xciOnSd[i].isGameOnPc = false;
-                    xciOnSd[i].xciSdFilePath = xciOnSd[i].xciFilePath;
+                    //xciOnSd[i].xciSdFilePath = xciOnSd[i].xciFilePath;
                     xciOnSd[i].xciFilePath = string.Empty;
                     masterList.Add(xciOnSd[i]);
                 }
@@ -154,13 +163,27 @@ namespace SwitchGameManager.Helpers
 
         }
 
-        public static void SaveXciCache(string fileName, List<XciItem> xciCache)
+        public static void SaveXciCache(string fileName = "", List<XciItem> xciCache = null)
         {
+            if (fileName.Length == 0)
+                fileName = "Cache.json";
+
+            if (xciCache == null)
+                xciCache = Settings.xciCache;
+
             File.WriteAllText(fileName, JsonConvert.SerializeObject(xciCache, Formatting.Indented));
         }
 
-        public static XciItem GetXciItemByPackageId(ulong packageId, List<XciItem> xciCache)
+        public static XciItem GetXciItemByPackageId(ulong packageId, List<XciItem> xciCache = null)
         {
+
+            if (xciCache == null)
+            {
+                if (Settings.xciCache == null)
+                    Settings.xciCache = LoadXciCache();
+                xciCache = Settings.xciCache;
+            }
+
             XciItem xci;
             try
             {
@@ -182,6 +205,10 @@ namespace SwitchGameManager.Helpers
                 return null;
 
             XCI_Explorer.MainForm mainForm = new XCI_Explorer.MainForm(false);
+
+            xci_header header = hac.GetXCIHeader(xci.xciFilePath);
+            
+            xci.packageId = header.PackageID;
 
             mainForm.ReadXci(filePath);
             
@@ -208,12 +235,7 @@ namespace SwitchGameManager.Helpers
 
             mainForm.Close();
             mainForm = null;
-
-            //read header to get PackageID
-            xci_header header = hac.GetXCIHeader(xci.xciFilePath);
-
-            xci.packageId = header.PackageID;
-
+            
             return xci;
         }
 
@@ -274,6 +296,12 @@ namespace SwitchGameManager.Helpers
             }
 
             return true;
+        }
+
+        public static T Clone<T>(T source)
+        {
+            var serialized = JsonConvert.SerializeObject(source);
+            return JsonConvert.DeserializeObject<T>(serialized);
         }
 
         public static string ReadableFileSize(double fileSize)
