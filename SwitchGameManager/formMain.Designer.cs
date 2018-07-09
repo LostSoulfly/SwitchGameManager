@@ -58,10 +58,12 @@ namespace SwitchGameManager
             this.sdToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sendToSDCardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.moveToSDCardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deleteFromSDToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cancelTransfersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.copyToPCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sendToPCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.moveToPCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deleteFromPCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cancelTransfersToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteGameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.trimGameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -89,8 +91,6 @@ namespace SwitchGameManager
             this.toolStripSpring = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressBar = new System.Windows.Forms.ToolStripProgressBar();
-            this.deleteFromSDToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.deleteFromPCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.olvLocal)).BeginInit();
             this.menuStrip.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -397,6 +397,13 @@ namespace SwitchGameManager
             this.moveToSDCardToolStripMenuItem.Text = "Move To SD Card";
             this.moveToSDCardToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
             // 
+            // deleteFromSDToolStripMenuItem
+            // 
+            this.deleteFromSDToolStripMenuItem.Name = "deleteFromSDToolStripMenuItem";
+            this.deleteFromSDToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.deleteFromSDToolStripMenuItem.Text = "Delete From SD";
+            this.deleteFromSDToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
+            // 
             // cancelTransfersToolStripMenuItem
             // 
             this.cancelTransfersToolStripMenuItem.Name = "cancelTransfersToolStripMenuItem";
@@ -428,6 +435,13 @@ namespace SwitchGameManager
             this.moveToPCToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.moveToPCToolStripMenuItem.Text = "Move To PC";
             this.moveToPCToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
+            // 
+            // deleteFromPCToolStripMenuItem
+            // 
+            this.deleteFromPCToolStripMenuItem.Name = "deleteFromPCToolStripMenuItem";
+            this.deleteFromPCToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.deleteFromPCToolStripMenuItem.Text = "Delete From PC";
+            this.deleteFromPCToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
             // 
             // cancelTransfersToolStripMenuItem1
             // 
@@ -634,20 +648,6 @@ namespace SwitchGameManager
             // 
             this.toolStripProgressBar.Name = "toolStripProgressBar";
             this.toolStripProgressBar.Size = new System.Drawing.Size(100, 16);
-            // 
-            // deleteFromSDToolStripMenuItem
-            // 
-            this.deleteFromSDToolStripMenuItem.Name = "deleteFromSDToolStripMenuItem";
-            this.deleteFromSDToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.deleteFromSDToolStripMenuItem.Text = "Delete From SD";
-            this.deleteFromSDToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
-            // 
-            // deleteFromPCToolStripMenuItem
-            // 
-            this.deleteFromPCToolStripMenuItem.Name = "deleteFromPCToolStripMenuItem";
-            this.deleteFromPCToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.deleteFromPCToolStripMenuItem.Text = "Delete From PC";
-            this.deleteFromPCToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
             // 
             // formMain
             // 

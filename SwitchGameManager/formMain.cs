@@ -176,6 +176,10 @@ namespace SwitchGameManager
 
         private void ToolStripFileManagement(object sender, EventArgs e)
         {
+            bool isPcAction = false, isSdAction = false;
+            string action = "", destination = "", source = "";
+            XciItem xci;
+
             ToolStripItem clicked = sender as ToolStripItem;
             ToolStripMenuItem toolStripMenu = (ToolStripMenuItem)contextMenuStrip.Items[0];
             int toolIndex = toolStripMenu.DropDownItems.IndexOf(clicked);
@@ -186,52 +190,55 @@ namespace SwitchGameManager
             if (!IsListIndexUsable())
                 return;
 
-            //TODO
-            //Use the TAGs to determine whether it's a PC or SD operaation and do so below
-
-            XciItem xci;
-            string action = "";
-
             if (toolIndex == 0) action = "copy";
             if (toolIndex == 1) action = "move";
             if (toolIndex == 2) action = "delete";
 
+            if ((string)clicked.Tag == "PC")
+            {
+                isPcAction = true;
+                source = "SD";
+                destination = "PC";
+            }
+            else
+            {
+                isSdAction = true;
+                source = "SD";
+                destination = "PC";
+            }
+
             if (olvLocal.SelectedIndices.Count > 1)
             {
-                if (MessageBox.Show($"Are you sure you want to {action} {olvLocal.SelectedObjects.Count} games to SD?", $"Confirm {action.ToUpperInvariant()}", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
-                    return;
+                if (toolIndex != 2)
+                {
+                    if (MessageBox.Show($"Are you sure you want to {action} {olvLocal.SelectedObjects.Count} games to {destination}?", $"Confirm {action.ToUpperInvariant()}", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
+                        return;
+                }
+                else
+                {
+                    if (MessageBox.Show($"Are you sure you want to {action} {olvLocal.SelectedObjects.Count} games from {destination}?", $"Confirm {action.ToUpperInvariant()}", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
+                        return;
+                }
 
                 foreach (Object obj in olvLocal.SelectedObjects)
                 {
                     xci = (XciItem)obj;
-                    switch (toolIndex)
-                    {
-                        case 0: //copy
-                            FileHelpers.TransferXci(xci, copyToSd: true);
-                    break;
-
-                        case 1: //move
-
-                            FileHelpers.TransferXci(xci, moveXci: true, copyToSd: true);
-                            break;
-
-                        case 2:
-                            File.Delete(xci.xciSdFilePath);
-                            xciList.Remove(xci);
-                            olvLocal.RefreshObject(xciList);
-                            break;
-
-                        default:
-                            break;
-                    }
+                    
                 }
             }
             else
             {
                 xci = (XciItem)olvLocal.GetItem(olvLocal.SelectedIndex).RowObject;
 
-                if (MessageBox.Show($"Are you sure you want to {action} {xci.gameName} to SD?", $"Confirm {action.ToUpperInvariant()}", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
-                    return;
+                if (toolIndex != 2)
+                {
+                    if (MessageBox.Show($"Are you sure you want to {action} {xci.gameName} to {source}?", $"Confirm {action.ToUpperInvariant()}", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
+                        return;
+                } else
+                {
+                    if (MessageBox.Show($"Are you sure you want to {action} {xci.gameName} from {source}?", $"Confirm {action.ToUpperInvariant()}", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
+                        return;
+                }
 
                 switch (toolIndex)
                 {
@@ -245,9 +252,9 @@ namespace SwitchGameManager
                         break;
 
                     case 2:
-                        File.Delete(xci.xciSdFilePath);
-                        xciList.Remove(xci);
-                        olvLocal.RefreshObject(xciList);
+                        //File.Delete(xci.xciSdFilePath);
+                        //xciList.Remove(xci);
+                        //olvLocal.RefreshObject(xciList);
                         break;
 
                     default:
@@ -257,6 +264,42 @@ namespace SwitchGameManager
             
         }
         
+        public bool ProcessFileManagement(XciItem xci, int toolIndex, bool isSdAction, bool isPcAction)
+        {
+            switch (toolIndex)
+            {
+                case 0: //copy
+                    if (isSdAction)
+                        FileHelpers.TransferXci(xci, copyToSd: true);
+                    if (isPcAction)
+
+                        FileHelpers.TransferXci(xci, copyToPc: true);
+                    break;
+
+                case 1: //move
+                    if (isSdAction)
+                        FileHelpers.TransferXci(xci, moveXci: true, copyToSd: true);
+                    if (isPcAction)
+                        FileHelpers.TransferXci(xci, moveXci: true, copyToPc: true);
+                    break;
+
+                case 2:
+                    if (isSdAction)
+                        File.Delete(xci.xciSdFilePath);
+                    if (isPcAction)
+                        File.Delete(xci.xciFilePath);
+
+                    xciList.Remove(xci);
+                    olvLocal.RefreshObject(xciList);
+                    break;
+
+                default:
+                    break;
+            }
+
+            return true;
+        }
+
         public void SetupProgressBar(int min, int max, int initial)
         {
             toolStripProgressBar.Minimum = min;
