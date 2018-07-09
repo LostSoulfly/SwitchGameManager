@@ -89,6 +89,8 @@ namespace SwitchGameManager
             this.toolStripSpring = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressBar = new System.Windows.Forms.ToolStripProgressBar();
+            this.deleteFromSDToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deleteFromPCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.olvLocal)).BeginInit();
             this.menuStrip.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -375,6 +377,7 @@ namespace SwitchGameManager
             this.sdToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.sendToSDCardToolStripMenuItem,
             this.moveToSDCardToolStripMenuItem,
+            this.deleteFromSDToolStripMenuItem,
             this.cancelTransfersToolStripMenuItem});
             this.sdToolStripMenuItem.Name = "sdToolStripMenuItem";
             this.sdToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
@@ -383,20 +386,21 @@ namespace SwitchGameManager
             // sendToSDCardToolStripMenuItem
             // 
             this.sendToSDCardToolStripMenuItem.Name = "sendToSDCardToolStripMenuItem";
-            this.sendToSDCardToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.sendToSDCardToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.sendToSDCardToolStripMenuItem.Text = "Copy To SD Card";
-            this.sendToSDCardToolStripMenuItem.Click += new System.EventHandler(this.ToolStripSdManagement);
+            this.sendToSDCardToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
             // 
             // moveToSDCardToolStripMenuItem
             // 
             this.moveToSDCardToolStripMenuItem.Name = "moveToSDCardToolStripMenuItem";
-            this.moveToSDCardToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.moveToSDCardToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.moveToSDCardToolStripMenuItem.Text = "Move To SD Card";
+            this.moveToSDCardToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
             // 
             // cancelTransfersToolStripMenuItem
             // 
             this.cancelTransfersToolStripMenuItem.Name = "cancelTransfersToolStripMenuItem";
-            this.cancelTransfersToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.cancelTransfersToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.cancelTransfersToolStripMenuItem.Text = "Cancel Transfers";
             this.cancelTransfersToolStripMenuItem.Click += new System.EventHandler(this.CancelFileTransfers);
             // 
@@ -405,6 +409,7 @@ namespace SwitchGameManager
             this.copyToPCToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.sendToPCToolStripMenuItem,
             this.moveToPCToolStripMenuItem,
+            this.deleteFromPCToolStripMenuItem,
             this.cancelTransfersToolStripMenuItem1});
             this.copyToPCToolStripMenuItem.Name = "copyToPCToolStripMenuItem";
             this.copyToPCToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
@@ -413,20 +418,21 @@ namespace SwitchGameManager
             // sendToPCToolStripMenuItem
             // 
             this.sendToPCToolStripMenuItem.Name = "sendToPCToolStripMenuItem";
-            this.sendToPCToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this.sendToPCToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.sendToPCToolStripMenuItem.Text = "Copy To PC";
-            this.sendToPCToolStripMenuItem.Click += new System.EventHandler(this.ToolStripPcManagement);
+            this.sendToPCToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
             // 
             // moveToPCToolStripMenuItem
             // 
             this.moveToPCToolStripMenuItem.Name = "moveToPCToolStripMenuItem";
-            this.moveToPCToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this.moveToPCToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.moveToPCToolStripMenuItem.Text = "Move To PC";
+            this.moveToPCToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
             // 
             // cancelTransfersToolStripMenuItem1
             // 
             this.cancelTransfersToolStripMenuItem1.Name = "cancelTransfersToolStripMenuItem1";
-            this.cancelTransfersToolStripMenuItem1.Size = new System.Drawing.Size(160, 22);
+            this.cancelTransfersToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.cancelTransfersToolStripMenuItem1.Text = "Cancel Transfers";
             this.cancelTransfersToolStripMenuItem1.Click += new System.EventHandler(this.CancelFileTransfers);
             // 
@@ -629,6 +635,20 @@ namespace SwitchGameManager
             this.toolStripProgressBar.Name = "toolStripProgressBar";
             this.toolStripProgressBar.Size = new System.Drawing.Size(100, 16);
             // 
+            // deleteFromSDToolStripMenuItem
+            // 
+            this.deleteFromSDToolStripMenuItem.Name = "deleteFromSDToolStripMenuItem";
+            this.deleteFromSDToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.deleteFromSDToolStripMenuItem.Text = "Delete From SD";
+            this.deleteFromSDToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
+            // 
+            // deleteFromPCToolStripMenuItem
+            // 
+            this.deleteFromPCToolStripMenuItem.Name = "deleteFromPCToolStripMenuItem";
+            this.deleteFromPCToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.deleteFromPCToolStripMenuItem.Text = "Delete From PC";
+            this.deleteFromPCToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
+            // 
             // formMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -715,6 +735,8 @@ namespace SwitchGameManager
         private BrightIdeasSoftware.OLVColumn olvColumnSdFilePath;
         private System.Windows.Forms.ToolStripMenuItem cancelTransfersToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem cancelTransfersToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem deleteFromSDToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem deleteFromPCToolStripMenuItem;
     }
 }
 

@@ -21,13 +21,19 @@ namespace SwitchGameManager.Helpers
 
         public static bool TransferXci(XciItem xci, bool moveXci = false, bool copyToPc = false, bool copyToSd = false)
         {
+
+            if (!transferWorker.IsBusy && transferWorker.CancellationPending)
+            {
+                transferWorker.Dispose();
+                transferWorker = null;
+            }
+
             if (transferWorker == null)
             {
                 transferWorker = new BackgroundWorker();
-                transferWorker.DoWork += CopyWorker_DoWork;
+                transferWorker.DoWork += TransferWorker_DoWork;
                 transferWorker.WorkerSupportsCancellation = true;
-                transferWorker.RunWorkerCompleted += CopyWorker_RunWorkerCompleted;
-                transferWorker.ProgressChanged += CopyWorker_ProgressChanged;
+                transferWorker.RunWorkerCompleted += TransferWorker_RunWorkerCompleted;
             }
 
             string source = string.Empty;
@@ -71,45 +77,54 @@ namespace SwitchGameManager.Helpers
         {
             if (transferWorker.IsBusy)
                 transferWorker.CancelAsync();
-            /*
-            if (moveWorker.IsBusy)
-                moveWorker.CancelAsync();
-            */
+        }
+        
+        private static void TransferWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            //needs error reporting
+            formMain.HideProgressElements();
+            if (e.Cancelled)
+                formMain.UpdateToolStripLabel("File transfers were canceled.");
+            else
+                formMain.UpdateToolStripLabel("All files transferred.");
+
+            //refresh the xciList and OLV
+            formMain.PopulateXciList();
+
         }
 
-        private static void CopyWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private static void TransferWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            throw new NotImplementedException();
-        }
-
-        private static void CopyWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static void CopyWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
+            //todo check if enough space on destination for transfer
+            formMain.SetupProgressBar(0, 100, 0);
             while (xciTransfers.Count > 0)
             {
                 Tuple<string, string, bool> action;
+                int totalFiles = 0;
+                int transferredFiles = 0;
 
                 lock (lockObject)
                 {
                     action = xciTransfers.First();
+                    totalFiles = xciTransfers.Count();
                 }
                 customCopy = new CustomFileCopy(action.Item1, action.Item2);
 
                 customCopy.OnProgressChanged += CustomCopy_OnProgressChanged;
                 customCopy.OnComplete += CustomCopy_OnComplete;
 
+                formMain.UpdateProgressLabel($"Copying {Path.GetFileName(action.Item1)} [{transferredFiles}/{totalFiles}]");
+
                 customCopy.Copy();
 
-                //File.Copy(action.Item1, action.Item2);
-                
+                //if file is set to be moved, and we didn't cancel, delete the source file
+                if (action.Item3 && !transferWorker.CancellationPending)
+                    File.Delete(action.Item1);
+
+                transferredFiles++;
+                                
                 if (transferWorker.CancellationPending)
-                {
                     break;
-                }
             }
         }
 
@@ -121,7 +136,7 @@ namespace SwitchGameManager.Helpers
         private static void CustomCopy_OnProgressChanged(double Percentage, ref bool Cancel)
         {
             Cancel = transferWorker.CancellationPending;
-            formMain.UpdateToolStripLabel("Progress: " + Percentage);
+            formMain.UpdateProgressBar((int)Percentage);
         }
     }
 }

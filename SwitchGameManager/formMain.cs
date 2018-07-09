@@ -147,7 +147,8 @@ namespace SwitchGameManager
                 {
                     foreach (ToolStripMenuItem subItem in menuItem.DropDownItems)
                     {
-                        subMenuItem = new ToolStripMenuItem(subItem.Text, null, onClick: ToolStripSdManagement);
+                        subMenuItem = new ToolStripMenuItem(subItem.Text, null, onClick: ToolStripFileManagement);
+                        subMenuItem.Tag = "SD";
                         newMenuItem.DropDownItems.Add(subMenuItem);
                     }
                 }
@@ -157,6 +158,7 @@ namespace SwitchGameManager
                     foreach (ToolStripMenuItem subItem in menuItem.DropDownItems)
                     {
                         subMenuItem = new ToolStripMenuItem(subItem.Text, null, onClick: ToolStripPcManagement);
+                        subMenuItem.Tag = "PC";
                         newMenuItem.DropDownItems.Add(subMenuItem);
                     }
                 }
@@ -172,7 +174,7 @@ namespace SwitchGameManager
             throw new NotImplementedException();
         }
 
-        private void ToolStripSdManagement(object sender, EventArgs e)
+        private void ToolStripFileManagement(object sender, EventArgs e)
         {
             ToolStripItem clicked = sender as ToolStripItem;
             ToolStripMenuItem toolStripMenu = (ToolStripMenuItem)contextMenuStrip.Items[0];
@@ -184,12 +186,15 @@ namespace SwitchGameManager
             if (!IsListIndexUsable())
                 return;
 
+            //TODO
+            //Use the TAGs to determine whether it's a PC or SD operaation and do so below
 
             XciItem xci;
             string action = "";
 
             if (toolIndex == 0) action = "copy";
             if (toolIndex == 1) action = "move";
+            if (toolIndex == 2) action = "delete";
 
             if (olvLocal.SelectedIndices.Count > 1)
             {
@@ -207,6 +212,13 @@ namespace SwitchGameManager
 
                         case 1: //move
 
+                            FileHelpers.TransferXci(xci, moveXci: true, copyToSd: true);
+                            break;
+
+                        case 2:
+                            File.Delete(xci.xciSdFilePath);
+                            xciList.Remove(xci);
+                            olvLocal.RefreshObject(xciList);
                             break;
 
                         default:
@@ -229,6 +241,13 @@ namespace SwitchGameManager
 
                     case 1: //move
 
+                        FileHelpers.TransferXci(xci, moveXci: true, copyToSd: true);
+                        break;
+
+                    case 2:
+                        File.Delete(xci.xciSdFilePath);
+                        xciList.Remove(xci);
+                        olvLocal.RefreshObject(xciList);
                         break;
 
                     default:
@@ -238,6 +257,34 @@ namespace SwitchGameManager
             
         }
         
+        public void SetupProgressBar(int min, int max, int initial)
+        {
+            toolStripProgressBar.Minimum = min;
+            toolStripProgressBar.Maximum = max;
+            toolStripProgressBar.Value = initial;
+            toolStripProgressBar.Visible = true;
+        }
+
+        public void UpdateProgressBar(int value)
+        {
+            try
+            {
+                toolStripProgressBar.Value = value;
+            }
+            catch { }
+        }
+
+        public void UpdateProgressLabel(string text)
+        {
+            toolStripProgressLabel.Text = text;
+        }
+
+        public void HideProgressElements()
+        {
+            toolStripProgressBar.Visible = false;
+            toolStripProgressLabel.Visible = false;
+        }
+
         public void UpdateToolStripLabel(string text = "")
         {
             if (text.Length == 0 && textBoxFilter.Text.Length > 0)
