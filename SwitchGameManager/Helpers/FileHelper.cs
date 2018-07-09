@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace SwitchGameManager.Helpers
 {
-    static class FileHelpers
+    public static class FileHelper
     {
         private static BackgroundWorker transferWorker;
         private static CustomFileCopy customCopy;

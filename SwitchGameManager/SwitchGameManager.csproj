@@ -65,7 +65,7 @@
       <DependentUpon>formMain.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\CustomFileCopy.cs" />
-    <Compile Include="Helpers\FileHelpers.cs" />
+    <Compile Include="Helpers\FileHelper.cs" />
     <Compile Include="Helpers\Settings.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

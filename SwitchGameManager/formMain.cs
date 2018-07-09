@@ -25,7 +25,7 @@ namespace SwitchGameManager
         private void formMain_Load(object sender, EventArgs e)
         {
             XciHelper.formMain = this;
-            FileHelpers.formMain = this;
+            FileHelper.formMain = this;
 
             SetupObjectListView();
 
@@ -185,8 +185,8 @@ namespace SwitchGameManager
                 Helpers.Settings.config.formWidth = this.Width;
             };
 
-            cancelTransfersToolStripMenuItem.Click += delegate (object s, EventArgs e) { FileHelpers.StopTransfers(); };
-            cancelTransfersToolStripMenuItem1.Click += delegate (object s, EventArgs e) { FileHelpers.StopTransfers(); };
+            cancelTransfersToolStripMenuItem.Click += delegate (object s, EventArgs e) { FileHelper.StopTransfers(); };
+            cancelTransfersToolStripMenuItem1.Click += delegate (object s, EventArgs e) { FileHelper.StopTransfers(); };
 
         }
 
@@ -542,20 +542,20 @@ namespace SwitchGameManager
             {
                 case 0: //copy
                     if (isSdAction)
-                        FileHelpers.TransferXci(xci, copyToSd: true);
+                        FileHelper.TransferXci(xci, copyToSd: true);
                     if (isPcAction)
 
-                        FileHelpers.TransferXci(xci, copyToPc: true);
+                        FileHelper.TransferXci(xci, copyToPc: true);
                     break;
 
                 case 1: //move
                     if (isSdAction)
-                        FileHelpers.TransferXci(xci, moveXci: true, copyToSd: true);
+                        FileHelper.TransferXci(xci, moveXci: true, copyToSd: true);
                     if (isPcAction)
-                        FileHelpers.TransferXci(xci, moveXci: true, copyToPc: true);
+                        FileHelper.TransferXci(xci, moveXci: true, copyToPc: true);
                     break;
 
-                case 2:
+                case 2: //delete
                     if (isSdAction)
                         File.Delete(xci.xciSdFilePath);
                     if (isPcAction)
@@ -589,11 +589,19 @@ namespace SwitchGameManager
 
         public void UpdateProgressBar(int value)
         {
-            try
+            if (statusStrip1.InvokeRequired)
             {
-                toolStripProgressBar.Value = value;
+                statusStrip1.Invoke(new MethodInvoker(delegate { UpdateProgressBar(value); }));
             }
-            catch { }
+            else
+            {
+                try
+                {
+                    toolStripProgressBar.Value = value;
+                }
+                catch { }
+            }
+            
         }
 
         public void HideProgressElements()
