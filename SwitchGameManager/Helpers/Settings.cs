@@ -9,11 +9,7 @@ namespace SwitchGameManager.Helpers
 {
     public class Config
     {
-        [JsonIgnore]
-        public string cacheFileName = "Cache.json";
-
-        [JsonIgnore]
-        public string configFileName = "Config.json";
+        
 
         //public bool confirmMultiActions;
         public bool encryptCertificates;
@@ -35,9 +31,13 @@ namespace SwitchGameManager.Helpers
         public static Config config;
         public static List<XciItem> xciCache = new List<XciItem>();
 
+        public static string cacheFileName = "Cache.json";
+
+        public static string configFileName = "Config.json";
+
         internal static void RebuildCache()
         {
-            File.Delete(config.cacheFileName);
+            File.Delete(cacheFileName);
             XciHelper.formMain.PopulateXciList();
         }
 
@@ -45,8 +45,8 @@ namespace SwitchGameManager.Helpers
         {
             Settings.config = new Config();
 
-            if (fileName.Length == 0)
-                fileName = config.configFileName;
+            if (String.IsNullOrWhiteSpace(fileName))
+                fileName = configFileName;
 
             try
             {
@@ -65,8 +65,8 @@ namespace SwitchGameManager.Helpers
         {
             try
             {
-                if (fileName.Length == 0)
-                    fileName = config.configFileName;
+                if (String.IsNullOrWhiteSpace(fileName))
+                    fileName = configFileName;
 
                 File.WriteAllText(fileName, JsonConvert.SerializeObject(config, formatting: Formatting.Indented));
                 return true;

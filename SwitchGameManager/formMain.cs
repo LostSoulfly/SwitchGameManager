@@ -79,7 +79,6 @@ namespace SwitchGameManager
 
             /* todo
              * Check if Keys.txt exists, otherwise download it. Maybe procedurally generate the URL? brute force the key?
-             * Menu option to refresh library (warn that this will be slow)
              * Add red X or green check for Game cert, either use a Resource img or system image?
              * Rom Renaming
              */
@@ -390,6 +389,12 @@ namespace SwitchGameManager
 
             if (!IsListIndexUsable()) return;
 
+            if (toolIndex == 4)
+            {
+                //load rename form
+                return;
+            }
+
             XciItem xci;
             int successful = 0;
             int failure = 0;
@@ -544,8 +549,8 @@ namespace SwitchGameManager
                     if (isSdAction)
                         FileHelper.TransferXci(xci, copyToSd: true);
                     if (isPcAction)
-
                         FileHelper.TransferXci(xci, copyToPc: true);
+
                     break;
 
                 case 1: //move
@@ -553,6 +558,7 @@ namespace SwitchGameManager
                         FileHelper.TransferXci(xci, moveXci: true, copyToSd: true);
                     if (isPcAction)
                         FileHelper.TransferXci(xci, moveXci: true, copyToPc: true);
+
                     break;
 
                 case 2: //delete
@@ -561,13 +567,13 @@ namespace SwitchGameManager
                     if (isPcAction)
                         File.Delete(xci.xciFilePath);
 
-                    PopulateXciList();
                     break;
 
                 default:
                     break;
             }
 
+            PopulateXciList();
             return true;
         }
 
@@ -618,11 +624,11 @@ namespace SwitchGameManager
 
         public void UpdateToolStripLabel(string text = "")
         {
-            if (text.Length == 0 && textBoxFilter.Text.Length > 0)
+            if (String.IsNullOrWhiteSpace(text) && textBoxFilter.Text.Length > 0)
             {
                 toolStripStatus.Text = $"Displaying {olvLocal.Items.Count} out of {xciList.Count} Switch games.";
             }
-            else if (text.Length == 0)
+            else if (String.IsNullOrWhiteSpace(text))
             {
                 toolStripStatus.Text = $"Displaying {olvLocal.Items.Count} Switch games.";
             }

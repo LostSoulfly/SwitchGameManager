@@ -138,7 +138,7 @@ namespace SwitchGameManager.Helpers
             if (copyToPc == copyToSd)
                 return false;
 
-            if (source.Length == 0 || destination.Length == 0)
+            if (String.IsNullOrWhiteSpace(source) || String.IsNullOrWhiteSpace(destination))
                 return false;
 
             if (File.Exists(destination))

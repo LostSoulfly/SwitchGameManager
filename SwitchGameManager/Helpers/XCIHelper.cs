@@ -187,14 +187,18 @@ namespace SwitchGameManager.Helpers
                 {
                     packageId = XciHelper.GetPackageID(item);
 
-                    xciTemp = Clone(XciHelper.GetXciItemByPackageId(packageId));    // Check if this game is in the Cache
+                    xciTemp = XciHelper.GetXciItemByPackageId(packageId);    // Check if this game is in the Cache
                     if (xciTemp == null)
                     {
                         xciTemp = XciHelper.GetXciInfo(item);   // retrieve game info
+                        if (xciTemp.titleId.Length != 16) xciTemp.titleId = 0 + xciTemp.titleId;
                         xciTemp.xciFilePath = string.Empty;
                         xciTemp.xciSdFilePath = string.Empty;
-                        Settings.xciCache.Add(Clone(xciTemp));         // add it to the CACHE
+                        Settings.xciCache.Add(xciTemp);         // add it to the CACHE
                     }
+
+                    //Let's clone it.. so changes made to it in xciList won't affect xciCache's object
+                    xciTemp = Clone(xciTemp);
 
                     if (isSdCard)
                     {
@@ -225,8 +229,8 @@ namespace SwitchGameManager.Helpers
         {
             List<XciItem> xciCache = new List<XciItem>();
 
-            if (fileName.Length == 0)
-                fileName = Settings.config.cacheFileName;
+            if (String.IsNullOrWhiteSpace(fileName))
+                fileName = Settings.cacheFileName;
 
             if (!File.Exists(fileName))
                 return xciCache;
@@ -264,8 +268,8 @@ namespace SwitchGameManager.Helpers
 
         public static void SaveXciCache(string fileName = "", List<XciItem> xciCache = null)
         {
-            if (fileName.Length == 0)
-                fileName = Settings.config.cacheFileName;
+            if (String.IsNullOrWhiteSpace(fileName))
+                fileName = Settings.cacheFileName;
 
             if (xciCache == null)
                 xciCache = Settings.xciCache;

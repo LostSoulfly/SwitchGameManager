@@ -104,14 +104,14 @@ namespace SwitchGameManager
                 comboBoxDriveLetters.Items.Add(item);
             }
 
-            if (Settings.config.sdDriveLetter.Length == 0 || !Directory.Exists(Settings.config.sdDriveLetter))
+            if (Settings.config.sdDriveLetter == null)
             {
                 buttonLocateSwitchSd_Click(null, null);
                 SetComboboxToDriveLetter(Settings.config.sdDriveLetter);
             }
             else
             {
-                if (Settings.config.sdDriveLetter.Length > 0)
+                if (Settings.config.sdDriveLetter.Length > 0 && Directory.Exists(Settings.config.sdDriveLetter))
                 {
                     SetComboboxToDriveLetter(Settings.config.sdDriveLetter);
                 }
@@ -120,7 +120,7 @@ namespace SwitchGameManager
 
         private void SetComboboxToDriveLetter(string drive)
         {
-            if (drive.Length == 0)
+            if (String.IsNullOrWhiteSpace(drive))
                 return;
 
             for (int i = 0; i < comboBoxDriveLetters.Items.Count; i++)
