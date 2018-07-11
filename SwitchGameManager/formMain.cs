@@ -2,6 +2,7 @@
 using SwitchGameManager.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -75,12 +76,12 @@ namespace SwitchGameManager
             if (Settings.config.formWidth > 0)
                 this.Width = Settings.config.formWidth;
 
+            UpdateToolMenus();
             PopulateXciList();
 
             /* todo
              * Check if Keys.txt exists, otherwise download it. Maybe procedurally generate the URL? brute force the key?
              * Add red X or green check for Game cert, either use a Resource img or system image?
-             * Rom Renaming
              */
         }
 
@@ -108,6 +109,7 @@ namespace SwitchGameManager
                 Settings.config.localXciFolders = form.localFolders;
                 Settings.config.sdDriveLetter = form.sdDriveLetter;
                 PopulateXciList();
+                UpdateToolMenus();
             }
         }
 
@@ -174,6 +176,7 @@ namespace SwitchGameManager
 
             olvLocal.MouseClick += delegate (object s, MouseEventArgs e)
             {
+                UpdateToolMenus();
                 if (e.Button == MouseButtons.Right) contextMenuStrip.Show(e.X, e.Y);
             };
 
@@ -199,6 +202,25 @@ namespace SwitchGameManager
             cancelTransfersToolStripMenuItem.Click += delegate (object s, EventArgs e) { FileHelper.StopTransfers(); };
             cancelTransfersToolStripMenuItem1.Click += delegate (object s, EventArgs e) { FileHelper.StopTransfers(); };
             rebuildCachetoolStripMenuItem.Click += delegate (object s, EventArgs e) { Settings.RebuildCache(); };
+            refreshGamesListToolStripMenuItem.Click += delegate (object s, EventArgs e) { PopulateXciList(); };
+        }
+
+        private void UpdateToolMenus()
+        {
+
+            Settings.CheckForSdCard();
+
+            sdToolStripMenuItem.Enabled = Settings.config.isSdEnabled;
+            sendToPCToolStripMenuItem.Enabled = Settings.config.isSdEnabled;
+            moveToPCToolStripMenuItem.Enabled = Settings.config.isSdEnabled;
+            cancelTransfersToolStripMenuItem1.Enabled = Settings.config.isSdEnabled;
+
+            //right-click context menu
+            ToolStripMenuItem toolStripMenu = (ToolStripMenuItem)contextMenuStrip.Items[1];
+            olvLocal.ContextMenuStrip.Items[0].Enabled = Settings.config.isSdEnabled;
+            toolStripMenu.DropDownItems[0].Enabled = Settings.config.isSdEnabled;
+            toolStripMenu.DropDownItems[1].Enabled = Settings.config.isSdEnabled;
+            toolStripMenu.DropDownItems[3].Enabled = Settings.config.isSdEnabled;
         }
 
         private void SetupObjectListView()
@@ -319,11 +341,19 @@ namespace SwitchGameManager
             ToolStripMenuItem toolStripMenu = (ToolStripMenuItem)contextMenuStrip.Items[0];
             int toolIndex = toolStripMenu.DropDownItems.IndexOf(clicked);
 
+            //TODO clean this up..
+            if (toolIndex < 0)
+            {
+                toolStripMenu = (ToolStripMenuItem)contextMenuStrip.Items[1];
+                toolIndex = toolStripMenu.DropDownItems.IndexOf(clicked);
+            }
             if (toolIndex < 0)
                 toolIndex = sdToolStripMenuItem.DropDownItems.IndexOf(clicked);
 
             if (toolIndex < 0)
                 toolIndex = pcToolStripMenuItem.DropDownItems.IndexOf(clicked);
+
+            Debug.Assert(toolIndex > 0);
 
             if (!IsListIndexUsable())
                 return;
@@ -335,14 +365,16 @@ namespace SwitchGameManager
             if ((string)clicked.Tag == "PC")
             {
                 isPcAction = true;
-                source = "SD";
-                destination = "PC";
+                source = "PC";
+                destination = "SD";
+
             }
             else
             {
                 isSdAction = true;
                 source = "SD";
                 destination = "PC";
+                
             }
 
             if (olvLocal.SelectedIndices.Count > 1)
@@ -375,6 +407,9 @@ namespace SwitchGameManager
 
                 ProcessFileManagement(xci, toolIndex, isSdAction, isPcAction);
             }
+
+            //PopulateXciList();
+
         }
 
         private void ToolStripManagement(object sender, EventArgs e)
@@ -387,11 +422,20 @@ namespace SwitchGameManager
 
             //Debug.Assert(toolIndex > 0, "toolIndex should be > 0");
 
+            Debug.Assert(toolIndex > 0);
+
             if (!IsListIndexUsable()) return;
 
             if (toolIndex == 4)
             {
-                //load rename form
+                formRenamer renamer = new formRenamer();
+                List<XciItem> renameList = new List<XciItem>();
+
+                foreach (XciItem item in olvLocal.SelectedObjects)
+                    renameList.Add(item);
+
+                renamer.PopulateList(renameList);
+                renamer.Show();
                 return;
             }
 
@@ -567,13 +611,14 @@ namespace SwitchGameManager
                     if (isPcAction)
                         File.Delete(xci.xciFilePath);
 
+                    olvLocal.RemoveObject(xci);
+                    xciList.Remove(xci);
                     break;
 
                 default:
                     break;
             }
 
-            PopulateXciList();
             return true;
         }
 

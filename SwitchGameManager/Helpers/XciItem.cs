@@ -42,7 +42,6 @@ namespace SwitchGameManager.Helpers
 
         public bool isUniqueCert;
 
-        [JsonIgnore]
         public bool isXciTrimmed;
 
         public string masterKeyRevision;

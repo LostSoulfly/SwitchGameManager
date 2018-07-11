@@ -72,6 +72,13 @@ namespace SwitchGameManager
 
         private void comboBoxDriveLetters_SelectedIndexChanged(object sender, EventArgs e)
         {
+
+            if (comboBoxDriveLetters.SelectedIndex == 0)
+            {
+                sdDriveLetter = "";
+                return;
+            }
+
             DriveInfo driveInfo = new DriveInfo(comboBoxDriveLetters.Text.Substring(0, 1));
             List<string> info = new List<string>();
             info.Add("VolumeLabel:\t" + driveInfo.VolumeLabel);
@@ -99,6 +106,8 @@ namespace SwitchGameManager
                 listBoxFolders.Items.Add(item);
             }
 
+            comboBoxDriveLetters.Items.Add("Disable SD Management");
+
             foreach (var item in getAvailableDriveLetters())
             {
                 comboBoxDriveLetters.Items.Add(item);
@@ -122,12 +131,15 @@ namespace SwitchGameManager
         {
             if (String.IsNullOrWhiteSpace(drive))
                 return;
-
-            for (int i = 0; i < comboBoxDriveLetters.Items.Count; i++)
+            try
             {
-                if (comboBoxDriveLetters.Items[i].ToString().Substring(0, 1).ToUpper() == drive.ToUpper().Substring(0, 1))
-                    comboBoxDriveLetters.SelectedIndex = i;
+                for (int i = 0; i < comboBoxDriveLetters.Items.Count; i++)
+                {
+                    if (comboBoxDriveLetters.Items[i].ToString().Substring(0, 1).ToUpper() == drive.ToUpper().Substring(0, 1))
+                        comboBoxDriveLetters.SelectedIndex = i;
+                }
             }
+            catch { }
         }
 
         public List<string> getAvailableDriveLetters()

@@ -75,6 +75,7 @@
             // 
             // textBoxDriveInfo
             // 
+            this.textBoxDriveInfo.Enabled = false;
             this.textBoxDriveInfo.Location = new System.Drawing.Point(6, 46);
             this.textBoxDriveInfo.Multiline = true;
             this.textBoxDriveInfo.Name = "textBoxDriveInfo";
@@ -92,6 +93,7 @@
             // 
             // comboBoxDriveLetters
             // 
+            this.comboBoxDriveLetters.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxDriveLetters.FormattingEnabled = true;
             this.comboBoxDriveLetters.Location = new System.Drawing.Point(65, 19);
             this.comboBoxDriveLetters.Name = "comboBoxDriveLetters";
