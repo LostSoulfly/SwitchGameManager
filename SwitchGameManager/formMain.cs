@@ -68,7 +68,10 @@ namespace SwitchGameManager
 
             //Setup the OLV with the saved state (if it was saved)
             if (Settings.config.olvState != null)
+            {
                 olvLocal.RestoreState(Settings.config.olvState);
+                ProcessChangeIconSize(Settings.config.listIconSize);
+            }
 
             if (Settings.config.formHeight > 0)
                 this.Height = Settings.config.formHeight;

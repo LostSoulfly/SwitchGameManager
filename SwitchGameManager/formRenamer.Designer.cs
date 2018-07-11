@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(formRenamer));
             this.olvRenameList = new BrightIdeasSoftware.ObjectListView();
             this.columnPath = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.columnRenamed = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
@@ -190,6 +191,7 @@
             this.Controls.Add(this.checkBoxShowPath);
             this.Controls.Add(this.checkBoxExtensions);
             this.Controls.Add(this.olvRenameList);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "formRenamer";
             this.Text = "XCI Renamer";
             this.Load += new System.EventHandler(this.formRenamer_Load);
