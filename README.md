@@ -1,7 +1,10 @@
 # SwitchGameManager
 
 Manage your XCI files on SD and PC, from multiple PC folders. Rename, search, trim, sort, copy/move/delete games.
-Display your library in a few different ways, with more likely to come. For now, it relies on hacbuild to extract the PackageID of each XCI and uses that as a unique identifier. I don't recommend having the same game multiple times in your library as that hasn't been well tested. I'll transition to [libhac soon.](https://github.com/Thealexbarney/libhac)
+
+Display your library in a few different ways, with more likely to come. For now, it relies on hacbuild to extract the PackageID of each XCI and uses that as a unique identifier, then uses the decompiled XCI-Explorer to retrieve game info.
+
+I'll transition to [libhac](https://github.com/Thealexbarney/libhac) soon to speed up the initial library processing and remove the extra bloat.
 
 ## Important
 You need a keys.txt file to use this program.
@@ -19,6 +22,7 @@ In addition to the usual keys, you'll also need **xci_header_key**!
 - Can copy the same file(s) multiple times
 - Probably some others, please report them!
 - Doesn't verify keys.txt existence
+- I don't recommend having the same game multiple times in your library as that hasn't been well tested.
 
 ## Current todo list
 - [ ] Make a todo list
