@@ -10,10 +10,13 @@ Display your library in a few different ways, with more likely to come.
 ![Screenshot](Screens/4.png)
 
 ## Bugs
-
+- Crashes if any file deletions occur during a file transfer
+- It's slow to build the library initially. I'll move to libhac soon.
+- Can copy the same file(s) multiple times
+- Probably some others, please report them!
 
 ## Current todo list
-- [] Make a todo list
+- [ ] Make a todo list
 
 ### Credits
 http://objectlistview.sourceforge.net/cs/index.html
