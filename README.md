@@ -25,7 +25,13 @@ In addition to the usual keys, you'll also need **xci_header_key**!
 - I don't recommend having the same game multiple times in your library as that hasn't been well tested.
 
 ## Current todo list
-- [ ] Make a todo list
+- [ ] Use pretty icons for games on PC/SD instead of "True" or "False"
+- [ ] Move to libhac and stop using hacbuild + XCI-Explorer
+- [ ] Refactor everything
+- [ ] Do the heavy lifting in the background so the program is more responsive (loading game info)
+- [ ] Better file transfer manager
+- [ ] Fix all the bugs
+- [ ] ?
 
 ### Credits
 http://objectlistview.sourceforge.net/cs/index.html
