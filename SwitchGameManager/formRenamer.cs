@@ -105,7 +105,10 @@ namespace SwitchGameManager
 
         public void ProcessNameFilter(string text)
         {
-            foreach (RenameItem item in olvRenameList.FilteredObjects)
+
+            List<RenameItem> filtered = olvRenameList.FilteredObjects.Cast<RenameItem>().ToList();
+
+            foreach (RenameItem item in filtered)
             {
                 item.renamePath = Path.Combine(Path.GetDirectoryName(item.filePath), GetRenamedFile(text, item.xci));
                 olvRenameList.UpdateObject(item);
@@ -210,6 +213,7 @@ namespace SwitchGameManager
 
             olvRenameList.RebuildColumns();
             buttonRename.Enabled = true;
+            XciHelper.formMain.PopulateXciList();
         }
 
         private bool TryRename(RenameItem item)

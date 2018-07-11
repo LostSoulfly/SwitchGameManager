@@ -400,7 +400,7 @@ namespace SwitchGameManager
             // sendToSDCardToolStripMenuItem
             // 
             this.sendToSDCardToolStripMenuItem.Name = "sendToSDCardToolStripMenuItem";
-            this.sendToSDCardToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.sendToSDCardToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
             this.sendToSDCardToolStripMenuItem.Tag = "SD";
             this.sendToSDCardToolStripMenuItem.Text = "Copy To SD Card";
             this.sendToSDCardToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
@@ -408,7 +408,7 @@ namespace SwitchGameManager
             // moveToSDCardToolStripMenuItem
             // 
             this.moveToSDCardToolStripMenuItem.Name = "moveToSDCardToolStripMenuItem";
-            this.moveToSDCardToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.moveToSDCardToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
             this.moveToSDCardToolStripMenuItem.Tag = "SD";
             this.moveToSDCardToolStripMenuItem.Text = "Move To SD Card";
             this.moveToSDCardToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
@@ -416,7 +416,7 @@ namespace SwitchGameManager
             // deleteFromSDToolStripMenuItem
             // 
             this.deleteFromSDToolStripMenuItem.Name = "deleteFromSDToolStripMenuItem";
-            this.deleteFromSDToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.deleteFromSDToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
             this.deleteFromSDToolStripMenuItem.Tag = "SD";
             this.deleteFromSDToolStripMenuItem.Text = "Delete From SD";
             this.deleteFromSDToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
@@ -424,7 +424,7 @@ namespace SwitchGameManager
             // cancelTransfersToolStripMenuItem
             // 
             this.cancelTransfersToolStripMenuItem.Name = "cancelTransfersToolStripMenuItem";
-            this.cancelTransfersToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.cancelTransfersToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
             this.cancelTransfersToolStripMenuItem.Tag = "SD";
             this.cancelTransfersToolStripMenuItem.Text = "Cancel Transfers";
             // 
@@ -442,7 +442,7 @@ namespace SwitchGameManager
             // sendToPCToolStripMenuItem
             // 
             this.sendToPCToolStripMenuItem.Name = "sendToPCToolStripMenuItem";
-            this.sendToPCToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.sendToPCToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.sendToPCToolStripMenuItem.Tag = "PC";
             this.sendToPCToolStripMenuItem.Text = "Copy To PC";
             this.sendToPCToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
@@ -450,7 +450,7 @@ namespace SwitchGameManager
             // moveToPCToolStripMenuItem
             // 
             this.moveToPCToolStripMenuItem.Name = "moveToPCToolStripMenuItem";
-            this.moveToPCToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.moveToPCToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.moveToPCToolStripMenuItem.Tag = "PC";
             this.moveToPCToolStripMenuItem.Text = "Move To PC";
             this.moveToPCToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
@@ -458,7 +458,7 @@ namespace SwitchGameManager
             // deleteFromPCToolStripMenuItem
             // 
             this.deleteFromPCToolStripMenuItem.Name = "deleteFromPCToolStripMenuItem";
-            this.deleteFromPCToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.deleteFromPCToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.deleteFromPCToolStripMenuItem.Tag = "PC";
             this.deleteFromPCToolStripMenuItem.Text = "Delete From PC";
             this.deleteFromPCToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
@@ -466,7 +466,7 @@ namespace SwitchGameManager
             // cancelTransfersToolStripMenuItem1
             // 
             this.cancelTransfersToolStripMenuItem1.Name = "cancelTransfersToolStripMenuItem1";
-            this.cancelTransfersToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.cancelTransfersToolStripMenuItem1.Size = new System.Drawing.Size(160, 22);
             this.cancelTransfersToolStripMenuItem1.Tag = "PC";
             this.cancelTransfersToolStripMenuItem1.Text = "Cancel Transfers";
             // 

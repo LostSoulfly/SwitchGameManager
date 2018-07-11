@@ -274,6 +274,9 @@ namespace SwitchGameManager.Helpers
             if (xciCache == null)
                 xciCache = Settings.xciCache;
 
+            if (xciCache == null || xciCache.Count == 0)
+                return;
+
             File.WriteAllText(fileName, JsonConvert.SerializeObject(xciCache, Formatting.Indented));
         }
 
