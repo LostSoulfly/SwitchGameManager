@@ -14,7 +14,7 @@ In addition to the usual keys, you'll also need **xci_header_key**!
 ![Screenshot](Screens/4.png)
 
 ## Bugs
-- Crashes if any file deletions occur during a file transfer
+- Crashes if any file operations (such as trimming) occur during a file transfer
 - It's slow to build the library initially. I'll move to libhac soon.
 - Can copy the same file(s) multiple times
 - Probably some others, please report them!
