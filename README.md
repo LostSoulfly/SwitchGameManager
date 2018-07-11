@@ -25,6 +25,9 @@ In addition to the usual keys, you'll also need **xci_header_key**!
 - I don't recommend having the same game multiple times in your library as that hasn't been well tested.
 
 ## Current todo list
+- [ ] Make it easier to see PC or SD only games
+- [ ] Show SD card remaining size and other info at a glance
+- [ ] Prevent copying games to SD if it would exceed SD space
 - [ ] Use pretty icons for games on PC/SD instead of "True" or "False"
 - [ ] Move to libhac and stop using hacbuild + XCI-Explorer
 - [ ] Refactor everything
