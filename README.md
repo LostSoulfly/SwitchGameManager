@@ -20,9 +20,9 @@ In addition to the usual keys, you'll also need **xci_header_key**!
 - Crashes if any file operations (such as trimming) occur during a file transfer
 - It's slow to build the library initially. I'll move to libhac soon.
 - Can copy the same file(s) multiple times
-- Probably some others, please report them!
 - Doesn't verify keys.txt existence
 - I don't recommend having the same game multiple times in your library as that hasn't been well tested.
+- Probably some others, please report them!
 
 ## Current todo list
 - [ ] Make it easier to see PC or SD only games
