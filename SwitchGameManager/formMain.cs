@@ -14,8 +14,6 @@ namespace SwitchGameManager
     {
         private ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
 
-        public List<XciItem> xciList = new List<XciItem>();
-
         public formMain()
         {
             InitializeComponent();
@@ -80,7 +78,7 @@ namespace SwitchGameManager
                 this.Width = Settings.config.formWidth;
 
             UpdateToolMenus();
-            PopulateXciList();
+            XciHelper.PopulateXciList();
 
             /* todo
              * Check if Keys.txt exists, otherwise download it. Maybe procedurally generate the URL? brute force the key?
@@ -111,7 +109,7 @@ namespace SwitchGameManager
             {
                 Settings.config.localXciFolders = form.localFolders;
                 Settings.config.sdDriveLetter = form.sdDriveLetter;
-                PopulateXciList();
+                XciHelper.PopulateXciList();
                 UpdateToolMenus();
             }
         }
@@ -123,13 +121,16 @@ namespace SwitchGameManager
                 case 2: //Delete files from BOTH
                     try
                     {
-                        File.Delete(xci.xciSdFilePath);
-                        File.Delete(xci.xciFilePath);
+                        if (File.Exists(xci.xciFilePath))
+                            File.Delete(xci.xciFilePath);
+                        if (File.Exists(xci.xciSdFilePath))
+                            File.Delete(xci.xciSdFilePath);
+
+                        return true;
                     }
                     catch { }
 
-                    return true;
-
+                    return false;
                 case 3: //trim games
                     bool trim;
                     if (xci.gameSize != xci.gameUsedSize)
@@ -144,10 +145,10 @@ namespace SwitchGameManager
                         //re-process the XCI
                         xci = XciHelper.GetXciInfo(xci.xciFilePath);
 
-                        XciItem oldXci = XciHelper.GetXciItemByPackageId(xci.packageId, xciList);
+                        XciItem oldXci = XciHelper.GetXciItemByPackageId(xci.packageId, XciHelper.xciList);
                         oldXci = xci;
 
-                        olvLocal.RefreshObject(xciList);
+                        olvLocal.RefreshObject(XciHelper.xciList);
                         return trim;
                     }
                     else
@@ -205,7 +206,7 @@ namespace SwitchGameManager
             cancelTransfersToolStripMenuItem.Click += delegate (object s, EventArgs e) { FileHelper.StopTransfers(); };
             cancelTransfersToolStripMenuItem1.Click += delegate (object s, EventArgs e) { FileHelper.StopTransfers(); };
             rebuildCachetoolStripMenuItem.Click += delegate (object s, EventArgs e) { Settings.RebuildCache(); };
-            refreshGamesListToolStripMenuItem.Click += delegate (object s, EventArgs e) { PopulateXciList(); };
+            refreshGamesListToolStripMenuItem.Click += delegate (object s, EventArgs e) { XciHelper.PopulateXciList(); };
         }
 
         private void UpdateToolMenus()
@@ -383,7 +384,9 @@ namespace SwitchGameManager
             if (olvLocal.SelectedIndices.Count > 1)
             {
                 if (toolIndex != 2)
-                    message = $"Are you sure you want to {action} {olvLocal.SelectedObjects.Count} games to {destination}?";
+                    message = $"Are you sure you want to {action} {olvLocal.SelectedObjects.Count} games to {source}?";
+                else if (toolIndex == 2 && isPcAction)
+                    message = $"Are you sure you want to {action} {olvLocal.SelectedObjects.Count} games from {source}?";
                 else
                     message = $"Are you sure you want to {action} {olvLocal.SelectedObjects.Count} games from {destination}?";
 
@@ -480,7 +483,7 @@ namespace SwitchGameManager
                 ProcessManagementAction(xci, toolIndex);
             }
 
-            olvLocal.RefreshObject(xciList);
+            olvLocal.RefreshObject(XciHelper.xciList);
         }
 
         public void HideProgressElements()
@@ -488,29 +491,7 @@ namespace SwitchGameManager
             toolStripProgressBar.Visible = false;
             toolStripProgressLabel.Visible = false;
         }
-
-        public void PopulateXciList()
-        {
-            xciList = new List<XciItem>();
-
-            foreach (string path in Settings.config.localXciFolders)
-            {
-                xciList.AddRange(XciHelper.LoadGamesFromPath(path, recurse: true, isSdCard: false));
-            }
-
-            if (Directory.Exists(Settings.config.sdDriveLetter))
-            {
-                List<XciItem> xciOnSd = new List<XciItem>();
-
-                // SD card games are currently only in the root directory (for SX OS)
-                xciOnSd = XciHelper.LoadGamesFromPath(Settings.config.sdDriveLetter, recurse: false, isSdCard: true);
-
-                xciList = XciHelper.CreateMasterXciList(xciList, xciOnSd);
-            }
-            olvLocal.SetObjects(xciList);
-            UpdateToolStripLabel();
-        }
-
+        
         public void ProcessChangeIconSize(int displayIndex)
         {
             Size largeSize;
@@ -558,7 +539,7 @@ namespace SwitchGameManager
             olvLocal.LargeImageList.ImageSize = largeSize;
             olvLocal.SmallImageList.ImageSize = smallSize;
 
-            olvLocal.SetObjects(xciList);
+            olvLocal.SetObjects(XciHelper.xciList);
         }
 
         public void ProcessDisplayChange(int displayIndex)
@@ -613,14 +594,13 @@ namespace SwitchGameManager
                         File.Delete(xci.xciSdFilePath);
                     if (isPcAction)
                         File.Delete(xci.xciFilePath);
-
-                    olvLocal.RemoveObject(xci);
-                    xciList.Remove(xci);
                     break;
 
                 default:
                     break;
             }
+
+            XciHelper.UpdateOrRemoveXci(xci);
 
             return true;
         }
@@ -674,7 +654,7 @@ namespace SwitchGameManager
         {
             if (String.IsNullOrWhiteSpace(text) && textBoxFilter.Text.Length > 0)
             {
-                toolStripStatus.Text = $"Displaying {olvLocal.Items.Count} out of {xciList.Count} Switch games.";
+                toolStripStatus.Text = $"Displaying {olvLocal.Items.Count} out of {XciHelper.xciList.Count} Switch games.";
             }
             else if (String.IsNullOrWhiteSpace(text))
             {

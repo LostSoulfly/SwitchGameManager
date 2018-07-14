@@ -43,7 +43,7 @@ namespace SwitchGameManager.Helpers
         {
             xciCache = new List<XciItem>();
             File.Delete(cacheFileName);
-            XciHelper.formMain.PopulateXciList();
+            XciHelper.PopulateXciList();
         }
 
         public static bool LoadSettings(string fileName = "")

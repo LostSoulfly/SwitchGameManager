@@ -9,10 +9,34 @@ using static hacbuild.XCIManager;
 
 namespace SwitchGameManager.Helpers
 {
-    internal class XciHelper
+    public static class XciHelper
     {
         private static hacbuild.XCI hac = new hacbuild.XCI();
         public static formMain formMain;
+
+        public static List<XciItem> xciList = new List<XciItem>();
+
+        public static void PopulateXciList()
+        {
+            xciList = new List<XciItem>();
+
+            foreach (string path in Settings.config.localXciFolders)
+            {
+                xciList.AddRange(XciHelper.LoadGamesFromPath(path, recurse: true, isSdCard: false));
+            }
+
+            if (Directory.Exists(Settings.config.sdDriveLetter))
+            {
+                List<XciItem> xciOnSd = new List<XciItem>();
+
+                // SD card games are currently only in the root directory (for SX OS)
+                xciOnSd = XciHelper.LoadGamesFromPath(Settings.config.sdDriveLetter, recurse: false, isSdCard: true);
+
+                xciList = XciHelper.CreateMasterXciList(xciList, xciOnSd);
+            }
+            formMain.olvLocal.SetObjects(xciList);
+            formMain.UpdateToolStripLabel();
+        }
 
         internal static List<XciItem> CreateMasterXciList(List<XciItem> xciList, List<XciItem> xciOnSd)
         {
@@ -60,10 +84,14 @@ namespace SwitchGameManager.Helpers
             return masterList;
         }
 
-        public static T Clone<T>(T source)
+        public static void RefreshGame(XciItem xci)
         {
-            var serialized = JsonConvert.SerializeObject(source);
-            return JsonConvert.DeserializeObject<T>(serialized);
+            //refresh the actual xci contents with GetXciInfo?
+            //
+        }
+
+        public static void UpdateOrRemoveXci(XciItem xci)
+        {
         }
 
         public static List<string> FindAllFiles(string startDir, string filter, bool recurse = true)
@@ -84,6 +112,11 @@ namespace SwitchGameManager.Helpers
             files.AddRange(Directory.GetFiles(startDir, filter).ToList());
 
             return files;
+        }
+        public static T Clone<T>(T source)
+        {
+            var serialized = JsonConvert.SerializeObject(source);
+            return JsonConvert.DeserializeObject<T>(serialized);
         }
 
         public static ulong GetPackageID(string fileName)
@@ -171,7 +204,7 @@ namespace SwitchGameManager.Helpers
             formMain.toolStripProgressBar.Minimum = 0;
             formMain.toolStripProgressBar.Value = 0;
             formMain.toolStripProgressBar.Visible = true;
-
+            
             //Make a list of all XCI files recursively
             List<string> xciFileList = FindAllFiles(dirPath, "*.xci", recurse);
 
@@ -215,7 +248,7 @@ namespace SwitchGameManager.Helpers
             }
 
             formMain.toolStripProgressBar.Visible = false;
-            formMain.olvLocal.SetObjects(formMain.xciList);
+            formMain.olvLocal.SetObjects(XciHelper.xciList);
             formMain.UpdateToolStripLabel();
 
             SaveXciCache();

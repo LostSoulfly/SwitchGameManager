@@ -16,6 +16,7 @@ namespace SwitchGameManager.Helpers
         private static BackgroundWorker transferWorker;
         private static List<Tuple<string, string, bool>> xciTransfers = new List<Tuple<string, string, bool>>();
         public static formMain formMain;
+        public static bool isTransferInProgress;
 
         private static void CustomCopy_OnComplete(bool Canceled)
         {
@@ -90,7 +91,7 @@ namespace SwitchGameManager.Helpers
                 MessageBox.Show("All files transferred.");
 
             //refresh the xciList and OLV
-            formMain.PopulateXciList();
+            XciHelper.PopulateXciList();
         }
 
         public static void StopTransfers()
