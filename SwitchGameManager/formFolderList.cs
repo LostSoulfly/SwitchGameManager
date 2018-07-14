@@ -149,10 +149,17 @@ namespace SwitchGameManager
 
             foreach (DriveInfo item in driveInfo)
             {
-                if (item.VolumeLabel.Length > 0)
-                    drives.Add($"{item.RootDirectory.ToString()} {item.VolumeLabel} [{item.DriveType}]");
-                else
-                    drives.Add($"{item.RootDirectory.ToString()} ({item.DriveFormat}) [{item.DriveType}]");
+
+                if (!item.IsReady)
+                    continue;
+                try
+                {
+                    if (item.VolumeLabel.Length > 0)
+                        drives.Add($"{item.RootDirectory.ToString()} {item.VolumeLabel} [{item.DriveType}]");
+                    else
+                        drives.Add($"{item.RootDirectory.ToString()} ({item.DriveFormat}) [{item.DriveType}]");
+                }
+                catch { }
             }
 
             return drives;
