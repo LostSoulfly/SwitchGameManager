@@ -15,6 +15,10 @@ namespace SwitchGameManager.Helpers
         private static int transferredFiles = 0;
         private static BackgroundWorker transferWorker;
         private static List<Tuple<string, string, bool>> xciTransfers = new List<Tuple<string, string, bool>>();
+        //TODO
+        //create a list of successful transfers and failed transfers
+        //and link their xci object to them. Update their file information after transfers, then update their information.
+        //also for trimming. TODO
         public static formMain formMain;
         public static bool isTransferInProgress;
 

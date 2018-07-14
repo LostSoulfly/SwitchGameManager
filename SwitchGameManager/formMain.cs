@@ -628,7 +628,7 @@ namespace SwitchGameManager
             }
         }
 
-        public void UpdateProgressBar(int value)
+        public void UpdateProgressBar(int value = 0)
         {
             if (statusStrip1.InvokeRequired)
             {
@@ -638,7 +638,10 @@ namespace SwitchGameManager
             {
                 try
                 {
-                    toolStripProgressBar.Value = value;
+                    if (value == 0)
+                        toolStripProgressBar.Value++;
+                    else
+                        toolStripProgressBar.Value = value;
                 }
                 catch { }
             }

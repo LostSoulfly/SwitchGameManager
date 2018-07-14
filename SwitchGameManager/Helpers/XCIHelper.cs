@@ -16,6 +16,30 @@ namespace SwitchGameManager.Helpers
 
         public static List<XciItem> xciList = new List<XciItem>();
 
+        public static void LoadXcis()
+        {
+            xciList = new List<XciItem>();
+
+            foreach (string path in Settings.config.localXciFolders)
+            {
+                xciList.AddRange(XciHelper.LoadGamesFromPath(path, recurse: true, isSdCard: false));
+            }
+
+            if (Directory.Exists(Settings.config.sdDriveLetter))
+            {
+                List<XciItem> xciOnSd = new List<XciItem>();
+
+                // SD card games are currently only in the root directory (for SX OS)
+                xciOnSd = XciHelper.LoadGamesFromPath(Settings.config.sdDriveLetter, recurse: false, isSdCard: true);
+            }
+
+            //Now we've got two lists of games. Get their unique identifier and join the lists.
+
+
+
+        }
+
+
         public static void PopulateXciList()
         {
             xciList = new List<XciItem>();
@@ -42,6 +66,12 @@ namespace SwitchGameManager.Helpers
         {
             List<XciItem> masterList = new List<XciItem>();
             XciItem xciTemp;
+
+            //TODO if (xciTemp.titleId.Length != 16) xciTemp.titleId = 0 + xciTemp.titleId;
+            //Fix the titleID if necessary.
+            //Update each XCI in case it's empty, which means we must call xciTemp = XciHelper.GetXciInfo(item)
+            //Use AddObject to add the game to the list as it is loaded and processed
+            //Maybe this shouldn't worry about that. Maybe call UpdateXci on each Xci in the list in LoadXcis
 
             for (int i = xciList.Count - 1; i >= 0; i--)
             {
@@ -92,6 +122,9 @@ namespace SwitchGameManager.Helpers
 
         public static void UpdateOrRemoveXci(XciItem xci)
         {
+            //check if on sd/pc/file name changed, etc
+            //then formMain.olvLocal.removeObject() if necesary
+            // otherwise .refreshObject()
         }
 
         public static List<string> FindAllFiles(string startDir, string filter, bool recurse = true)
@@ -192,28 +225,52 @@ namespace SwitchGameManager.Helpers
             return xci;
         }
 
-        public static List<XciItem> LoadGamesFromPath(string dirPath, bool recurse = true, bool isSdCard = false)
+        public static void UpdateXciCache(List<XciItem> newXciList, List<XciItem> xciCache)
         {
-            List<XciItem> xciList = new List<XciItem>();
+
+        }
+
+        public static List<XciItem> LoadGamesFromPathEx(string dirPath, bool recurse = true, bool isSdCard = false)
+        {
+            List<XciItem> pathXciList = new List<XciItem>();
             ulong packageId;
             XciItem xciTemp;
 
             formMain.UpdateToolStripLabel("Loading games..");
             formMain.olvLocal.EmptyListMsg = "Loading games..";
 
-            formMain.toolStripProgressBar.Minimum = 0;
-            formMain.toolStripProgressBar.Value = 0;
-            formMain.toolStripProgressBar.Visible = true;
-            
-            //Make a list of all XCI files recursively
             List<string> xciFileList = FindAllFiles(dirPath, "*.xci", recurse);
 
-            //set our progressbar to the maximum
-            formMain.toolStripProgressBar.Maximum = xciFileList.Count;
+            formMain.SetupProgressBar(0, pathXciList.Count, 0);
 
             foreach (var item in xciFileList)
             {
                 formMain.UpdateToolStripLabel("Processing " + item);
+                formMain.UpdateProgressBar();
+
+                packageId = XciHelper.GetPackageID(item);
+
+                xciTemp = XciHelper.GetXciItemByPackageId(packageId);    // Check if this game is in the Cache
+                if (xciTemp == null)
+                    xciTemp = new XciItem();
+                    //;   // retrieve game info
+                    
+                if (isSdCard)
+                    xciTemp.xciSdFilePath = item;
+                else
+                    xciTemp.xciFilePath = item;
+
+                pathXciList.Add(xciTemp);
+
+            }
+        }
+
+        public static List<XciItem> LoadGamesFromPath(string dirPath, bool recurse = true, bool isSdCard = false)
+        {
+            
+
+            foreach (var item in xciFileList)
+            {
                 formMain.toolStripProgressBar.Value += 1;
                 Application.DoEvents();
                 if (File.Exists(item))
