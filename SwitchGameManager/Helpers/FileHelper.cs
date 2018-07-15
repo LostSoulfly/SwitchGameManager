@@ -95,7 +95,7 @@ namespace SwitchGameManager.Helpers
                 MessageBox.Show("All files transferred.");
 
             //refresh the xciList and OLV
-            XciHelper.PopulateXciList();
+            //XciHelper.LoadXcis();
         }
 
         public static void StopTransfers()

@@ -33,18 +33,12 @@ namespace SwitchGameManager.Helpers
     public class Settings
     {
         public static Config config;
-        public static List<XciItem> xciCache = new List<XciItem>();
 
         public static string cacheFileName = "Cache.json";
 
         public static string configFileName = "Config.json";
 
-        internal static void RebuildCache()
-        {
-            xciCache = new List<XciItem>();
-            File.Delete(cacheFileName);
-            XciHelper.PopulateXciList();
-        }
+        
 
         public static bool LoadSettings(string fileName = "")
         {

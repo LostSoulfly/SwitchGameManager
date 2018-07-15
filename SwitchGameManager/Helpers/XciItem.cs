@@ -66,11 +66,15 @@ namespace SwitchGameManager.Helpers
             get
             {
                 Bitmap bmp;
-                using (var ms = new MemoryStream(this.gameIconBytes))
+                try
                 {
-                    bmp = new Bitmap(ms);
-                    return bmp;
+                    using (var ms = new MemoryStream(this.gameIconBytes))
+                    {
+                        bmp = new Bitmap(ms);
+                        return bmp;
+                    }
                 }
+                catch { return new Bitmap(256, 256); }
             }
             set
             {

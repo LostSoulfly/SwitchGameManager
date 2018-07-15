@@ -213,7 +213,7 @@ namespace SwitchGameManager
 
             olvRenameList.RebuildColumns();
             buttonRename.Enabled = true;
-            XciHelper.PopulateXciList();
+            //XciHelper.LoadXcis();
         }
 
         private bool TryRename(RenameItem item)

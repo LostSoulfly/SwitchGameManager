@@ -837,32 +837,7 @@ namespace XCI_Explorer
                 Clipboard.SetText(betterTreeNode.ActualHash);
             }
         }
-
-        private void TB_File_DragDrop(object sender, DragEventArgs e)
-        {
-            if (backgroundWorker1.IsBusy != true)
-            {
-                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-                TB_File.Text = files[0];
-                ProcessFile();
-            }
-        }
-
-        private void TB_File_DragEnter(object sender, DragEventArgs e)
-        {
-            if (backgroundWorker1.IsBusy != true)
-            {
-                if (e.Data.GetDataPresent(DataFormats.FileDrop))
-                {
-                    e.Effect = DragDropEffects.Copy;
-                }
-                else
-                {
-                    e.Effect = DragDropEffects.None;
-                }
-            }
-        }
-
+        
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
@@ -982,15 +957,11 @@ namespace XCI_Explorer
             // 
             // TB_File
             // 
-            this.TB_File.AllowDrop = true;
             this.TB_File.Location = new System.Drawing.Point(85, 13);
             this.TB_File.Name = "TB_File";
             this.TB_File.ReadOnly = true;
             this.TB_File.Size = new System.Drawing.Size(258, 20);
             this.TB_File.TabIndex = 1;
-            this.TB_File.TextChanged += new System.EventHandler(this.TB_File_TextChanged);
-            this.TB_File.DragDrop += new System.Windows.Forms.DragEventHandler(this.TB_File_DragDrop);
-            this.TB_File.DragEnter += new System.Windows.Forms.DragEventHandler(this.TB_File_DragEnter);
             // 
             // TABC_Main
             // 
@@ -1419,7 +1390,6 @@ namespace XCI_Explorer
             // 
             // MainForm
             // 
-            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(362, 529);
@@ -1475,9 +1445,5 @@ namespace XCI_Explorer
 
         }
 
-        private void TB_File_TextChanged(object sender, EventArgs e)
-        {
-
-        }
     }
 }

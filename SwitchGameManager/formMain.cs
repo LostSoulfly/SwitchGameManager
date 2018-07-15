@@ -42,32 +42,21 @@ namespace SwitchGameManager
         {
             XciHelper.formMain = this;
             FileHelper.formMain = this;
-
+            
             SetupObjectListView();
 
             SetupDelegates();
-
-            //todo Lazy update. Do this stuff in the background
-            this.Show();
-            Application.DoEvents();
-
-            //Load the cache
-            UpdateToolStripLabel("Loading Cache file..");
-            Settings.xciCache = XciHelper.LoadXciCache();
-
+            
             //Load the settings
             if (Settings.LoadSettings() == false)
                 manageXciLocToolStripMenuItem_Click(null, null);
-
-            /*
-            if (Settings.config.sdDriveLetter != null && !Directory.Exists(Settings.config.sdDriveLetter))
-                manageXciLocToolStripMenuItem_Click(null, null);
-            */
+            
+            locationToolStripComboBox.SelectedIndex = 0;
 
             //Setup the OLV with the saved state (if it was saved)
             if (Settings.config.olvState != null)
             {
-                olvLocal.RestoreState(Settings.config.olvState);
+                olvList.RestoreState(Settings.config.olvState);
                 ProcessChangeIconSize(Settings.config.listIconSize);
             }
 
@@ -78,7 +67,7 @@ namespace SwitchGameManager
                 this.Width = Settings.config.formWidth;
 
             UpdateToolMenus();
-            XciHelper.PopulateXciList();
+            XciHelper.LoadXcisInBackground();
 
             /* todo
              * Check if Keys.txt exists, otherwise download it. Maybe procedurally generate the URL? brute force the key?
@@ -88,10 +77,10 @@ namespace SwitchGameManager
 
         private bool IsListIndexUsable()
         {
-            if (olvLocal.SelectedIndices.Count >= 1)
+            if (olvList.SelectedIndices.Count >= 1)
                 return true;
 
-            if (olvLocal.SelectedIndex < 0)
+            if (olvList.SelectedIndex < 0)
             {
                 MessageBox.Show("You need to select a thing before doing that!");
                 return false;
@@ -109,7 +98,7 @@ namespace SwitchGameManager
             {
                 Settings.config.localXciFolders = form.localFolders;
                 Settings.config.sdDriveLetter = form.sdDriveLetter;
-                XciHelper.PopulateXciList();
+                //XciHelper.LoadXcis();
                 UpdateToolMenus();
             }
         }
@@ -145,10 +134,10 @@ namespace SwitchGameManager
                         //re-process the XCI
                         xci = XciHelper.GetXciInfo(xci.xciFilePath);
 
-                        XciItem oldXci = XciHelper.GetXciItemByPackageId(xci.packageId, XciHelper.xciList);
-                        oldXci = xci;
+                        //XciItem oldXci = XciHelper.GetXciItemByPackageId(xci.packageId, XciHelper.xciList);
+                        //oldXci = xci;
 
-                        olvLocal.RefreshObject(XciHelper.xciList);
+                        //olvList.RefreshObject(XciHelper.xciList);
                         return trim;
                     }
                     else
@@ -173,20 +162,20 @@ namespace SwitchGameManager
         {
             textBoxFilter.TextChanged += delegate (object o, EventArgs e)
             {
-                TextMatchFilter filter = TextMatchFilter.Contains(olvLocal, textBoxFilter.Text);
-                olvLocal.AdditionalFilter = filter;
+                TextMatchFilter filter = TextMatchFilter.Contains(olvList, textBoxFilter.Text);
+                olvList.AdditionalFilter = filter;
                 UpdateToolStripLabel();
             };
 
-            olvLocal.MouseClick += delegate (object s, MouseEventArgs e)
+            olvList.MouseClick += delegate (object s, MouseEventArgs e)
             {
                 UpdateToolMenus();
                 if (e.Button == MouseButtons.Right) contextMenuStrip.Show(e.X, e.Y);
             };
 
-            olvLocal.MouseDoubleClick += delegate (object s, MouseEventArgs e)
+            olvList.MouseDoubleClick += delegate (object s, MouseEventArgs e)
             {
-                XciItem xci = (XciItem)olvLocal.GetItem(olvLocal.SelectedIndex).RowObject;
+                XciItem xci = (XciItem)olvList.GetItem(olvList.SelectedIndex).RowObject;
                 XciHelper.ShowXciExplorer(xci.xciFilePath);
             };
 
@@ -205,8 +194,8 @@ namespace SwitchGameManager
 
             cancelTransfersToolStripMenuItem.Click += delegate (object s, EventArgs e) { FileHelper.StopTransfers(); };
             cancelTransfersToolStripMenuItem1.Click += delegate (object s, EventArgs e) { FileHelper.StopTransfers(); };
-            rebuildCachetoolStripMenuItem.Click += delegate (object s, EventArgs e) { Settings.RebuildCache(); };
-            refreshGamesListToolStripMenuItem.Click += delegate (object s, EventArgs e) { XciHelper.PopulateXciList(); };
+            rebuildCachetoolStripMenuItem.Click += delegate (object s, EventArgs e) { XciHelper.RebuildCache(); };
+            refreshGamesListToolStripMenuItem.Click += delegate (object s, EventArgs e) { XciHelper.LoadXcisInBackground(); };
         }
 
         private void UpdateToolMenus()
@@ -221,7 +210,7 @@ namespace SwitchGameManager
 
             //right-click context menu
             ToolStripMenuItem toolStripMenu = (ToolStripMenuItem)contextMenuStrip.Items[1];
-            olvLocal.ContextMenuStrip.Items[0].Enabled = Settings.config.isSdEnabled;
+            olvList.ContextMenuStrip.Items[0].Enabled = Settings.config.isSdEnabled;
             toolStripMenu.DropDownItems[0].Enabled = Settings.config.isSdEnabled;
             toolStripMenu.DropDownItems[1].Enabled = Settings.config.isSdEnabled;
             toolStripMenu.DropDownItems[3].Enabled = Settings.config.isSdEnabled;
@@ -232,10 +221,10 @@ namespace SwitchGameManager
             SendMessage(textBoxFilter.Handle, 0x1501, 1, "Filter Library..");
 
             //initialize the image lists, big and small
-            olvLocal.LargeImageList = new ImageList();
-            olvLocal.LargeImageList.ImageSize = new Size(128, 128);
-            olvLocal.SmallImageList = new ImageList();
-            olvLocal.SmallImageList.ImageSize = new Size(64, 64);
+            olvList.LargeImageList = new ImageList();
+            olvList.LargeImageList.ImageSize = new Size(128, 128);
+            olvList.SmallImageList = new ImageList();
+            olvList.SmallImageList.ImageSize = new Size(64, 64);
 
             //setup the getters that determine how the list shows data/icons
             olvColumnGameSize.AspectGetter = delegate (object row)
@@ -266,12 +255,12 @@ namespace SwitchGameManager
             {
                 XciItem xciInfo = (XciItem)row;
                 String key = xciInfo.packageId.ToString();
-                if (!this.olvLocal.LargeImageList.Images.ContainsKey(key))
+                if (!this.olvList.LargeImageList.Images.ContainsKey(key))
                 {
                     if (xciInfo.gameIcon != null)
                     {
-                        this.olvLocal.SmallImageList.Images.Add(key, xciInfo.gameIcon);
-                        this.olvLocal.LargeImageList.Images.Add(key, xciInfo.gameIcon);
+                        this.olvList.SmallImageList.Images.Add(key, xciInfo.gameIcon);
+                        this.olvList.LargeImageList.Images.Add(key, xciInfo.gameIcon);
                     }
                 }
                 return key;
@@ -317,7 +306,7 @@ namespace SwitchGameManager
                 contextMenuStrip.Items.Add(newMenuItem);
             }
 
-            olvLocal.ContextMenuStrip = contextMenuStrip;
+            olvList.ContextMenuStrip = contextMenuStrip;
         }
 
         private void ToolStripDisplayChange(object sender, EventArgs e)
@@ -381,19 +370,19 @@ namespace SwitchGameManager
                 
             }
 
-            if (olvLocal.SelectedIndices.Count > 1)
+            if (olvList.SelectedIndices.Count > 1)
             {
                 if (toolIndex != 2)
-                    message = $"Are you sure you want to {action} {olvLocal.SelectedObjects.Count} games to {source}?";
+                    message = $"Are you sure you want to {action} {olvList.SelectedObjects.Count} games to {source}?";
                 else if (toolIndex == 2 && isPcAction)
-                    message = $"Are you sure you want to {action} {olvLocal.SelectedObjects.Count} games from {source}?";
+                    message = $"Are you sure you want to {action} {olvList.SelectedObjects.Count} games from {source}?";
                 else
-                    message = $"Are you sure you want to {action} {olvLocal.SelectedObjects.Count} games from {destination}?";
+                    message = $"Are you sure you want to {action} {olvList.SelectedObjects.Count} games from {destination}?";
 
                 if (MessageBox.Show(message, $"Confirm {action.ToUpperInvariant()}", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
                     return;
 
-                foreach (Object obj in olvLocal.SelectedObjects)
+                foreach (Object obj in olvList.SelectedObjects)
                 {
                     xci = (XciItem)obj;
                     ProcessFileManagement(xci, toolIndex, isSdAction, isPcAction);
@@ -401,7 +390,7 @@ namespace SwitchGameManager
             }
             else
             {
-                xci = (XciItem)olvLocal.GetItem(olvLocal.SelectedIndex).RowObject;
+                xci = (XciItem)olvList.GetItem(olvList.SelectedIndex).RowObject;
 
                 if (toolIndex != 2)
                     message = $"Are you sure you want to {action} {xci.gameName} to {source}?";
@@ -421,7 +410,7 @@ namespace SwitchGameManager
         private void ToolStripManagement(object sender, EventArgs e)
         {
             ToolStripItem clicked = sender as ToolStripItem;
-            int toolIndex = olvLocal.ContextMenuStrip.Items.IndexOf(clicked);
+            int toolIndex = olvList.ContextMenuStrip.Items.IndexOf(clicked);
 
             if (toolIndex < 0)
                 toolIndex = gameManagementToolStripMenuItem.DropDownItems.IndexOf(clicked);
@@ -437,7 +426,7 @@ namespace SwitchGameManager
                 formRenamer renamer = new formRenamer();
                 List<XciItem> renameList = new List<XciItem>();
 
-                foreach (XciItem item in olvLocal.SelectedObjects)
+                foreach (XciItem item in olvList.SelectedObjects)
                     renameList.Add(item);
 
                 renamer.PopulateList(renameList);
@@ -455,12 +444,12 @@ namespace SwitchGameManager
             if (toolIndex == 4) action = "rename";
             if (toolIndex == 5) action = "show certs for";
 
-            if (olvLocal.SelectedIndices.Count > 1)
+            if (olvList.SelectedIndices.Count > 1)
             {
-                if (MessageBox.Show($"Are you sure you want to {action} {olvLocal.SelectedObjects.Count} games?", $"Confirm {action.ToUpperInvariant()}", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
+                if (MessageBox.Show($"Are you sure you want to {action} {olvList.SelectedObjects.Count} games?", $"Confirm {action.ToUpperInvariant()}", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
                     return;
 
-                foreach (Object obj in olvLocal.SelectedObjects)
+                foreach (Object obj in olvList.SelectedObjects)
                 {
                     xci = (XciItem)obj;
                     if (ProcessManagementAction(xci, toolIndex))
@@ -472,7 +461,7 @@ namespace SwitchGameManager
             }
             else
             {
-                xci = (XciItem)olvLocal.GetItem(olvLocal.SelectedIndex).RowObject;
+                xci = (XciItem)olvList.GetItem(olvList.SelectedIndex).RowObject;
 
                 if (toolIndex < 4)
                 {
@@ -483,13 +472,20 @@ namespace SwitchGameManager
                 ProcessManagementAction(xci, toolIndex);
             }
 
-            olvLocal.RefreshObject(XciHelper.xciList);
+            //olvList.RefreshObject(XciHelper.xciList);
         }
 
         public void HideProgressElements()
         {
-            toolStripProgressBar.Visible = false;
-            toolStripProgressLabel.Visible = false;
+            if (statusStrip1.InvokeRequired)
+            {
+                statusStrip1.Invoke(new MethodInvoker(delegate { HideProgressElements(); }));
+            }
+            else
+            {
+                toolStripProgressBar.Visible = false;
+                toolStripProgressLabel.Visible = false;
+            }
         }
         
         public void ProcessChangeIconSize(int displayIndex)
@@ -501,45 +497,45 @@ namespace SwitchGameManager
                 case 0: //biggest
                     largeSize = new Size(256, 256);
                     smallSize = new Size(128, 128);
-                    olvLocal.TileSize = new Size(450, 256);
+                    olvList.TileSize = new Size(450, 256);
                     break;
 
                 case 1:
                     largeSize = new Size(128, 128);
                     smallSize = new Size(64, 64);
-                    olvLocal.TileSize = new Size(300, 128);
+                    olvList.TileSize = new Size(300, 128);
                     break;
 
                 case 2:
                     largeSize = new Size(64, 64);
                     smallSize = new Size(32, 32);
-                    olvLocal.TileSize = new Size(250, 64);
+                    olvList.TileSize = new Size(250, 64);
                     break;
 
                 case 3:
                     largeSize = new Size(32, 32);
                     smallSize = new Size(16, 16);
 
-                    olvLocal.TileSize = new Size(150, 32);
+                    olvList.TileSize = new Size(150, 32);
                     break;
 
                 default:
                     largeSize = new Size(128, 128);
                     smallSize = new Size(64, 64);
 
-                    olvLocal.TileSize = new Size(100, 16);
+                    olvList.TileSize = new Size(100, 16);
                     break;
             }
 
-            olvLocal.ClearObjects();
+            olvList.ClearObjects();
 
-            olvLocal.LargeImageList = new ImageList();
-            olvLocal.SmallImageList = new ImageList();
+            olvList.LargeImageList = new ImageList();
+            olvList.SmallImageList = new ImageList();
 
-            olvLocal.LargeImageList.ImageSize = largeSize;
-            olvLocal.SmallImageList.ImageSize = smallSize;
+            olvList.LargeImageList.ImageSize = largeSize;
+            olvList.SmallImageList.ImageSize = smallSize;
 
-            olvLocal.SetObjects(XciHelper.xciList);
+            //olvList.SetObjects(XciHelper.xciList);
         }
 
         public void ProcessDisplayChange(int displayIndex)
@@ -547,26 +543,26 @@ namespace SwitchGameManager
             switch (displayIndex)
             {
                 case 0:
-                    olvLocal.View = View.SmallIcon;
+                    olvList.View = View.SmallIcon;
                     break;
 
                 case 1:
-                    olvLocal.View = View.LargeIcon;
+                    olvList.View = View.LargeIcon;
                     break;
 
                 case 2:
-                    olvLocal.View = View.List;
+                    olvList.View = View.List;
                     break;
 
                 case 3:
-                    olvLocal.View = View.Tile;
+                    olvList.View = View.Tile;
                     break;
 
                 case 4:
-                    olvLocal.View = View.Details;
+                    olvList.View = View.Details;
                     break;
             }
-            olvLocal.Invalidate();
+            olvList.Invalidate();
         }
 
         public bool ProcessFileManagement(XciItem xci, int toolIndex, bool isSdAction, bool isPcAction)
@@ -608,7 +604,7 @@ namespace SwitchGameManager
         public void SaveSettings()
         {
             //save the OLV state to olvState byte array (column positions, etc)
-            Settings.config.olvState = olvLocal.SaveState();
+            Settings.config.olvState = olvList.SaveState();
             XciHelper.SaveXciCache();
             Settings.SaveSettings();
         }
@@ -657,11 +653,11 @@ namespace SwitchGameManager
         {
             if (String.IsNullOrWhiteSpace(text) && textBoxFilter.Text.Length > 0)
             {
-                toolStripStatus.Text = $"Displaying {olvLocal.Items.Count} out of {XciHelper.xciList.Count} Switch games.";
+                //toolStripStatus.Text = $"Displaying {olvList.Items.Count} out of {XciHelper.xciList.Count} Switch games.";
             }
             else if (String.IsNullOrWhiteSpace(text))
             {
-                toolStripStatus.Text = $"Displaying {olvLocal.Items.Count} Switch games.";
+                toolStripStatus.Text = $"Displaying {olvList.Items.Count} Switch games.";
             }
             else
             {

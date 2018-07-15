@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -13,62 +15,82 @@ namespace SwitchGameManager.Helpers
     {
         private static hacbuild.XCI hac = new hacbuild.XCI();
         public static formMain formMain;
+        private static BackgroundWorker backgroundWorker;
 
-        public static List<XciItem> xciList = new List<XciItem>();
+        public static List<XciItem> xciOnPc = new List<XciItem>();
+        public static List<XciItem> xciOnSd = new List<XciItem>();
+        public static List<XciItem> xciCache;
 
-        public static void LoadXcis()
+
+        public static void LoadXcisInBackground()
         {
-            xciList = new List<XciItem>();
-
-            foreach (string path in Settings.config.localXciFolders)
+            if (backgroundWorker == null)
             {
-                xciList.AddRange(XciHelper.LoadGamesFromPath(path, recurse: true, isSdCard: false));
+                backgroundWorker = new BackgroundWorker();
+                backgroundWorker.RunWorkerCompleted += delegate { };
+                backgroundWorker.DoWork += delegate { LoadXcis(); };
             }
 
-            if (Directory.Exists(Settings.config.sdDriveLetter))
+            if (!backgroundWorker.IsBusy)
             {
-                List<XciItem> xciOnSd = new List<XciItem>();
-
-                // SD card games are currently only in the root directory (for SX OS)
-                xciOnSd = XciHelper.LoadGamesFromPath(Settings.config.sdDriveLetter, recurse: false, isSdCard: true);
+                formMain.olvList.ClearObjects();
+                backgroundWorker.RunWorkerAsync();
             }
-
-            //Now we've got two lists of games. Get their unique identifier and join the lists.
-
-
-
         }
 
-
-        public static void PopulateXciList()
+        private static void LoadXcis()
         {
-            xciList = new List<XciItem>();
+            bool updatedXciCache = false;
 
-            foreach (string path in Settings.config.localXciFolders)
+            formMain.UpdateToolStripLabel("Loading games..");
+            formMain.olvList.EmptyListMsg = "Loading games..";
+
+            Application.DoEvents();
+
+            xciOnPc = GetPcXcis();
+            xciOnSd = GetSdXcis();
+            
+            int progressCount = xciOnPc.Count + xciOnSd.Count;
+
+            if (xciOnPc.Count == 0)
+                progressCount--;
+            if (xciOnSd.Count == 0)
+                progressCount--;
+
+            formMain.SetupProgressBar(0, progressCount, 1);
+
+            for (int i = 0; i < xciOnPc.Count -1; i++)
             {
-                xciList.AddRange(XciHelper.LoadGamesFromPath(path, recurse: true, isSdCard: false));
+                formMain.UpdateToolStripLabel("Processing " + xciOnPc[i].xciFilePath);
+
+                xciOnPc[i] = RefreshGame(xciOnPc[i]);
+
+                if (FindXciByIdentifer(xciOnPc[i].packageId, xciOnSd) != null)
+                    xciOnPc[i].isGameOnSd = true;
+
+                formMain.olvList.AddObject(xciOnPc[i]);
+
+                if (UpdateXciCache(xciOnPc[i]))
+                    updatedXciCache = true;
+
+                formMain.UpdateProgressBar();
+
             }
+            
 
-            if (Directory.Exists(Settings.config.sdDriveLetter))
-            {
-                List<XciItem> xciOnSd = new List<XciItem>();
+            if (updatedXciCache)
+                SaveXciCache();
 
-                // SD card games are currently only in the root directory (for SX OS)
-                xciOnSd = XciHelper.LoadGamesFromPath(Settings.config.sdDriveLetter, recurse: false, isSdCard: true);
-
-                xciList = XciHelper.CreateMasterXciList(xciList, xciOnSd);
-            }
-            formMain.olvLocal.SetObjects(xciList);
+            formMain.HideProgressElements();
             formMain.UpdateToolStripLabel();
         }
 
+        /*
         internal static List<XciItem> CreateMasterXciList(List<XciItem> xciList, List<XciItem> xciOnSd)
         {
             List<XciItem> masterList = new List<XciItem>();
             XciItem xciTemp;
 
-            //TODO if (xciTemp.titleId.Length != 16) xciTemp.titleId = 0 + xciTemp.titleId;
-            //Fix the titleID if necessary.
             //Update each XCI in case it's empty, which means we must call xciTemp = XciHelper.GetXciInfo(item)
             //Use AddObject to add the game to the list as it is loaded and processed
             //Maybe this shouldn't worry about that. Maybe call UpdateXci on each Xci in the list in LoadXcis
@@ -88,7 +110,7 @@ namespace SwitchGameManager.Helpers
                     xciList[i].xciSdFilePath = xciTemp.xciSdFilePath;
                     xciOnSd.Remove(xciTemp);
                 }
-                masterList.Add(xciList[i]);
+                masterList.Add(Clone(xciList[i]));
             }
 
             for (int i = xciOnSd.Count - 1; i >= 0; i--)
@@ -113,18 +135,127 @@ namespace SwitchGameManager.Helpers
 
             return masterList;
         }
-
-        public static void RefreshGame(XciItem xci)
-        {
-            //refresh the actual xci contents with GetXciInfo?
-            //
-        }
-
+        */
+        
         public static void UpdateOrRemoveXci(XciItem xci)
         {
             //check if on sd/pc/file name changed, etc
             //then formMain.olvLocal.removeObject() if necesary
             // otherwise .refreshObject()
+        }
+
+        public static bool UpdateXciCache(XciItem xci)
+        {
+            XciItem xciTemp = FindXciByIdentifer(xci.packageId);
+
+            if (!IsXciInfoValid(xciTemp))
+            {
+                if (xciTemp == null)
+                {
+                    xciCache.Add(xci);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static List<XciItem> LoadGamesFromPath(string dirPath, bool recurse = true, bool isSdCard = false)
+        {
+            List<XciItem> pathXciList = new List<XciItem>();
+            ulong packageId;
+            XciItem xciTemp;
+
+            List<string> xciFileList = FindAllFiles(dirPath, "*.xci", recurse);
+
+            foreach (var item in xciFileList)
+            {
+                packageId = XciHelper.GetXciIdentifier(item);
+
+                // Check if this game is in the Cache and Clone the cache XciItem to decouple the objects
+                xciTemp = Clone(XciHelper.FindXciByIdentifer(packageId)); 
+                if (xciTemp == null)
+                    xciTemp = new XciItem();
+
+                xciTemp.xciFilePath = "";
+                xciTemp.xciSdFilePath = "";
+
+                xciTemp.isGameOnSd = isSdCard;
+                xciTemp.isGameOnPc = !isSdCard;
+
+                if (isSdCard)
+                    xciTemp.xciSdFilePath = item;
+                else
+                    xciTemp.xciFilePath = item;
+
+
+                pathXciList.Add(xciTemp);
+            }
+
+            return pathXciList;
+        }
+
+        public static XciItem RefreshGame(XciItem xci, bool force = false)
+        {
+            if (force || !IsXciInfoValid(xci))
+            {
+                if (xci.isGameOnPc)
+                {
+                    xci.isGameOnSd = false;
+                    if (File.Exists(xci.xciFilePath))
+                        xci = GetXciInfo(xci.xciFilePath);
+                }
+                if (xci.isGameOnSd)
+                {
+                    xci.isGameOnPc = false;
+                    if (File.Exists(xci.xciSdFilePath))
+                        xci = GetXciInfo(xci.xciSdFilePath);
+                }
+            }
+
+            return xci;
+        }
+
+        public static List<XciItem> GetPcXcis()
+        {
+            List<XciItem> xciList = new List<XciItem>();
+
+            foreach (string path in Settings.config.localXciFolders)
+            {
+                xciList.AddRange(XciHelper.LoadGamesFromPath(path, recurse: true, isSdCard: false));
+            }
+
+            //xciList = XciHelper.CreateMasterXciList(xciList, xciOnSd);
+
+            return xciList;
+
+        }
+
+        public static List<XciItem> GetSdXcis()
+        {
+            List<XciItem> xciList = new List<XciItem>();
+
+            if (Directory.Exists(Settings.config.sdDriveLetter))
+            {
+                // SD card games are currently only in the root directory (for SX OS)
+                xciList = XciHelper.LoadGamesFromPath(Settings.config.sdDriveLetter, recurse: false, isSdCard: true);
+            }
+
+            return xciList;
+        }
+
+        public static bool IsXciInfoValid(XciItem xci)
+        {
+            if (xci == null)
+                return false;
+
+            if (string.IsNullOrWhiteSpace(xci.gameName))
+                return false;
+
+            if (string.IsNullOrWhiteSpace(xci.titleId))
+                return false;
+
+            return true;
         }
 
         public static List<string> FindAllFiles(string startDir, string filter, bool recurse = true)
@@ -146,13 +277,40 @@ namespace SwitchGameManager.Helpers
 
             return files;
         }
+
         public static T Clone<T>(T source)
         {
-            var serialized = JsonConvert.SerializeObject(source);
-            return JsonConvert.DeserializeObject<T>(serialized);
+            try
+            {
+                var serialized = JsonConvert.SerializeObject(source);
+                return JsonConvert.DeserializeObject<T>(serialized);
+            }
+            catch { return default(T); }
         }
 
-        public static ulong GetPackageID(string fileName)
+        public static List<XciItem> LoadXciCache(string fileName = "")
+        {
+            List<XciItem> xciCache = new List<XciItem>();
+
+            if (String.IsNullOrWhiteSpace(fileName))
+                fileName = Settings.cacheFileName;
+
+            if (!File.Exists(fileName))
+                return xciCache;
+
+            xciCache = JsonConvert.DeserializeObject<IEnumerable<XciItem>>(File.ReadAllText(fileName)).ToList<XciItem>();
+
+            return xciCache;
+        }
+
+        internal static void RebuildCache()
+        {
+            xciCache = new List<XciItem>();
+            File.Delete(Settings.cacheFileName);
+            XciHelper.LoadXcisInBackground();
+        }
+
+        public static ulong GetXciIdentifier(string fileName)
         {
             if (!File.Exists(fileName))
                 return 0;
@@ -170,7 +328,7 @@ namespace SwitchGameManager.Helpers
                 return null;
 
             XCI_Explorer.MainForm mainForm = new XCI_Explorer.MainForm(false);
-
+            
             xci_header header = hac.GetXCIHeader(xci.xciFilePath);
 
             xci.packageId = header.PackageID;
@@ -185,6 +343,7 @@ namespace SwitchGameManager.Helpers
             xci.masterKeyRevision = mainForm.TB_MKeyRev.Text;
             xci.sdkVersion = mainForm.TB_SDKVer.Text;
             xci.titleId = mainForm.TB_TID.Text;
+            if (xci.titleId.Length != 16) xci.titleId = 0 + xci.titleId;
             xci.gameSize = mainForm.exactSize;
             xci.gameUsedSize = mainForm.exactUsedSpace;
             xci.productCode = mainForm.TB_ProdCode.Text;
@@ -204,13 +363,14 @@ namespace SwitchGameManager.Helpers
             return xci;
         }
 
-        public static XciItem GetXciItemByPackageId(ulong packageId, List<XciItem> xciCache = null)
+        public static XciItem FindXciByIdentifer(ulong packageId, List<XciItem> xciCache = null)
         {
             if (xciCache == null)
             {
-                if (Settings.xciCache == null)
-                    Settings.xciCache = LoadXciCache();
-                xciCache = Settings.xciCache;
+                if (XciHelper.xciCache == null)
+                    XciHelper.xciCache = LoadXciCache();
+
+                xciCache = XciHelper.xciCache;
             }
 
             XciItem xci;
@@ -223,111 +383,6 @@ namespace SwitchGameManager.Helpers
                 return null;
             }
             return xci;
-        }
-
-        public static void UpdateXciCache(List<XciItem> newXciList, List<XciItem> xciCache)
-        {
-
-        }
-
-        public static List<XciItem> LoadGamesFromPathEx(string dirPath, bool recurse = true, bool isSdCard = false)
-        {
-            List<XciItem> pathXciList = new List<XciItem>();
-            ulong packageId;
-            XciItem xciTemp;
-
-            formMain.UpdateToolStripLabel("Loading games..");
-            formMain.olvLocal.EmptyListMsg = "Loading games..";
-
-            List<string> xciFileList = FindAllFiles(dirPath, "*.xci", recurse);
-
-            formMain.SetupProgressBar(0, pathXciList.Count, 0);
-
-            foreach (var item in xciFileList)
-            {
-                formMain.UpdateToolStripLabel("Processing " + item);
-                formMain.UpdateProgressBar();
-
-                packageId = XciHelper.GetPackageID(item);
-
-                xciTemp = XciHelper.GetXciItemByPackageId(packageId);    // Check if this game is in the Cache
-                if (xciTemp == null)
-                    xciTemp = new XciItem();
-                    //;   // retrieve game info
-                    
-                if (isSdCard)
-                    xciTemp.xciSdFilePath = item;
-                else
-                    xciTemp.xciFilePath = item;
-
-                pathXciList.Add(xciTemp);
-
-            }
-        }
-
-        public static List<XciItem> LoadGamesFromPath(string dirPath, bool recurse = true, bool isSdCard = false)
-        {
-            
-
-            foreach (var item in xciFileList)
-            {
-                formMain.toolStripProgressBar.Value += 1;
-                Application.DoEvents();
-                if (File.Exists(item))
-                {
-                    packageId = XciHelper.GetPackageID(item);
-
-                    xciTemp = XciHelper.GetXciItemByPackageId(packageId);    // Check if this game is in the Cache
-                    if (xciTemp == null)
-                    {
-                        xciTemp = XciHelper.GetXciInfo(item);   // retrieve game info
-                        if (xciTemp.titleId.Length != 16) xciTemp.titleId = 0 + xciTemp.titleId;
-                        xciTemp.xciFilePath = string.Empty;
-                        xciTemp.xciSdFilePath = string.Empty;
-                        Settings.xciCache.Add(xciTemp);         // add it to the CACHE
-                    }
-
-                    //Let's clone it.. so changes made to it in xciList won't affect xciCache's object
-                    xciTemp = Clone(xciTemp);
-
-                    if (isSdCard)
-                    {
-                        xciTemp.xciSdFilePath = item; //set this game's file path
-                        xciTemp.xciFilePath = string.Empty;
-                    }
-                    else
-                    {
-                        xciTemp.xciFilePath = item; //set this game's file path
-                        xciTemp.xciSdFilePath = string.Empty;
-                    }
-                    xciList.Add(xciTemp);   //add the game to the return list
-                }
-            }
-
-            formMain.toolStripProgressBar.Visible = false;
-            formMain.olvLocal.SetObjects(XciHelper.xciList);
-            formMain.UpdateToolStripLabel();
-
-            SaveXciCache();
-
-            formMain.olvLocal.EmptyListMsg = "No Switch games found!";
-
-            return xciList;
-        }
-
-        public static List<XciItem> LoadXciCache(string fileName = "")
-        {
-            List<XciItem> xciCache = new List<XciItem>();
-
-            if (String.IsNullOrWhiteSpace(fileName))
-                fileName = Settings.cacheFileName;
-
-            if (!File.Exists(fileName))
-                return xciCache;
-
-            xciCache = JsonConvert.DeserializeObject<IEnumerable<XciItem>>(File.ReadAllText(fileName)).ToList<XciItem>();
-
-            return xciCache;
         }
 
         public static string ReadableFileSize(double fileSize)
@@ -362,7 +417,7 @@ namespace SwitchGameManager.Helpers
                 fileName = Settings.cacheFileName;
 
             if (xciCache == null)
-                xciCache = Settings.xciCache;
+                xciCache = XciHelper.xciCache;
 
             if (xciCache == null || xciCache.Count == 0)
                 return;
