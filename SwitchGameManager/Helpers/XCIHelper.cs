@@ -37,10 +37,11 @@ namespace SwitchGameManager.Helpers
         public static void LoadXcisInBackground()
         {
             isGameLoadingComplete = false;
+            formMain.locationToolStripComboBox.Enabled = isGameLoadingComplete;
             if (backgroundWorker == null)
             {
                 backgroundWorker = new BackgroundWorker();
-                backgroundWorker.RunWorkerCompleted += delegate { };
+                backgroundWorker.RunWorkerCompleted += delegate { formMain.locationToolStripComboBox.Enabled = isGameLoadingComplete; formMain.olvList.EmptyListMsg = "No Games Found!"; };
                 backgroundWorker.DoWork += delegate { LoadXcis(); };
             }
             if (!backgroundWorker.IsBusy)
@@ -48,6 +49,9 @@ namespace SwitchGameManager.Helpers
                 formMain.olvList.ClearObjects();
                 backgroundWorker.RunWorkerAsync();
             }
+
+            
+
         }
 
         private static void LoadXcis()
@@ -216,6 +220,8 @@ namespace SwitchGameManager.Helpers
             if (!XciHelper.isGameLoadingComplete)
                 return;
 
+            formMain.locationToolStripComboBox.Enabled = false;
+
             formMain.olvList.ClearObjects();
 
             switch (Settings.config.defaultView)
@@ -233,6 +239,7 @@ namespace SwitchGameManager.Helpers
                     break;
             }
 
+            formMain.locationToolStripComboBox.Enabled = true;
         }
 
         public static bool UpdateXciCache(XciItem xci)

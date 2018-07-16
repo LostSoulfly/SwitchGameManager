@@ -56,7 +56,7 @@
             this.columnPath,
             this.columnRenamed});
             this.olvRenameList.Cursor = System.Windows.Forms.Cursors.Default;
-            this.olvRenameList.EmptyListMsg = "Nothing to see here!";
+            this.olvRenameList.EmptyListMsg = "Nothing left to see here! (That's a good thing)";
             this.olvRenameList.EmptyListMsgFont = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.olvRenameList.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.olvRenameList.FullRowSelect = true;

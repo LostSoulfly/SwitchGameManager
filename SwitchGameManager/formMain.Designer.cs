@@ -46,7 +46,6 @@ namespace SwitchGameManager
             this.olvColumnSdGame = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvColumnXciPath = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvColumnSdFilePath = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.textBoxFilter = new System.Windows.Forms.TextBox();
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.generalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -57,10 +56,10 @@ namespace SwitchGameManager
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gameManagementToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.sdToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.sendToSDCardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.moveToSDCardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.deleteFromSDToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.moveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cancelTransfersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pcToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sendToPCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -96,6 +95,7 @@ namespace SwitchGameManager
             this.toolStripProgressLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.textBoxFilter = new System.Windows.Forms.ToolStripTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.olvList)).BeginInit();
             this.menuStrip.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -133,7 +133,7 @@ namespace SwitchGameManager
             this.olvColumnSdGame,
             this.olvColumnXciPath});
             this.olvList.Cursor = System.Windows.Forms.Cursors.Default;
-            this.olvList.EmptyListMsg = "No Switch Games found!";
+            this.olvList.EmptyListMsg = "No Games found!";
             this.olvList.EmptyListMsgFont = new System.Drawing.Font("Microsoft Sans Serif", 24F);
             this.olvList.FullRowSelect = true;
             this.olvList.HeaderUsesThemes = true;
@@ -297,14 +297,6 @@ namespace SwitchGameManager
             this.olvColumnSdFilePath.IsVisible = false;
             this.olvColumnSdFilePath.Text = "SD File Path";
             // 
-            // textBoxFilter
-            // 
-            this.textBoxFilter.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBoxFilter.Location = new System.Drawing.Point(610, 7);
-            this.textBoxFilter.Name = "textBoxFilter";
-            this.textBoxFilter.Size = new System.Drawing.Size(138, 20);
-            this.textBoxFilter.TabIndex = 3;
-            // 
             // menuStrip
             // 
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -381,7 +373,7 @@ namespace SwitchGameManager
             // gameManagementToolStripMenuItem
             // 
             this.gameManagementToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.sdToolStripMenuItem,
+            this.fileToolStripMenuItem,
             this.pcToolStripMenuItem,
             this.deleteGameToolStripMenuItem,
             this.trimGameToolStripMenuItem,
@@ -391,45 +383,45 @@ namespace SwitchGameManager
             this.gameManagementToolStripMenuItem.Size = new System.Drawing.Size(124, 23);
             this.gameManagementToolStripMenuItem.Text = "Game Management";
             // 
-            // sdToolStripMenuItem
+            // fileToolStripMenuItem
             // 
-            this.sdToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.sendToSDCardToolStripMenuItem,
-            this.moveToSDCardToolStripMenuItem,
-            this.deleteFromSDToolStripMenuItem,
+            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.copyToolStripMenuItem,
+            this.moveToolStripMenuItem,
+            this.deleteToolStripMenuItem,
             this.cancelTransfersToolStripMenuItem});
-            this.sdToolStripMenuItem.Name = "sdToolStripMenuItem";
-            this.sdToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
-            this.sdToolStripMenuItem.Text = "SD Storage";
+            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
+            this.fileToolStripMenuItem.Text = "File Management";
             // 
-            // sendToSDCardToolStripMenuItem
+            // copyToolStripMenuItem
             // 
-            this.sendToSDCardToolStripMenuItem.Name = "sendToSDCardToolStripMenuItem";
-            this.sendToSDCardToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
-            this.sendToSDCardToolStripMenuItem.Tag = "SD";
-            this.sendToSDCardToolStripMenuItem.Text = "Copy To SD Card";
-            this.sendToSDCardToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
+            this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
+            this.copyToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this.copyToolStripMenuItem.Tag = "SD";
+            this.copyToolStripMenuItem.Text = "Copy";
+            this.copyToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
             // 
-            // moveToSDCardToolStripMenuItem
+            // moveToolStripMenuItem
             // 
-            this.moveToSDCardToolStripMenuItem.Name = "moveToSDCardToolStripMenuItem";
-            this.moveToSDCardToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
-            this.moveToSDCardToolStripMenuItem.Tag = "SD";
-            this.moveToSDCardToolStripMenuItem.Text = "Move To SD Card";
-            this.moveToSDCardToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
+            this.moveToolStripMenuItem.Name = "moveToolStripMenuItem";
+            this.moveToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this.moveToolStripMenuItem.Tag = "SD";
+            this.moveToolStripMenuItem.Text = "Move";
+            this.moveToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
             // 
-            // deleteFromSDToolStripMenuItem
+            // deleteToolStripMenuItem
             // 
-            this.deleteFromSDToolStripMenuItem.Name = "deleteFromSDToolStripMenuItem";
-            this.deleteFromSDToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
-            this.deleteFromSDToolStripMenuItem.Tag = "SD";
-            this.deleteFromSDToolStripMenuItem.Text = "Delete From SD";
-            this.deleteFromSDToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
+            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this.deleteToolStripMenuItem.Tag = "SD";
+            this.deleteToolStripMenuItem.Text = "Delete";
+            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
             // 
             // cancelTransfersToolStripMenuItem
             // 
             this.cancelTransfersToolStripMenuItem.Name = "cancelTransfersToolStripMenuItem";
-            this.cancelTransfersToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.cancelTransfersToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.cancelTransfersToolStripMenuItem.Tag = "SD";
             this.cancelTransfersToolStripMenuItem.Text = "Cancel Transfers";
             // 
@@ -441,8 +433,9 @@ namespace SwitchGameManager
             this.deleteFromPCToolStripMenuItem,
             this.cancelTransfersToolStripMenuItem1});
             this.pcToolStripMenuItem.Name = "pcToolStripMenuItem";
-            this.pcToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.pcToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
             this.pcToolStripMenuItem.Text = "PC Storage";
+            this.pcToolStripMenuItem.Visible = false;
             // 
             // sendToPCToolStripMenuItem
             // 
@@ -478,28 +471,28 @@ namespace SwitchGameManager
             // deleteGameToolStripMenuItem
             // 
             this.deleteGameToolStripMenuItem.Name = "deleteGameToolStripMenuItem";
-            this.deleteGameToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
-            this.deleteGameToolStripMenuItem.Text = "Delete Completely";
+            this.deleteGameToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
+            this.deleteGameToolStripMenuItem.Text = "Delete From Everywhere";
             this.deleteGameToolStripMenuItem.Click += new System.EventHandler(this.ToolStripManagement);
             // 
             // trimGameToolStripMenuItem
             // 
             this.trimGameToolStripMenuItem.Name = "trimGameToolStripMenuItem";
-            this.trimGameToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
-            this.trimGameToolStripMenuItem.Text = "Trim Game(s)";
+            this.trimGameToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
+            this.trimGameToolStripMenuItem.Text = "Trim";
             this.trimGameToolStripMenuItem.Click += new System.EventHandler(this.ToolStripManagement);
             // 
             // renameXCIFilesToolStripMenuItem
             // 
             this.renameXCIFilesToolStripMenuItem.Name = "renameXCIFilesToolStripMenuItem";
-            this.renameXCIFilesToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
-            this.renameXCIFilesToolStripMenuItem.Text = "Rename XCI File(s)";
+            this.renameXCIFilesToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
+            this.renameXCIFilesToolStripMenuItem.Text = "Open Rename Tool..";
             this.renameXCIFilesToolStripMenuItem.Click += new System.EventHandler(this.ToolStripManagement);
             // 
             // showXCICertificateToolStripMenuItem
             // 
             this.showXCICertificateToolStripMenuItem.Name = "showXCICertificateToolStripMenuItem";
-            this.showXCICertificateToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.showXCICertificateToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
             this.showXCICertificateToolStripMenuItem.Text = "Show XCI Certificate";
             this.showXCICertificateToolStripMenuItem.Click += new System.EventHandler(this.ToolStripManagement);
             // 
@@ -661,26 +654,26 @@ namespace SwitchGameManager
             // toolStripStatus
             // 
             this.toolStripStatus.Name = "toolStripStatus";
-            this.toolStripStatus.Size = new System.Drawing.Size(84, 17);
+            this.toolStripStatus.Size = new System.Drawing.Size(84, 18);
             this.toolStripStatus.Text = "toolStripStatus";
             // 
             // toolStripSpring
             // 
             this.toolStripSpring.Name = "toolStripSpring";
-            this.toolStripSpring.Size = new System.Drawing.Size(758, 17);
+            this.toolStripSpring.Size = new System.Drawing.Size(631, 18);
             this.toolStripSpring.Spring = true;
             // 
             // toolStripProgressLabel
             // 
             this.toolStripProgressLabel.Name = "toolStripProgressLabel";
-            this.toolStripProgressLabel.Size = new System.Drawing.Size(89, 17);
+            this.toolStripProgressLabel.Size = new System.Drawing.Size(89, 18);
             this.toolStripProgressLabel.Text = "Copy progress..";
             this.toolStripProgressLabel.Visible = false;
             // 
             // toolStripProgressBar
             // 
             this.toolStripProgressBar.Name = "toolStripProgressBar";
-            this.toolStripProgressBar.Size = new System.Drawing.Size(100, 16);
+            this.toolStripProgressBar.Size = new System.Drawing.Size(100, 17);
             this.toolStripProgressBar.Step = 1;
             // 
             // statusStrip1
@@ -689,12 +682,18 @@ namespace SwitchGameManager
             this.toolStripStatus,
             this.toolStripSpring,
             this.toolStripProgressLabel,
-            this.toolStripProgressBar});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 421);
+            this.toolStripProgressBar,
+            this.textBoxFilter});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 420);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(959, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(959, 23);
             this.statusStrip1.TabIndex = 5;
             this.statusStrip1.Text = "statusStrip1";
+            // 
+            // textBoxFilter
+            // 
+            this.textBoxFilter.Name = "textBoxFilter";
+            this.textBoxFilter.Size = new System.Drawing.Size(125, 23);
             // 
             // formMain
             // 
@@ -702,7 +701,6 @@ namespace SwitchGameManager
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(959, 443);
             this.Controls.Add(this.statusStrip1);
-            this.Controls.Add(this.textBoxFilter);
             this.Controls.Add(this.olvList);
             this.Controls.Add(this.menuStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -732,7 +730,6 @@ namespace SwitchGameManager
         private BrightIdeasSoftware.OLVColumn olvColumnGameUsedSize;
         private BrightIdeasSoftware.OLVColumn olvColumnProductCode;
         private BrightIdeasSoftware.OLVColumn olvColumnGameCertEmpty;
-        private System.Windows.Forms.TextBox textBoxFilter;
         private BrightIdeasSoftware.OLVColumn olvColumnPackageId;
         private System.Windows.Forms.MenuStrip menuStrip;
         private System.Windows.Forms.ToolStripMenuItem generalToolStripMenuItem;
@@ -742,7 +739,7 @@ namespace SwitchGameManager
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem gameManagementToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem deleteGameToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem sdToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem trimGameToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem renameXCIFilesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem visualToolStripMenuItem;
@@ -764,8 +761,8 @@ namespace SwitchGameManager
         private System.Windows.Forms.ToolStripMenuItem smallest32x32ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem iconsOnlyToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem pcToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem sendToSDCardToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem moveToSDCardToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem moveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem sendToPCToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem moveToPCToolStripMenuItem;
         private BrightIdeasSoftware.OLVColumn olvColumnLocalGame;
@@ -774,7 +771,7 @@ namespace SwitchGameManager
         private BrightIdeasSoftware.OLVColumn olvColumnSdFilePath;
         private System.Windows.Forms.ToolStripMenuItem cancelTransfersToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem cancelTransfersToolStripMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem deleteFromSDToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem deleteFromPCToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem manageXciLocToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem rebuildCachetoolStripMenuItem;
@@ -786,7 +783,8 @@ namespace SwitchGameManager
         private System.Windows.Forms.StatusStrip statusStrip1;
         public System.Windows.Forms.ToolStripProgressBar toolStripProgressBar1;
         private System.Windows.Forms.ToolStripComboBox toolStripComboBox1;
-        private System.Windows.Forms.ToolStripComboBox locationToolStripComboBox;
+        private System.Windows.Forms.ToolStripTextBox textBoxFilter;
+        public System.Windows.Forms.ToolStripComboBox locationToolStripComboBox;
     }
 }
 

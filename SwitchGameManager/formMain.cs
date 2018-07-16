@@ -157,7 +157,7 @@ namespace SwitchGameManager
 
         private void SetupObjectListView()
         {
-            SendMessage(textBoxFilter.Handle, 0x1501, 1, "Filter Library..");
+            SendMessage(textBoxFilter.Control.Handle, 0x1501, 1, "Filter Library..");
 
             //initialize the image lists, big and small
             olvList.LargeImageList = new ImageList();
@@ -400,5 +400,6 @@ namespace SwitchGameManager
                 toolStripStatus.Text = text;
             }
         }
+
     }
 }
