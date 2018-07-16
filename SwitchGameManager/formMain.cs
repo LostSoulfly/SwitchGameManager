@@ -105,57 +105,7 @@ namespace SwitchGameManager
 
         private bool ProcessManagementAction(XciItem xci, int toolIndex)
         {
-            switch (toolIndex)
-            {
-                case 2: //Delete files from BOTH
-                    try
-                    {
-                        if (File.Exists(xci.xciFilePath))
-                            File.Delete(xci.xciFilePath);
-                        if (File.Exists(xci.xciSdFilePath))
-                            File.Delete(xci.xciSdFilePath);
-
-                        return true;
-                    }
-                    catch { }
-
-                    return false;
-                case 3: //trim games
-                    bool trim;
-                    if (xci.gameSize != xci.gameUsedSize)
-                    {
-                        trim = XciHelper.TrimXci(xci);
-
-                        if (trim)
-                            UpdateToolStripLabel($"Successfully trimmed {xci.gameName}!");
-                        else
-                            UpdateToolStripLabel($"Failed to trim {xci.gameName}!");
-
-                        //re-process the XCI
-                        xci = XciHelper.GetXciInfo(xci.xciFilePath);
-
-                        //XciItem oldXci = XciHelper.GetXciItemByPackageId(xci.packageId, XciHelper.xciList);
-                        //oldXci = xci;
-
-                        //olvList.RefreshObject(XciHelper.xciList);
-                        return trim;
-                    }
-                    else
-                    {
-                        UpdateToolStripLabel($"{xci.gameName} is already trimmed!");
-                        return true;
-                    }
-
-                case 4: //Rename files
-                    return true;
-
-                case 5: //show XCI Cert
-                    XciHelper.ShowXciCert(xci);
-                    return true;
-
-                default:
-                    return false;
-            }
+            return true;
         }
 
         private void SetupDelegates()
@@ -181,6 +131,8 @@ namespace SwitchGameManager
 
             exitToolStripMenuItem.Click += delegate (object s, EventArgs e) { Application.Exit(); };
 
+            locationToolStripComboBox.SelectedIndexChanged += delegate (object s, EventArgs e) { Settings.config.defaultView = locationToolStripComboBox.SelectedIndex; XciHelper.RefreshList(); };
+
             this.FormClosing += delegate (object s, FormClosingEventArgs e) { SaveSettings(); };
 
             this.ResizeEnd += delegate (object s, EventArgs e)
@@ -201,19 +153,6 @@ namespace SwitchGameManager
         private void UpdateToolMenus()
         {
 
-            Settings.CheckForSdCard();
-
-            sdToolStripMenuItem.Enabled = Settings.config.isSdEnabled;
-            sendToPCToolStripMenuItem.Enabled = Settings.config.isSdEnabled;
-            moveToPCToolStripMenuItem.Enabled = Settings.config.isSdEnabled;
-            cancelTransfersToolStripMenuItem1.Enabled = Settings.config.isSdEnabled;
-
-            //right-click context menu
-            ToolStripMenuItem toolStripMenu = (ToolStripMenuItem)contextMenuStrip.Items[1];
-            olvList.ContextMenuStrip.Items[0].Enabled = Settings.config.isSdEnabled;
-            toolStripMenu.DropDownItems[0].Enabled = Settings.config.isSdEnabled;
-            toolStripMenu.DropDownItems[1].Enabled = Settings.config.isSdEnabled;
-            toolStripMenu.DropDownItems[3].Enabled = Settings.config.isSdEnabled;
         }
 
         private void SetupObjectListView()
@@ -273,40 +212,6 @@ namespace SwitchGameManager
             });
             */
 
-            //set up the right-click menu for the objectlistview without remaking it..
-            ToolStripMenuItem newMenuItem;
-            ToolStripMenuItem subMenuItem;
-            foreach (ToolStripMenuItem menuItem in gameManagementToolStripMenuItem.DropDownItems)
-            {
-                if (menuItem.DropDownItems.Count > 0)
-                    newMenuItem = new ToolStripMenuItem(menuItem.Text);
-                else
-                    newMenuItem = new ToolStripMenuItem(menuItem.Text, null, onClick: ToolStripManagement);
-
-                if (newMenuItem.Text.Contains("SD"))
-                {
-                    foreach (ToolStripMenuItem subItem in menuItem.DropDownItems)
-                    {
-                        subMenuItem = new ToolStripMenuItem(subItem.Text, null, onClick: ToolStripFileManagement);
-                        subMenuItem.Tag = "SD";
-                        newMenuItem.DropDownItems.Add(subMenuItem);
-                    }
-                }
-
-                if (newMenuItem.Text.Contains("PC"))
-                {
-                    foreach (ToolStripMenuItem subItem in menuItem.DropDownItems)
-                    {
-                        subMenuItem = new ToolStripMenuItem(subItem.Text, null, onClick: ToolStripFileManagement);
-                        subMenuItem.Tag = "PC";
-                        newMenuItem.DropDownItems.Add(subMenuItem);
-                    }
-                }
-
-                contextMenuStrip.Items.Add(newMenuItem);
-            }
-
-            olvList.ContextMenuStrip = contextMenuStrip;
         }
 
         private void ToolStripDisplayChange(object sender, EventArgs e)
@@ -326,153 +231,12 @@ namespace SwitchGameManager
 
         private void ToolStripFileManagement(object sender, EventArgs e)
         {
-            bool isPcAction = false, isSdAction = false;
-            string action = "", destination = "", source = "", message = "";
-            XciItem xci;
-
-            ToolStripItem clicked = sender as ToolStripItem;
-            ToolStripMenuItem toolStripMenu = (ToolStripMenuItem)contextMenuStrip.Items[0];
-            int toolIndex = toolStripMenu.DropDownItems.IndexOf(clicked);
-
-            //TODO clean this up..
-            if (toolIndex < 0)
-            {
-                toolStripMenu = (ToolStripMenuItem)contextMenuStrip.Items[1];
-                toolIndex = toolStripMenu.DropDownItems.IndexOf(clicked);
-            }
-            if (toolIndex < 0)
-                toolIndex = sdToolStripMenuItem.DropDownItems.IndexOf(clicked);
-
-            if (toolIndex < 0)
-                toolIndex = pcToolStripMenuItem.DropDownItems.IndexOf(clicked);
-
-            Debug.Assert(toolIndex > 0);
-
-            if (!IsListIndexUsable())
-                return;
-
-            if (toolIndex == 0) action = "copy";
-            if (toolIndex == 1) action = "move";
-            if (toolIndex == 2) action = "delete";
-
-            if ((string)clicked.Tag == "PC")
-            {
-                isPcAction = true;
-                source = "PC";
-                destination = "SD";
-
-            }
-            else
-            {
-                isSdAction = true;
-                source = "SD";
-                destination = "PC";
-                
-            }
-
-            if (olvList.SelectedIndices.Count > 1)
-            {
-                if (toolIndex != 2)
-                    message = $"Are you sure you want to {action} {olvList.SelectedObjects.Count} games to {source}?";
-                else if (toolIndex == 2 && isPcAction)
-                    message = $"Are you sure you want to {action} {olvList.SelectedObjects.Count} games from {source}?";
-                else
-                    message = $"Are you sure you want to {action} {olvList.SelectedObjects.Count} games from {destination}?";
-
-                if (MessageBox.Show(message, $"Confirm {action.ToUpperInvariant()}", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
-                    return;
-
-                foreach (Object obj in olvList.SelectedObjects)
-                {
-                    xci = (XciItem)obj;
-                    ProcessFileManagement(xci, toolIndex, isSdAction, isPcAction);
-                }
-            }
-            else
-            {
-                xci = (XciItem)olvList.GetItem(olvList.SelectedIndex).RowObject;
-
-                if (toolIndex != 2)
-                    message = $"Are you sure you want to {action} {xci.gameName} to {source}?";
-                else
-                    message = $"Are you sure you want to {action} {xci.gameName} from {source}?";
-
-                if (MessageBox.Show(message, $"Confirm {action.ToUpperInvariant()}", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
-                    return;
-
-                ProcessFileManagement(xci, toolIndex, isSdAction, isPcAction);
-            }
-
-            //PopulateXciList();
 
         }
 
         private void ToolStripManagement(object sender, EventArgs e)
         {
-            ToolStripItem clicked = sender as ToolStripItem;
-            int toolIndex = olvList.ContextMenuStrip.Items.IndexOf(clicked);
 
-            if (toolIndex < 0)
-                toolIndex = gameManagementToolStripMenuItem.DropDownItems.IndexOf(clicked);
-
-            //Debug.Assert(toolIndex > 0, "toolIndex should be > 0");
-
-            Debug.Assert(toolIndex > 0);
-
-            if (!IsListIndexUsable()) return;
-
-            if (toolIndex == 4)
-            {
-                formRenamer renamer = new formRenamer();
-                List<XciItem> renameList = new List<XciItem>();
-
-                foreach (XciItem item in olvList.SelectedObjects)
-                    renameList.Add(item);
-
-                renamer.PopulateList(renameList);
-                renamer.Show();
-                return;
-            }
-
-            XciItem xci;
-            int successful = 0;
-            int failure = 0;
-            string action = "";
-
-            if (toolIndex == 2) action = "completely delete";
-            if (toolIndex == 3) action = "trim";
-            if (toolIndex == 4) action = "rename";
-            if (toolIndex == 5) action = "show certs for";
-
-            if (olvList.SelectedIndices.Count > 1)
-            {
-                if (MessageBox.Show($"Are you sure you want to {action} {olvList.SelectedObjects.Count} games?", $"Confirm {action.ToUpperInvariant()}", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
-                    return;
-
-                foreach (Object obj in olvList.SelectedObjects)
-                {
-                    xci = (XciItem)obj;
-                    if (ProcessManagementAction(xci, toolIndex))
-                        successful++;
-                    else
-                        failure++;
-                    UpdateToolStripLabel($"{action.ToUpperInvariant()} results: Success: {successful}  Failed: {failure}");
-                }
-            }
-            else
-            {
-                xci = (XciItem)olvList.GetItem(olvList.SelectedIndex).RowObject;
-
-                if (toolIndex < 4)
-                {
-                    if (MessageBox.Show($"Are you sure you want to {action} {xci.gameName}?", $"Confirm {action.ToUpperInvariant()}", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
-                        return;
-                }
-
-                ProcessManagementAction(xci, toolIndex);
-            }
-
-            //olvList.RefreshObject(XciHelper.xciList);
         }
 
         public void HideProgressElements()
@@ -567,36 +331,7 @@ namespace SwitchGameManager
 
         public bool ProcessFileManagement(XciItem xci, int toolIndex, bool isSdAction, bool isPcAction)
         {
-            switch (toolIndex)
-            {
-                case 0: //copy
-                    if (isSdAction)
-                        FileHelper.TransferXci(xci, copyToSd: true);
-                    if (isPcAction)
-                        FileHelper.TransferXci(xci, copyToPc: true);
-
-                    break;
-
-                case 1: //move
-                    if (isSdAction)
-                        FileHelper.TransferXci(xci, moveXci: true, copyToSd: true);
-                    if (isPcAction)
-                        FileHelper.TransferXci(xci, moveXci: true, copyToPc: true);
-
-                    break;
-
-                case 2: //delete
-                    if (isSdAction)
-                        File.Delete(xci.xciSdFilePath);
-                    if (isPcAction)
-                        File.Delete(xci.xciFilePath);
-                    break;
-
-                default:
-                    break;
-            }
-
-            XciHelper.UpdateOrRemoveXci(xci);
+            
 
             return true;
         }
@@ -621,6 +356,7 @@ namespace SwitchGameManager
                 toolStripProgressBar.Maximum = max;
                 toolStripProgressBar.Value = initial;
                 toolStripProgressBar.Visible = true;
+                Application.DoEvents();
             }
         }
 

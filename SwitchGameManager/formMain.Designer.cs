@@ -90,12 +90,12 @@ namespace SwitchGameManager
             this.selectImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
+            this.locationToolStripComboBox = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripSpring = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.locationToolStripComboBox = new System.Windows.Forms.ToolStripComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.olvList)).BeginInit();
             this.menuStrip.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -286,7 +286,7 @@ namespace SwitchGameManager
             this.olvColumnXciPath.IsEditable = false;
             this.olvColumnXciPath.IsTileViewColumn = true;
             this.olvColumnXciPath.MinimumWidth = 125;
-            this.olvColumnXciPath.Text = "File Path";
+            this.olvColumnXciPath.Text = "PC File Path";
             this.olvColumnXciPath.Width = 125;
             // 
             // olvColumnSdFilePath
@@ -523,7 +523,7 @@ namespace SwitchGameManager
             this.detailsToolStripMenuItem,
             this.iconsOnlyToolStripMenuItem});
             this.displayStyleToolStripMenuItem.Name = "displayStyleToolStripMenuItem";
-            this.displayStyleToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.displayStyleToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
             this.displayStyleToolStripMenuItem.Text = "List Display Style";
             // 
             // smallIconsToolStripMenuItem
@@ -576,7 +576,7 @@ namespace SwitchGameManager
             this.small64x64ToolStripMenuItem,
             this.smallest32x32ToolStripMenuItem});
             this.iconSizeToolStripMenuItem.Name = "iconSizeToolStripMenuItem";
-            this.iconSizeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.iconSizeToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
             this.iconSizeToolStripMenuItem.Text = "Icon Size";
             // 
             // biggestToolStripMenuItem
@@ -613,7 +613,7 @@ namespace SwitchGameManager
             this.backgroundImageToolStripMenuItem});
             this.themesToolStripMenuItem.Enabled = false;
             this.themesToolStripMenuItem.Name = "themesToolStripMenuItem";
-            this.themesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.themesToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
             this.themesToolStripMenuItem.Text = "Themes";
             // 
             // backgroundImageToolStripMenuItem
@@ -649,6 +649,15 @@ namespace SwitchGameManager
             this.toolStripComboBox1.Name = "toolStripComboBox1";
             this.toolStripComboBox1.Size = new System.Drawing.Size(100, 23);
             // 
+            // locationToolStripComboBox
+            // 
+            this.locationToolStripComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.locationToolStripComboBox.Items.AddRange(new object[] {
+            "Show Local Games",
+            "Show SD Games"});
+            this.locationToolStripComboBox.Name = "locationToolStripComboBox";
+            this.locationToolStripComboBox.Size = new System.Drawing.Size(130, 23);
+            // 
             // toolStripStatus
             // 
             this.toolStripStatus.Name = "toolStripStatus";
@@ -672,6 +681,7 @@ namespace SwitchGameManager
             // 
             this.toolStripProgressBar.Name = "toolStripProgressBar";
             this.toolStripProgressBar.Size = new System.Drawing.Size(100, 16);
+            this.toolStripProgressBar.Step = 1;
             // 
             // statusStrip1
             // 
@@ -685,15 +695,6 @@ namespace SwitchGameManager
             this.statusStrip1.Size = new System.Drawing.Size(959, 22);
             this.statusStrip1.TabIndex = 5;
             this.statusStrip1.Text = "statusStrip1";
-            // 
-            // locationToolStripComboBox
-            // 
-            this.locationToolStripComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.locationToolStripComboBox.Items.AddRange(new object[] {
-            "Show Local Games",
-            "Show SD Games"});
-            this.locationToolStripComboBox.Name = "locationToolStripComboBox";
-            this.locationToolStripComboBox.Size = new System.Drawing.Size(130, 23);
             // 
             // formMain
             // 

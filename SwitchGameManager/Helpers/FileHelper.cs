@@ -15,6 +15,27 @@ namespace SwitchGameManager.Helpers
         private static int transferredFiles = 0;
         private static BackgroundWorker transferWorker;
         private static List<Tuple<string, string, bool>> xciTransfers = new List<Tuple<string, string, bool>>();
+
+        public struct FileStruct
+        {
+            public FileAction action;
+            public string destinationPath;
+            public string sourcePath;
+            public XciHelper.XciLocation source;
+            public XciHelper.XciLocation destination;
+        }
+
+        public enum FileAction
+        {
+            None,
+            Copy,
+            Move,
+            Delete,
+            Trim,
+            ShowCert,
+            ShowXciInfo
+        }
+
         //TODO
         //create a list of successful transfers and failed transfers
         //and link their xci object to them. Update their file information after transfers, then update their information.
@@ -86,6 +107,8 @@ namespace SwitchGameManager.Helpers
             //needs error reporting
             formMain.HideProgressElements();
 
+            isTransferInProgress = false;
+
             if (transferWorker.CancellationPending)
                 formMain.UpdateProgressLabel($"Transfer cancelled; [{transferredFiles}/{totalFiles}] transferred.");
 
@@ -124,7 +147,7 @@ namespace SwitchGameManager.Helpers
 
             string source = string.Empty;
             string destination = string.Empty;
-
+            
             if (copyToPc)
             {
                 source = xci.xciSdFilePath;
@@ -163,6 +186,7 @@ namespace SwitchGameManager.Helpers
 
             if (!transferWorker.IsBusy)
             {
+                isTransferInProgress = true;
                 transferWorker.RunWorkerAsync();
             }
 

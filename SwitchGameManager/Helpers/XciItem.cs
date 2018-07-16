@@ -40,6 +40,11 @@ namespace SwitchGameManager.Helpers
         [JsonIgnore]
         public bool isGameOnSd;
 
+        [JsonIgnore]
+        public FileHelper.FileStruct fileAction;
+
+        public XciHelper.XciLocation xciLocation;
+
         public bool isUniqueCert;
 
         public bool isXciTrimmed;
