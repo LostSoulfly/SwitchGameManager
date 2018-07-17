@@ -104,13 +104,7 @@ namespace SwitchGameManager
                 UpdateToolMenus();
             }
         }
-
-        private bool ProcessManagementAction(XciItem xci, int toolIndex)
-        {
-            //ToolStripManagement?
-            return true;
-        }
-
+        
         private void SetupDelegates()
         {
             textBoxFilter.TextChanged += delegate (object o, EventArgs e)
@@ -268,6 +262,7 @@ namespace SwitchGameManager
 
             XciItem xci;
             string message = string.Empty, action = string.Empty, source = string.Empty, destination = string.Empty;
+            int success = 0, failure = 0;
             FileStruct fileAction = new FileStruct();
 
             ToolStripItem clicked = sender as ToolStripItem;
@@ -303,7 +298,7 @@ namespace SwitchGameManager
             action = Enum.GetName(typeof(FileAction), fileAction.action);
             source = Enum.GetName(typeof(XciLocation), fileAction.source);
             destination = Enum.GetName(typeof(XciLocation), fileAction.destination);
-
+            
             if (olvList.SelectedIndices.Count > 1)
             {
 
@@ -320,8 +315,13 @@ namespace SwitchGameManager
                 {
                     xci = XciHelper.Clone((XciItem)obj);
                     xci.fileAction = fileAction;
-                    ProcessFileManagement(xci);
+                    if (ProcessFileManagement(xci))
+                        success++;
+                    else
+                        failure++;
                 }
+
+                UpdateToolStripLabel($"{action.ToUpperInvariant()} results: Success: {success}  Failed: {failure}");
             }
             else
             {
@@ -338,14 +338,19 @@ namespace SwitchGameManager
 
 
                 xci.fileAction = fileAction;
-                ProcessFileManagement(xci);
+                if (ProcessFileManagement(xci))
+                    UpdateToolStripLabel($"{action.ToUpperInvariant()} successful for {xci.gameName}");
+                else
+                    UpdateToolStripLabel($"{action.ToUpperInvariant()} failed for {xci.gameName}");
             }
+
+            XciHelper.LoadXcisInBackground();
 
         }
 
         private void ToolStripManagement(object sender, EventArgs e)
         {
-            //use ProcessManagementAction
+            //use ProcessFileManagement
             //delete all copies
             //trim
             //show cert
@@ -365,39 +370,85 @@ namespace SwitchGameManager
             if (toolIndex == 3) fileAction.action = FileAction.ShowRenameWindow;
             if (toolIndex == 4) fileAction.action = FileAction.ShowCert;
             if (toolIndex == 5) fileAction.action = FileAction.ShowInExplorer;
-
-            if (fileAction.action == FileAction.ShowRenameWindow)
-            {
-                formRenamer renamer = new formRenamer();
-                List<XciItem> renameList = new List<XciItem>();
-
-                foreach (XciItem item in olvList.SelectedObjects)
-                    renameList.Add(item);
-
-                renamer.PopulateList(renameList);
-                renamer.Show();
-                return;
-            }
-
-            //process single or multi items here
-            //confirm also
-
+            
             switch (fileAction.action)
             {
-                case FileAction.Delete:
-                    break;
-                case FileAction.Trim:
-                    //ProcessFileManagement();
-                    break;
-                case FileAction.ShowCert:
-                    break;
-                case FileAction.ShowXciInfo:
-                    break;
+                case FileAction.ShowRenameWindow:
+                    formRenamer renamer = new formRenamer();
+                    List<XciItem> renameList = new List<XciItem>();
+
+                    foreach (XciItem item in olvList.SelectedObjects)
+                        renameList.Add(item);
+
+                    renamer.PopulateList(renameList);
+                    renamer.Show();
+                    return;
+
                 case FileAction.ShowInExplorer:
-                    break;
+                    return;
+
+                case FileAction.ShowCert:
+                    return;
+
+                case FileAction.ShowXciInfo:
+                    return;
+
                 default:
                     break;
             }
+
+            XciItem xci;
+            int success = 0, failure = 0;
+
+            action = Enum.GetName(typeof(FileAction), fileAction.action);
+
+            if (fileAction.action == FileAction.CompletelyDelete) action = "completely delete (from all locations)";
+
+            if (olvList.SelectedIndices.Count > 1)
+            {
+                if (MessageBox.Show($"Are you sure you want to {action} {olvList.SelectedObjects.Count} games?", $"Confirm {action.ToUpperInvariant()}", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
+                    return;
+
+                List<XciItem> actionList = new List<XciItem>();
+
+                foreach (object obj in olvList.SelectedObjects)
+                {
+                    xci = (XciItem)obj;
+                    actionList.Add(Clone(xci));
+                }
+
+                foreach (XciItem obj in actionList)
+                {
+                    xci = (XciItem)obj;
+                    xci.fileAction = fileAction;
+
+                    if (ProcessFileManagement(xci))
+                        success++;
+                    else
+                        failure++;
+
+                    UpdateToolStripLabel($"{action.ToUpperInvariant()} results: Success: {success}  Failed: {failure}");
+
+                    if (fileAction.action == FileAction.Trim)
+                        XciHelper.UpdateXci(xci);
+                }
+            }
+            else
+            {
+                xci = (XciItem)olvList.GetItem(olvList.SelectedIndex).RowObject;
+                xci.fileAction = fileAction;
+
+                if (MessageBox.Show($"Are you sure you want to {action} {xci.gameName}?", $"Confirm {action.ToUpperInvariant()}", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
+                    return;
+                
+                ProcessFileManagement(xci);
+
+                if (fileAction.action == FileAction.Trim)
+                    XciHelper.UpdateXci(xci);
+            }
+
+            if (fileAction.action == FileAction.CompletelyDelete)
+                XciHelper.RefreshList();
 
         }
 
@@ -521,6 +572,20 @@ namespace SwitchGameManager
                     catch { }
 
                     return false;
+
+                case FileAction.CompletelyDelete:
+
+                    List<XciItem> deleteItems = GetAllItemsByIdentifer(xci.packageId);
+
+                    for (int i = deleteItems.Count - 1; i >= 0; i--)
+                    {
+                        if (File.Exists(deleteItems[i].xciFilePath))
+                            File.Delete(deleteItems[i].xciFilePath);
+                        if (File.Exists(deleteItems[i].xciSdFilePath))
+                            File.Delete(deleteItems[i].xciSdFilePath);
+                    }
+
+                    return true;
 
                 case FileAction.Trim:
                     bool trim;

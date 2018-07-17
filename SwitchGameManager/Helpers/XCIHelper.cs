@@ -585,6 +585,25 @@ namespace SwitchGameManager.Helpers
             return xci;
         }
 
+        public static List<XciItem> GetAllItemsByIdentifer(ulong packageId)
+        {
+            List<XciItem> xciList = new List<XciItem>();
+
+            try
+            {
+                xciList.AddRange(xciOnPc.FindAll(item => item.packageId == packageId));
+            }
+            catch { }
+
+            try
+            {
+                xciList.AddRange(xciOnSd.FindAll(item => item.packageId == packageId));
+            }
+            catch { }
+
+            return xciList;
+        }
+
         public static string ReadableFileSize(double fileSize)
         {
             string[] sizes = { "B", "KB", "MB", "GB", "TB" };

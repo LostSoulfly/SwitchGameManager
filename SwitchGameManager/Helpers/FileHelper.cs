@@ -31,6 +31,7 @@ namespace SwitchGameManager.Helpers
             Copy,
             Move,
             Delete,
+            CompletelyDelete,
             Trim,
             ShowCert,
             ShowXciInfo,
