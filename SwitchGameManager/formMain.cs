@@ -126,6 +126,8 @@ namespace SwitchGameManager
                 if (e.Button == MouseButtons.Right) contextMenuStrip.Show(e.X, e.Y);
             };
 
+            gameManagementToolStripMenuItem.Click += delegate (object s, EventArgs e) { UpdateToolMenus(); };
+
             olvList.MouseDoubleClick += delegate (object s, MouseEventArgs e)
             {
                 XciItem xci = (XciItem)olvList.GetItem(olvList.SelectedIndex).RowObject;
@@ -218,6 +220,30 @@ namespace SwitchGameManager
             });
             */
 
+            ToolStripMenuItem newMenuItem;
+            ToolStripMenuItem subMenuItem;
+            foreach (ToolStripMenuItem menuItem in gameManagementToolStripMenuItem.DropDownItems)
+            {
+                if (menuItem.DropDownItems.Count > 0)
+                {
+                    newMenuItem = new ToolStripMenuItem(menuItem.Text);
+
+                    foreach (ToolStripMenuItem subItem in menuItem.DropDownItems)
+                    {
+                        subMenuItem = new ToolStripMenuItem(subItem.Text, null, onClick: ToolStripFileManagement);
+                        newMenuItem.DropDownItems.Add(subMenuItem);
+                    }
+                }
+                else
+                {
+                    newMenuItem = new ToolStripMenuItem(menuItem.Text, null, onClick: ToolStripManagement);
+                }
+
+                contextMenuStrip.Items.Add(newMenuItem);
+            }
+
+            olvList.ContextMenuStrip = contextMenuStrip;
+
         }
 
         private void ToolStripDisplayChange(object sender, EventArgs e)
@@ -248,11 +274,9 @@ namespace SwitchGameManager
             ToolStripMenuItem toolStripMenu = fileToolStripMenuItem;
             int toolIndex = toolStripMenu.DropDownItems.IndexOf(clicked);
 
-            //ToolStripMenuItem toolStripMenu = (ToolStripMenuItem)contextMenuStrip.Items[0];
-            
             if (toolIndex < 0)
             {
-                toolStripMenu = (ToolStripMenuItem)contextMenuStrip.Items[1];
+                toolStripMenu = (ToolStripMenuItem)contextMenuStrip.Items[0];
                 toolIndex = toolStripMenu.DropDownItems.IndexOf(clicked);
             }
 
@@ -327,6 +351,54 @@ namespace SwitchGameManager
             //show cert
             //show xciexplorer
             //show in explorer
+            string message = string.Empty, action = string.Empty, source = string.Empty, destination = string.Empty;
+            FileStruct fileAction = new FileStruct();
+
+            ToolStripItem clicked = sender as ToolStripItem;
+            int toolIndex = olvList.ContextMenuStrip.Items.IndexOf(clicked);
+
+            if (toolIndex < 0)
+                toolIndex = gameManagementToolStripMenuItem.DropDownItems.IndexOf(clicked);
+
+            if (toolIndex == 1) fileAction.action = FileAction.Delete;
+            if (toolIndex == 2) fileAction.action = FileAction.Trim;
+            if (toolIndex == 3) fileAction.action = FileAction.ShowRenameWindow;
+            if (toolIndex == 4) fileAction.action = FileAction.ShowCert;
+            if (toolIndex == 5) fileAction.action = FileAction.ShowInExplorer;
+
+            if (fileAction.action == FileAction.ShowRenameWindow)
+            {
+                formRenamer renamer = new formRenamer();
+                List<XciItem> renameList = new List<XciItem>();
+
+                foreach (XciItem item in olvList.SelectedObjects)
+                    renameList.Add(item);
+
+                renamer.PopulateList(renameList);
+                renamer.Show();
+                return;
+            }
+
+            //process single or multi items here
+            //confirm also
+
+            switch (fileAction.action)
+            {
+                case FileAction.Delete:
+                    break;
+                case FileAction.Trim:
+                    //ProcessFileManagement();
+                    break;
+                case FileAction.ShowCert:
+                    break;
+                case FileAction.ShowXciInfo:
+                    break;
+                case FileAction.ShowInExplorer:
+                    break;
+                default:
+                    break;
+            }
+
         }
 
         public void HideProgressElements()
@@ -421,6 +493,13 @@ namespace SwitchGameManager
 
         public bool ProcessFileManagement(XciItem xci)
         {
+
+            if (!Settings.config.isSdEnabled &&
+                (xci.fileAction.action == FileAction.Copy
+                || xci.fileAction.action == FileAction.Delete
+                || xci.fileAction.action == FileAction.Move))
+                return false;
+
             switch (xci.fileAction.action)
             {
                 case FileAction.None:
@@ -553,9 +632,5 @@ namespace SwitchGameManager
             }
         }
 
-        private void menuStrip_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
-
-        }
     }
 }

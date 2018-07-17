@@ -34,7 +34,8 @@ namespace SwitchGameManager.Helpers
             Trim,
             ShowCert,
             ShowXciInfo,
-            ShowInExplorer
+            ShowInExplorer,
+            ShowRenameWindow
         }
 
         //TODO
@@ -124,6 +125,17 @@ namespace SwitchGameManager.Helpers
         {
             if (transferWorker.IsBusy)
                 transferWorker.CancelAsync();
+        }
+
+        public static bool IsXciInTransferList(XciItem xci)
+        {
+            lock (lockObject)
+            {
+                if (xciTransfers.Contains(xci))
+                    return true;
+            }
+
+            return false;
         }
 
         public static bool TransferXci(XciItem xci)

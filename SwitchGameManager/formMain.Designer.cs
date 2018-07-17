@@ -91,6 +91,7 @@ namespace SwitchGameManager
             this.toolStripProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.textBoxFilter = new System.Windows.Forms.ToolStripTextBox();
+            this.showInXCIExplorerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.olvList)).BeginInit();
             this.menuStrip.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -306,7 +307,6 @@ namespace SwitchGameManager
             this.menuStrip.Size = new System.Drawing.Size(959, 27);
             this.menuStrip.TabIndex = 4;
             this.menuStrip.Text = "Menu";
-            this.menuStrip.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menuStrip_ItemClicked);
             // 
             // generalToolStripMenuItem
             // 
@@ -373,7 +373,8 @@ namespace SwitchGameManager
             this.deleteGameToolStripMenuItem,
             this.trimGameToolStripMenuItem,
             this.renameXCIFilesToolStripMenuItem,
-            this.showXCICertificateToolStripMenuItem});
+            this.showXCICertificateToolStripMenuItem,
+            this.showInXCIExplorerToolStripMenuItem});
             this.gameManagementToolStripMenuItem.Name = "gameManagementToolStripMenuItem";
             this.gameManagementToolStripMenuItem.Size = new System.Drawing.Size(124, 23);
             this.gameManagementToolStripMenuItem.Text = "Game Management";
@@ -468,7 +469,7 @@ namespace SwitchGameManager
             this.detailsToolStripMenuItem,
             this.iconsOnlyToolStripMenuItem});
             this.displayStyleToolStripMenuItem.Name = "displayStyleToolStripMenuItem";
-            this.displayStyleToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.displayStyleToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
             this.displayStyleToolStripMenuItem.Text = "List Display Style";
             // 
             // smallIconsToolStripMenuItem
@@ -521,7 +522,7 @@ namespace SwitchGameManager
             this.small64x64ToolStripMenuItem,
             this.smallest32x32ToolStripMenuItem});
             this.iconSizeToolStripMenuItem.Name = "iconSizeToolStripMenuItem";
-            this.iconSizeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.iconSizeToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
             this.iconSizeToolStripMenuItem.Text = "Icon Size";
             // 
             // biggestToolStripMenuItem
@@ -558,7 +559,7 @@ namespace SwitchGameManager
             this.backgroundImageToolStripMenuItem});
             this.themesToolStripMenuItem.Enabled = false;
             this.themesToolStripMenuItem.Name = "themesToolStripMenuItem";
-            this.themesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.themesToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
             this.themesToolStripMenuItem.Text = "Themes";
             // 
             // backgroundImageToolStripMenuItem
@@ -647,6 +648,12 @@ namespace SwitchGameManager
             this.textBoxFilter.Name = "textBoxFilter";
             this.textBoxFilter.Size = new System.Drawing.Size(125, 23);
             // 
+            // showInXCIExplorerToolStripMenuItem
+            // 
+            this.showInXCIExplorerToolStripMenuItem.Name = "showInXCIExplorerToolStripMenuItem";
+            this.showInXCIExplorerToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
+            this.showInXCIExplorerToolStripMenuItem.Text = "Show In XCI Explorer";
+            // 
             // formMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -732,6 +739,7 @@ namespace SwitchGameManager
         private System.Windows.Forms.ToolStripComboBox toolStripComboBox1;
         private System.Windows.Forms.ToolStripTextBox textBoxFilter;
         public System.Windows.Forms.ToolStripComboBox locationToolStripComboBox;
+        private System.Windows.Forms.ToolStripMenuItem showInXCIExplorerToolStripMenuItem;
     }
 }
 
