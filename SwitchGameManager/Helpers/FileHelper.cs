@@ -14,7 +14,7 @@ namespace SwitchGameManager.Helpers
         private static int totalFiles = 0;
         private static int transferredFiles = 0;
         private static BackgroundWorker transferWorker;
-        private static List<Tuple<string, string, bool>> xciTransfers = new List<Tuple<string, string, bool>>();
+        private static List<XciItem> xciTransfers = new List<XciItem>();
 
         public struct FileStruct
         {
@@ -33,7 +33,8 @@ namespace SwitchGameManager.Helpers
             Delete,
             Trim,
             ShowCert,
-            ShowXciInfo
+            ShowXciInfo,
+            ShowInExplorer
         }
 
         //TODO
@@ -58,7 +59,7 @@ namespace SwitchGameManager.Helpers
             //todo check if enough space on destination for transfer
             formMain.SetupProgressBar(0, 100, 0);
 
-            Tuple<string, string, bool> action;
+            XciItem xciAction;
 
             totalFiles = xciTransfers.Count();
             transferredFiles = 0;
@@ -66,31 +67,29 @@ namespace SwitchGameManager.Helpers
             while (xciTransfers.Count > 0)
             {
                 lock (lockObject)
-                    action = xciTransfers.First();
+                    xciAction = xciTransfers.First();
 
-                customCopy = new CustomFileCopy(action.Item1, action.Item2);
+                customCopy = new CustomFileCopy(xciAction.fileAction.sourcePath, xciAction.fileAction.destinationPath);
 
                 customCopy.OnProgressChanged += CustomCopy_OnProgressChanged;
                 customCopy.OnComplete += CustomCopy_OnComplete;
 
-                formMain.UpdateProgressLabel($"Copying {Path.GetFileName(action.Item1)} [{transferredFiles}/{totalFiles}]");
+                formMain.UpdateProgressLabel($"Copying {Path.GetFileName(xciAction.fileAction.sourcePath)} [{transferredFiles}/{totalFiles}]");
 
                 customCopy.Copy();
 
                 //if file is set to be moved, and we didn't cancel, delete the source file
-                if (action.Item3 && !transferWorker.CancellationPending)
-                    File.Delete(action.Item1);
+                if (xciAction.fileAction.action == FileAction.Move && !transferWorker.CancellationPending)
+                    File.Delete(xciAction.fileAction.sourcePath);
 
                 transferredFiles++;
 
                 lock (lockObject)
-                {
-                    xciTransfers.Remove(action);
-                }
+                    xciTransfers.Remove(xciAction);
 
                 if (transferWorker.CancellationPending)
                 {
-                    File.Delete(action.Item2); //delete the destination if we cancelled early
+                    File.Delete(xciAction.fileAction.destinationPath); //delete the destination if we cancelled early
                     e.Cancel = true;
                     return;
                 }
@@ -127,7 +126,7 @@ namespace SwitchGameManager.Helpers
                 transferWorker.CancelAsync();
         }
 
-        public static bool TransferXci(XciItem xci, bool moveXci = false, bool copyToPc = false, bool copyToSd = false)
+        public static bool TransferXci(XciItem xci)
         {
             if (transferWorker != null && !transferWorker.IsBusy && transferWorker.CancellationPending)
             {
@@ -147,14 +146,13 @@ namespace SwitchGameManager.Helpers
 
             string source = string.Empty;
             string destination = string.Empty;
-            
-            if (copyToPc)
+
+            if (xci.fileAction.destination == XciHelper.XciLocation.PC)
             {
                 source = xci.xciSdFilePath;
                 destination = Path.Combine(Settings.config.localXciFolders[0], Path.GetFileName(source));
             }
-
-            if (copyToSd)
+            else
             {
                 source = xci.xciFilePath;
                 destination = Path.Combine(Settings.config.sdDriveLetter, Path.GetFileName(source));
@@ -163,7 +161,7 @@ namespace SwitchGameManager.Helpers
             if (source == destination)
                 return false;
 
-            if (copyToPc == copyToSd)
+            if (xci.fileAction.destination == xci.fileAction.source)
                 return false;
 
             if (String.IsNullOrWhiteSpace(source) || String.IsNullOrWhiteSpace(destination))
@@ -179,9 +177,9 @@ namespace SwitchGameManager.Helpers
 
             lock (lockObject)
             {
-                xciTransfers.Add(new Tuple<string, string, bool>(source, destination, moveXci));
+                xciTransfers.Add(xci);
                 totalFiles++;
-                formMain.UpdateProgressLabel($"Copying {Path.GetFileName(xciTransfers.First().Item1)} [{transferredFiles}/{totalFiles}]");
+                formMain.UpdateProgressLabel($"Copying {Path.GetFileName(xciTransfers.First().fileAction.sourcePath)} [{transferredFiles}/{totalFiles}]");
             }
 
             if (!transferWorker.IsBusy)

@@ -23,7 +23,7 @@ namespace SwitchGameManager.Helpers
         public List<string> localXciFolders = new List<string>();
         public string sdDriveLetter = string.Empty;
         public byte[] olvState;
-        public int defaultView;
+        public XciHelper.XciLocation defaultView;
 
         [JsonIgnore]
         public bool isSdEnabled = false;
