@@ -85,8 +85,6 @@ namespace SwitchGameManager
             {
                 if (File.Exists(item.xciFilePath))
                     renameItems.Add(new RenameItem(item.xciFilePath, item.xciFilePath, item));
-                if (File.Exists(item.xciSdFilePath))
-                    renameItems.Add(new RenameItem(item.xciSdFilePath, item.xciSdFilePath, item));
             }
 
             olvRenameList.SetObjects(renameItems);

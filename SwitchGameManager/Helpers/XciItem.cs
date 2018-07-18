@@ -63,7 +63,7 @@ namespace SwitchGameManager.Helpers
 
         public long xciFileSize;
 
-        public string xciSdFilePath;
+        //public string xciSdFilePath;
 
         //Can't serialize a Bitmap object.. so we convert it to and from a Byte array on the fly
         internal Bitmap gameIcon

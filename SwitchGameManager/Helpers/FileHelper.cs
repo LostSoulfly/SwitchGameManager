@@ -23,6 +23,8 @@ namespace SwitchGameManager.Helpers
             public string sourcePath;
             public XciHelper.XciLocation source;
             public XciHelper.XciLocation destination;
+            public bool actionCompleted;
+            public bool actionSuccess;
         }
 
         public enum FileAction
@@ -80,12 +82,8 @@ namespace SwitchGameManager.Helpers
 
                 customCopy.Copy();
 
-                //if file is set to be moved, and we didn't cancel, delete the source file
-                if (xciAction.fileAction.action == FileAction.Move && !transferWorker.CancellationPending)
-                    File.Delete(xciAction.fileAction.sourcePath);
-
                 transferredFiles++;
-
+                
                 lock (lockObject)
                     xciTransfers.Remove(xciAction);
 
@@ -95,6 +93,8 @@ namespace SwitchGameManager.Helpers
                     e.Cancel = true;
                     return;
                 }
+
+                XciHelper.UpdateXci(xciAction);
             }
         }
 
@@ -141,6 +141,11 @@ namespace SwitchGameManager.Helpers
 
         public static bool TransferXci(XciItem xci)
         {
+
+            if (xci.fileAction.action != FileAction.Copy &&
+                xci.fileAction.action != FileAction.Move)
+                return false;
+
             if (transferWorker != null && !transferWorker.IsBusy && transferWorker.CancellationPending)
             {
                 transferWorker.Dispose();
@@ -157,35 +162,30 @@ namespace SwitchGameManager.Helpers
                 transferWorker.ProgressChanged += TransferWorker_ProgressChanged;
             }
 
-            string source = string.Empty;
-            string destination = string.Empty;
+            if (string.IsNullOrWhiteSpace(xci.fileAction.sourcePath))
+                xci.fileAction.sourcePath = xci.xciFilePath;
 
-            if (xci.fileAction.destination == XciHelper.XciLocation.PC)
-            {
-                source = xci.xciSdFilePath;
-                destination = Path.Combine(Settings.config.localXciFolders[0], Path.GetFileName(source));
-            }
+            if (xci.fileAction.source == XciHelper.XciLocation.SD)
+                xci.fileAction.destinationPath = Path.Combine(Settings.config.localXciFolders[0], Path.GetFileName(xci.fileAction.sourcePath));
             else
-            {
-                source = xci.xciFilePath;
-                destination = Path.Combine(Settings.config.sdDriveLetter, Path.GetFileName(source));
-            }
+                xci.fileAction.destinationPath = Path.Combine(Settings.config.sdDriveLetter, Path.GetFileName(xci.fileAction.sourcePath));
 
-            if (source == destination)
+
+            if (String.IsNullOrWhiteSpace(xci.fileAction.sourcePath) || String.IsNullOrWhiteSpace(xci.fileAction.destinationPath))
                 return false;
 
             if (xci.fileAction.destination == xci.fileAction.source)
                 return false;
 
-            if (String.IsNullOrWhiteSpace(source) || String.IsNullOrWhiteSpace(destination))
+            if (xci.fileAction.destinationPath == xci.fileAction.sourcePath)
                 return false;
 
-            if (File.Exists(destination))
+            if (File.Exists(xci.fileAction.destinationPath))
             {
-                if (MessageBox.Show($"{destination} already exists. Overwrite it?", "Overwrite Destination File", MessageBoxButtons.YesNo) != DialogResult.Yes)
+                if (MessageBox.Show($"{xci.fileAction.destinationPath} already exists. Overwrite it?", "Overwrite Destination File", MessageBoxButtons.YesNo) != DialogResult.Yes)
                     return false;
 
-                File.Delete(destination);
+                File.Delete(xci.fileAction.destinationPath);
             }
 
             lock (lockObject)

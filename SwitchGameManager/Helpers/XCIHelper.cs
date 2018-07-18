@@ -164,100 +164,75 @@ namespace SwitchGameManager.Helpers
             isGameLoadingComplete = true;
         }
 
-        /*
-        internal static List<XciItem> CreateMasterXciList(List<XciItem> xciList, List<XciItem> xciOnSd)
-        {
-            List<XciItem> masterList = new List<XciItem>();
-            XciItem xciTemp;
-
-            //Update each XCI in case it's empty, which means we must call xciTemp = XciHelper.GetXciInfo(item)
-            //Use AddObject to add the game to the list as it is loaded and processed
-            //Maybe this shouldn't worry about that. Maybe call UpdateXci on each Xci in the list in LoadXcis
-
-            for (int i = xciList.Count - 1; i >= 0; i--)
-            {
-                xciTemp = GetXciItemByPackageId(xciList[i].packageId, xciOnSd);
-                if (xciTemp == null)
-                {
-                    xciList[i].isGameOnSd = false;
-                    xciList[i].isGameOnPc = true;
-                }
-                else
-                {
-                    xciList[i].isGameOnPc = true;
-                    xciList[i].isGameOnSd = true;
-                    xciList[i].xciSdFilePath = xciTemp.xciSdFilePath;
-                    xciOnSd.Remove(xciTemp);
-                }
-                masterList.Add(Clone(xciList[i]));
-            }
-
-            for (int i = xciOnSd.Count - 1; i >= 0; i--)
-            {
-                xciTemp = GetXciItemByPackageId(xciOnSd[i].packageId, masterList);
-                if (xciTemp == null)
-                {
-                    xciOnSd[i].isGameOnSd = true;
-                    xciOnSd[i].isGameOnPc = false;
-                    //xciOnSd[i].xciSdFilePath = xciOnSd[i].xciFilePath;
-                    xciOnSd[i].xciFilePath = string.Empty;
-                    masterList.Add(xciOnSd[i]);
-                }
-                else
-                {
-                    masterList[i].isGameOnPc = true;
-                    masterList[i].isGameOnSd = true;
-                    xciOnSd[i].xciSdFilePath = xciOnSd[i].xciFilePath;
-                    xciOnSd[i].xciFilePath = xciTemp.xciFilePath;
-                }
-            }
-
-            return masterList;
-        }
-        */
-        
         public static void UpdateXci(XciItem xci)
         {
-            XciItem xciTempSource;
-            XciItem xciTempDest;
+            XciItem xciTempSource = new XciItem();
+            XciItem xciTempDest = new XciItem();
 
+            if (xci.fileAction.action == FileHelper.FileAction.Copy || xci.fileAction.action == FileHelper.FileAction.Move)
+            {
+                if (xci.fileAction.destination == XciLocation.SD)
+                    xciTempSource = FindXciByIdentifer(xci.packageId, xciOnPc);
+                else
+                    xciTempSource = FindXciByIdentifer(xci.packageId, xciOnSd);
+            }
+            else
+            {
+                if (xci.xciLocation == XciLocation.PC)
+                    xciTempSource = FindXciByIdentifer(xci.packageId, xciOnSd);
+                else
+                    xciTempSource = FindXciByIdentifer(xci.packageId, xciOnPc);
+            }
+            
             switch (xci.fileAction.action)
             {
                 case FileHelper.FileAction.None:
                     break;
                 case FileHelper.FileAction.Copy:
+                    
+                    xciTempSource.isGameOnPc = true;
+                    xciTempSource.isGameOnSd = true;
 
-                    if (xci.fileAction.destination == XciLocation.SD)
+                    xciTempDest = Clone(xci);
+                    xciTempDest.xciFilePath = xci.fileAction.destinationPath;
+                    xciTempDest.xciLocation = xci.fileAction.destination;
+                    xciTempDest = RefreshGame(xciTempDest, true);
+                    
+                    if (xci.fileAction.destination == XciLocation.PC)
+                        xciOnPc.Add(xciTempDest);
+                    else
+                        xciOnSd.Add(xciTempDest);
+
+                    if (Settings.config.defaultView == xciTempDest.xciLocation)
+                        formMain.olvList.AddObject(xciTempDest);
+
+                    break;
+
+                case FileHelper.FileAction.Move:
+                    //check if the source still exists, check if the destination exists
+                    //add the new object to the list for the destination
+                    //remove the object from the source list
+                    //add object to list if that listview
+                    break;
+
+                case FileHelper.FileAction.Delete:
+                    //Check if file exists any longer. May not be necessary if we just refresh the xci lists
+                    if (!File.Exists(xci.xciFilePath))
                     {
-                        xciTempDest = Clone(xci);
-                        xciTempDest.xciSdFilePath = xciTempDest.fileAction.destinationPath;
-                        xciTempDest.fileAction = new FileHelper.FileStruct();
-                        xciTempDest.xciLocation = XciLocation.SD;
-                        xciTempDest = RefreshGame(xciTempDest, true);
-                        xciTempDest.isGameOnPc = true;
-                    } else
-                    {
-                        xciTempDest = Clone(xci);
-                        xciTempDest.xciFilePath = xciTempDest.fileAction.destinationPath;
-                        xciTempDest.fileAction = new FileHelper.FileStruct();
-                        xciTempDest.xciLocation = XciLocation.SD;
-                        xciTempDest = RefreshGame(xciTempDest, true);
-                        xciTempDest.isGameOnPc = true;
+                        if (xci.xciLocation == XciLocation.PC)
+                            xciOnPc.Remove(xci);
+                        else
+                            xciOnSd.Remove(xci);
+                            
+                        if (Settings.config.defaultView == xci.xciLocation)
+                            formMain.olvList.RemoveObject(xci);
                     }
 
                     break;
-                case FileHelper.FileAction.Move:
-                    break;
-                case FileHelper.FileAction.Delete:
-                    break;
                 case FileHelper.FileAction.Trim:
-                    break;
-                case FileHelper.FileAction.ShowCert:
-                    break;
-                case FileHelper.FileAction.ShowXciInfo:
-                    break;
-                case FileHelper.FileAction.ShowInExplorer:
-                    //todo
+                    //check if the file size changed, and if it did, get the XCI Info again
+                    xciTempSource.gameSize = (double)new FileInfo(xci.xciFilePath).Length;
+                    xciTempSource.isXciTrimmed = (xci.gameSize == xci.gameUsedSize);
                     break;
                 default:
                     break;
@@ -334,22 +309,16 @@ namespace SwitchGameManager.Helpers
                     xciTemp = new XciItem();
 
                 xciTemp.xciFilePath = "";
-                xciTemp.xciSdFilePath = "";
 
                 xciTemp.isGameOnSd = isSdCard;
                 xciTemp.isGameOnPc = !isSdCard;
 
                 if (isSdCard)
-                {
                     xciTemp.xciLocation = XciLocation.SD;
-                    xciTemp.xciSdFilePath = item;
-                }
                 else
-                {
                     xciTemp.xciLocation = XciLocation.PC;
-                    xciTemp.xciFilePath = item;
-                }
 
+                xciTemp.xciFilePath = item;
 
                 pathXciList.Add(xciTemp);
             }
@@ -375,20 +344,8 @@ namespace SwitchGameManager.Helpers
         {
             if (force || !IsXciInfoValid(xci))
             {
-                if (xci.xciLocation == XciLocation.PC)
-                {
-                    xci.isGameOnSd = false;
-                    xci.xciSdFilePath = "";
-                    if (File.Exists(xci.xciFilePath))
-                        xci = GetXciInfo(xci.xciFilePath, XciLocation.PC);
-                }
-                else
-                {
-                    xci.isGameOnPc = false;
-                    xci.xciFilePath = "";
-                    if (File.Exists(xci.xciSdFilePath))
-                        xci = GetXciInfo(xci.xciSdFilePath, XciLocation.SD);
-                }
+                if (File.Exists(xci.xciFilePath))
+                    xci = GetXciInfo(xci.xciFilePath, xci.xciLocation);
             }
 
             xci.isGameOnSd = (FindXciByIdentifer(xci.packageId, xciOnSd) != null);
