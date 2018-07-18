@@ -45,7 +45,6 @@ namespace SwitchGameManager
             this.olvColumnLocalGame = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvColumnSdGame = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvColumnXciPath = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.olvColumnSdFilePath = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.generalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -66,6 +65,7 @@ namespace SwitchGameManager
             this.renameXCIFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showXCICertificateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showInXCIExplorerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.showInWindowsExplorerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.visualToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.displayStyleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.smallIconsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -83,16 +83,14 @@ namespace SwitchGameManager
             this.backgroundImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.selectImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
-            this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
             this.locationToolStripComboBox = new System.Windows.Forms.ToolStripComboBox();
+            this.textBoxFilter = new System.Windows.Forms.ToolStripTextBox();
             this.toolStripStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripSpring = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.textBoxFilter = new System.Windows.Forms.ToolStripTextBox();
-            this.showInWindowsExplorerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.sdInfoToolStripStatus = new System.Windows.Forms.ToolStripStatusLabel();
             ((System.ComponentModel.ISupportInitialize)(this.olvList)).BeginInit();
             this.menuStrip.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -113,7 +111,6 @@ namespace SwitchGameManager
             this.olvList.AllColumns.Add(this.olvColumnLocalGame);
             this.olvList.AllColumns.Add(this.olvColumnSdGame);
             this.olvList.AllColumns.Add(this.olvColumnXciPath);
-            this.olvList.AllColumns.Add(this.olvColumnSdFilePath);
             this.olvList.AllowColumnReorder = true;
             this.olvList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
@@ -135,12 +132,12 @@ namespace SwitchGameManager
             this.olvList.FullRowSelect = true;
             this.olvList.HeaderUsesThemes = true;
             this.olvList.LabelWrap = false;
-            this.olvList.Location = new System.Drawing.Point(12, 37);
+            this.olvList.Location = new System.Drawing.Point(0, 30);
             this.olvList.Name = "olvList";
             this.olvList.ShowGroups = false;
             this.olvList.ShowImagesOnSubItems = true;
             this.olvList.ShowItemCountOnGroups = true;
-            this.olvList.Size = new System.Drawing.Size(935, 381);
+            this.olvList.Size = new System.Drawing.Size(959, 387);
             this.olvList.TabIndex = 0;
             this.olvList.TileSize = new System.Drawing.Size(300, 50);
             this.olvList.TintSortColumn = true;
@@ -286,23 +283,15 @@ namespace SwitchGameManager
             this.olvColumnXciPath.Text = "PC File Path";
             this.olvColumnXciPath.Width = 125;
             // 
-            // olvColumnSdFilePath
-            // 
-            this.olvColumnSdFilePath.AspectName = "xciSdFilePath";
-            this.olvColumnSdFilePath.DisplayIndex = 10;
-            this.olvColumnSdFilePath.FillsFreeSpace = true;
-            this.olvColumnSdFilePath.IsVisible = false;
-            this.olvColumnSdFilePath.Text = "SD File Path";
-            // 
             // menuStrip
             // 
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.generalToolStripMenuItem,
             this.gameManagementToolStripMenuItem,
             this.visualToolStripMenuItem,
-            this.toolStripProgressBar1,
-            this.toolStripComboBox1,
-            this.locationToolStripComboBox});
+            this.locationToolStripComboBox,
+            this.textBoxFilter,
+            this.sdInfoToolStripStatus});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
             this.menuStrip.Size = new System.Drawing.Size(959, 27);
@@ -395,7 +384,7 @@ namespace SwitchGameManager
             // copyToolStripMenuItem
             // 
             this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
-            this.copyToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.copyToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.copyToolStripMenuItem.Tag = "SD";
             this.copyToolStripMenuItem.Text = "Copy";
             this.copyToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
@@ -403,7 +392,7 @@ namespace SwitchGameManager
             // moveToolStripMenuItem
             // 
             this.moveToolStripMenuItem.Name = "moveToolStripMenuItem";
-            this.moveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.moveToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.moveToolStripMenuItem.Tag = "SD";
             this.moveToolStripMenuItem.Text = "Move";
             this.moveToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
@@ -411,7 +400,7 @@ namespace SwitchGameManager
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.deleteToolStripMenuItem.Tag = "SD";
             this.deleteToolStripMenuItem.Text = "Delete";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
@@ -419,7 +408,7 @@ namespace SwitchGameManager
             // cancelTransfersToolStripMenuItem
             // 
             this.cancelTransfersToolStripMenuItem.Name = "cancelTransfersToolStripMenuItem";
-            this.cancelTransfersToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.cancelTransfersToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.cancelTransfersToolStripMenuItem.Tag = "SD";
             this.cancelTransfersToolStripMenuItem.Text = "Cancel Transfers";
             // 
@@ -457,6 +446,13 @@ namespace SwitchGameManager
             this.showInXCIExplorerToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
             this.showInXCIExplorerToolStripMenuItem.Text = "Show In XCI Explorer";
             this.showInXCIExplorerToolStripMenuItem.Click += new System.EventHandler(this.ToolStripManagement);
+            // 
+            // showInWindowsExplorerToolStripMenuItem
+            // 
+            this.showInWindowsExplorerToolStripMenuItem.Name = "showInWindowsExplorerToolStripMenuItem";
+            this.showInWindowsExplorerToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.showInWindowsExplorerToolStripMenuItem.Text = "Open In Windows Explorer";
+            this.showInWindowsExplorerToolStripMenuItem.Click += new System.EventHandler(this.ToolStripManagement);
             // 
             // visualToolStripMenuItem
             // 
@@ -570,6 +566,7 @@ namespace SwitchGameManager
             this.themesToolStripMenuItem.Name = "themesToolStripMenuItem";
             this.themesToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
             this.themesToolStripMenuItem.Text = "Themes";
+            this.themesToolStripMenuItem.Visible = false;
             // 
             // backgroundImageToolStripMenuItem
             // 
@@ -592,26 +589,22 @@ namespace SwitchGameManager
             this.selectImageToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
             this.selectImageToolStripMenuItem.Text = "Select Image..";
             // 
-            // toolStripProgressBar1
-            // 
-            this.toolStripProgressBar1.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.toolStripProgressBar1.Name = "toolStripProgressBar1";
-            this.toolStripProgressBar1.Size = new System.Drawing.Size(100, 20);
-            // 
-            // toolStripComboBox1
-            // 
-            this.toolStripComboBox1.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.toolStripComboBox1.Name = "toolStripComboBox1";
-            this.toolStripComboBox1.Size = new System.Drawing.Size(100, 23);
-            // 
             // locationToolStripComboBox
             // 
             this.locationToolStripComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.locationToolStripComboBox.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.locationToolStripComboBox.Items.AddRange(new object[] {
             "Show Local Games",
             "Show SD Games"});
             this.locationToolStripComboBox.Name = "locationToolStripComboBox";
             this.locationToolStripComboBox.Size = new System.Drawing.Size(130, 23);
+            // 
+            // textBoxFilter
+            // 
+            this.textBoxFilter.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.textBoxFilter.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.textBoxFilter.Name = "textBoxFilter";
+            this.textBoxFilter.Size = new System.Drawing.Size(125, 23);
             // 
             // toolStripStatus
             // 
@@ -622,7 +615,7 @@ namespace SwitchGameManager
             // toolStripSpring
             // 
             this.toolStripSpring.Name = "toolStripSpring";
-            this.toolStripSpring.Size = new System.Drawing.Size(631, 18);
+            this.toolStripSpring.Size = new System.Drawing.Size(758, 18);
             this.toolStripSpring.Spring = true;
             // 
             // toolStripProgressLabel
@@ -644,25 +637,18 @@ namespace SwitchGameManager
             this.toolStripStatus,
             this.toolStripSpring,
             this.toolStripProgressLabel,
-            this.toolStripProgressBar,
-            this.textBoxFilter});
+            this.toolStripProgressBar});
             this.statusStrip1.Location = new System.Drawing.Point(0, 420);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(959, 23);
             this.statusStrip1.TabIndex = 5;
             this.statusStrip1.Text = "statusStrip1";
             // 
-            // textBoxFilter
+            // sdInfoToolStripStatus
             // 
-            this.textBoxFilter.Name = "textBoxFilter";
-            this.textBoxFilter.Size = new System.Drawing.Size(125, 23);
-            // 
-            // showInWindowsExplorerToolStripMenuItem
-            // 
-            this.showInWindowsExplorerToolStripMenuItem.Name = "showInWindowsExplorerToolStripMenuItem";
-            this.showInWindowsExplorerToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
-            this.showInWindowsExplorerToolStripMenuItem.Text = "Open In Windows Explorer";
-            this.showInWindowsExplorerToolStripMenuItem.Click += new System.EventHandler(this.ToolStripManagement);
+            this.sdInfoToolStripStatus.Name = "sdInfoToolStripStatus";
+            this.sdInfoToolStripStatus.Size = new System.Drawing.Size(125, 18);
+            this.sdInfoToolStripStatus.Text = "E:\\ (120GB Remaining)";
             // 
             // formMain
             // 
@@ -734,7 +720,6 @@ namespace SwitchGameManager
         private BrightIdeasSoftware.OLVColumn olvColumnLocalGame;
         private BrightIdeasSoftware.OLVColumn olvColumnSdGame;
         public BrightIdeasSoftware.ObjectListView olvList;
-        private BrightIdeasSoftware.OLVColumn olvColumnSdFilePath;
         private System.Windows.Forms.ToolStripMenuItem cancelTransfersToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem manageXciLocToolStripMenuItem;
@@ -745,12 +730,11 @@ namespace SwitchGameManager
         private System.Windows.Forms.ToolStripStatusLabel toolStripProgressLabel;
         public System.Windows.Forms.ToolStripProgressBar toolStripProgressBar;
         private System.Windows.Forms.StatusStrip statusStrip1;
-        public System.Windows.Forms.ToolStripProgressBar toolStripProgressBar1;
-        private System.Windows.Forms.ToolStripComboBox toolStripComboBox1;
-        private System.Windows.Forms.ToolStripTextBox textBoxFilter;
         public System.Windows.Forms.ToolStripComboBox locationToolStripComboBox;
         private System.Windows.Forms.ToolStripMenuItem showInXCIExplorerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem showInWindowsExplorerToolStripMenuItem;
+        private System.Windows.Forms.ToolStripTextBox textBoxFilter;
+        private System.Windows.Forms.ToolStripStatusLabel sdInfoToolStripStatus;
     }
 }
 

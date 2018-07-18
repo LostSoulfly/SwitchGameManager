@@ -267,8 +267,10 @@ namespace SwitchGameManager.Helpers
                     {
                         if (xci.xciLocation == XciLocation.PC)
                         {
-                            xciOnPc.Remove(xciTempSource);
-                            xciTempDest.isGameOnPc = false;
+                            if (xciTempSource != null)
+                                xciOnPc.Remove(xciTempSource);
+                            if (xciTempDest != null)
+                                xciTempDest.isGameOnPc = false;
                         }
                         else
                         {

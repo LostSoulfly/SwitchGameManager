@@ -149,7 +149,6 @@ namespace SwitchGameManager
 
             foreach (DriveInfo item in driveInfo)
             {
-
                 if (!item.IsReady)
                     continue;
                 try
