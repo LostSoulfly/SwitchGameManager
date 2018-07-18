@@ -24,10 +24,7 @@ namespace SwitchGameManager.Helpers
         public string sdDriveLetter = string.Empty;
         public byte[] olvState;
         public XciHelper.XciLocation defaultView;
-
-        [JsonIgnore]
-        public bool isSdEnabled = false;
-
+        
         //public bool lowMemoryMode = false; //Reduce memory usage at cost of slower UI updates (stop caching info, etc)
     }
 
@@ -44,14 +41,12 @@ namespace SwitchGameManager.Helpers
         public static bool LoadSettings(string fileName = "")
         {
             Settings.config = new Config();
-
             if (String.IsNullOrWhiteSpace(fileName))
                 fileName = configFileName;
 
             try
             {
                 config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(fileName));
-                CheckForSdCard();
                 return true;
             }
             catch (Exception ex)
@@ -62,12 +57,12 @@ namespace SwitchGameManager.Helpers
             return false;
         }
 
-        public static void CheckForSdCard()
+        public static bool CheckForSdCard()
         {
             if (!string.IsNullOrWhiteSpace(config.sdDriveLetter) && Directory.Exists(config.sdDriveLetter))
-                config.isSdEnabled = true;
+                return true;
             else
-                config.isSdEnabled = false;
+                return false;
         }
 
         public static bool SaveSettings(string fileName = "")

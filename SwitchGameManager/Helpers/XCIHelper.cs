@@ -169,19 +169,34 @@ namespace SwitchGameManager.Helpers
             XciItem xciTempSource = new XciItem();
             XciItem xciTempDest = new XciItem();
 
-            if (xci.fileAction.action == FileHelper.FileAction.Copy || xci.fileAction.action == FileHelper.FileAction.Move)
+            Debug.Assert(xci.fileAction.actionCompleted);
+            
+
+            if (xci.fileAction.action == FileHelper.FileAction.Copy || xci.fileAction.action == FileHelper.FileAction.Move || xci.fileAction.action == FileHelper.FileAction.Delete)
             {
                 if (xci.fileAction.destination == XciLocation.SD)
+                {
                     xciTempSource = FindXciByIdentifer(xci.packageId, xciOnPc);
+                    xciTempDest = FindXciByIdentifer(xci.packageId, xciOnSd);
+                }
                 else
+                {
                     xciTempSource = FindXciByIdentifer(xci.packageId, xciOnSd);
+                    xciTempDest = FindXciByIdentifer(xci.packageId, xciOnPc);
+                }
             }
             else
             {
                 if (xci.xciLocation == XciLocation.PC)
+                {
                     xciTempSource = FindXciByIdentifer(xci.packageId, xciOnSd);
+                    xciTempDest = FindXciByIdentifer(xci.packageId, xciOnPc);
+                }
                 else
+                {
                     xciTempSource = FindXciByIdentifer(xci.packageId, xciOnPc);
+                    xciTempDest = FindXciByIdentifer(xci.packageId, xciOnSd);
+                }
             }
             
             switch (xci.fileAction.action)
@@ -189,15 +204,16 @@ namespace SwitchGameManager.Helpers
                 case FileHelper.FileAction.None:
                     break;
                 case FileHelper.FileAction.Copy:
-                    
-                    xciTempSource.isGameOnPc = true;
-                    xciTempSource.isGameOnSd = true;
-
                     xciTempDest = Clone(xci);
                     xciTempDest.xciFilePath = xci.fileAction.destinationPath;
                     xciTempDest.xciLocation = xci.fileAction.destination;
                     xciTempDest = RefreshGame(xciTempDest, true);
-                    
+
+                    xciTempSource.isGameOnPc = true;
+                    xciTempSource.isGameOnSd = true;
+                    xciTempDest.isGameOnPc = true;
+                    xciTempDest.isGameOnSd = true;
+
                     if (xci.fileAction.destination == XciLocation.PC)
                         xciOnPc.Add(xciTempDest);
                     else
@@ -205,14 +221,44 @@ namespace SwitchGameManager.Helpers
 
                     if (Settings.config.defaultView == xciTempDest.xciLocation)
                         formMain.olvList.AddObject(xciTempDest);
+                    else
+                        formMain.olvList.RefreshObject(xciTempSource);
 
                     break;
 
                 case FileHelper.FileAction.Move:
-                    //check if the source still exists, check if the destination exists
-                    //add the new object to the list for the destination
-                    //remove the object from the source list
-                    //add object to list if that listview
+
+                    if (!File.Exists(xci.fileAction.destinationPath))
+                        return;
+                    if (File.Exists(xci.fileAction.sourcePath))
+                        return;
+
+                    xciTempDest = Clone(xci);
+                    xciTempDest.xciFilePath = xci.fileAction.destinationPath;
+                    xciTempDest.xciLocation = xci.fileAction.destination;
+                    xciTempDest = RefreshGame(xciTempDest, true);
+
+                    if (xci.fileAction.destination == XciLocation.PC)
+                    {
+                        xciTempDest.isGameOnPc = true;
+                        xciTempDest.isGameOnSd = false;
+                        xciOnPc.Add(xciTempDest);
+                        xciOnSd.Remove(xciTempSource);
+                    }
+                    else
+                    {
+                        xciTempDest.isGameOnPc = false;
+                        xciTempDest.isGameOnSd = true;
+                        xciOnSd.Add(xciTempDest);
+                        xciOnPc.Remove(xciTempSource);
+                    }
+                                            
+
+                    if (Settings.config.defaultView == xciTempDest.xciLocation)
+                        formMain.olvList.AddObject(xciTempDest);
+                    else
+                        formMain.olvList.RemoveObject(xciTempSource);
+
                     break;
 
                 case FileHelper.FileAction.Delete:
@@ -220,12 +266,20 @@ namespace SwitchGameManager.Helpers
                     if (!File.Exists(xci.xciFilePath))
                     {
                         if (xci.xciLocation == XciLocation.PC)
-                            xciOnPc.Remove(xci);
+                        {
+                            xciOnPc.Remove(xciTempSource);
+                            xciTempDest.isGameOnPc = false;
+                        }
                         else
-                            xciOnSd.Remove(xci);
-                            
+                        {
+                            xciOnSd.Remove(xciTempSource);
+                            xciTempDest.isGameOnSd = false;
+                        }
+                        
                         if (Settings.config.defaultView == xci.xciLocation)
-                            formMain.olvList.RemoveObject(xci);
+                            formMain.olvList.RemoveObject(xciTempSource);
+                        else
+                            formMain.olvList.RefreshObject(xciTempDest);
                     }
 
                     break;
@@ -233,6 +287,10 @@ namespace SwitchGameManager.Helpers
                     //check if the file size changed, and if it did, get the XCI Info again
                     xciTempSource.gameSize = (double)new FileInfo(xci.xciFilePath).Length;
                     xciTempSource.isXciTrimmed = (xci.gameSize == xci.gameUsedSize);
+
+                    if (Settings.config.defaultView == xci.xciLocation)
+                        formMain.olvList.UpdateObject(xciTempSource);
+
                     break;
                 default:
                     break;

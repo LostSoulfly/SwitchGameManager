@@ -65,6 +65,7 @@ namespace SwitchGameManager
             this.trimGameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.renameXCIFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showXCICertificateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.showInXCIExplorerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.visualToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.displayStyleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.smallIconsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -91,7 +92,7 @@ namespace SwitchGameManager
             this.toolStripProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.textBoxFilter = new System.Windows.Forms.ToolStripTextBox();
-            this.showInXCIExplorerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.showInWindowsExplorerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.olvList)).BeginInit();
             this.menuStrip.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -374,7 +375,8 @@ namespace SwitchGameManager
             this.trimGameToolStripMenuItem,
             this.renameXCIFilesToolStripMenuItem,
             this.showXCICertificateToolStripMenuItem,
-            this.showInXCIExplorerToolStripMenuItem});
+            this.showInXCIExplorerToolStripMenuItem,
+            this.showInWindowsExplorerToolStripMenuItem});
             this.gameManagementToolStripMenuItem.Name = "gameManagementToolStripMenuItem";
             this.gameManagementToolStripMenuItem.Size = new System.Drawing.Size(124, 23);
             this.gameManagementToolStripMenuItem.Text = "Game Management";
@@ -387,7 +389,7 @@ namespace SwitchGameManager
             this.deleteToolStripMenuItem,
             this.cancelTransfersToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
             this.fileToolStripMenuItem.Text = "File Management";
             // 
             // copyToolStripMenuItem
@@ -424,30 +426,37 @@ namespace SwitchGameManager
             // deleteGameToolStripMenuItem
             // 
             this.deleteGameToolStripMenuItem.Name = "deleteGameToolStripMenuItem";
-            this.deleteGameToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
+            this.deleteGameToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
             this.deleteGameToolStripMenuItem.Text = "Delete From Everywhere";
             this.deleteGameToolStripMenuItem.Click += new System.EventHandler(this.ToolStripManagement);
             // 
             // trimGameToolStripMenuItem
             // 
             this.trimGameToolStripMenuItem.Name = "trimGameToolStripMenuItem";
-            this.trimGameToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
+            this.trimGameToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
             this.trimGameToolStripMenuItem.Text = "Trim";
             this.trimGameToolStripMenuItem.Click += new System.EventHandler(this.ToolStripManagement);
             // 
             // renameXCIFilesToolStripMenuItem
             // 
             this.renameXCIFilesToolStripMenuItem.Name = "renameXCIFilesToolStripMenuItem";
-            this.renameXCIFilesToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
+            this.renameXCIFilesToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
             this.renameXCIFilesToolStripMenuItem.Text = "Open Rename Tool..";
             this.renameXCIFilesToolStripMenuItem.Click += new System.EventHandler(this.ToolStripManagement);
             // 
             // showXCICertificateToolStripMenuItem
             // 
             this.showXCICertificateToolStripMenuItem.Name = "showXCICertificateToolStripMenuItem";
-            this.showXCICertificateToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
+            this.showXCICertificateToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
             this.showXCICertificateToolStripMenuItem.Text = "Show XCI Certificate";
             this.showXCICertificateToolStripMenuItem.Click += new System.EventHandler(this.ToolStripManagement);
+            // 
+            // showInXCIExplorerToolStripMenuItem
+            // 
+            this.showInXCIExplorerToolStripMenuItem.Name = "showInXCIExplorerToolStripMenuItem";
+            this.showInXCIExplorerToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.showInXCIExplorerToolStripMenuItem.Text = "Show In XCI Explorer";
+            this.showInXCIExplorerToolStripMenuItem.Click += new System.EventHandler(this.ToolStripManagement);
             // 
             // visualToolStripMenuItem
             // 
@@ -648,11 +657,12 @@ namespace SwitchGameManager
             this.textBoxFilter.Name = "textBoxFilter";
             this.textBoxFilter.Size = new System.Drawing.Size(125, 23);
             // 
-            // showInXCIExplorerToolStripMenuItem
+            // showInWindowsExplorerToolStripMenuItem
             // 
-            this.showInXCIExplorerToolStripMenuItem.Name = "showInXCIExplorerToolStripMenuItem";
-            this.showInXCIExplorerToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
-            this.showInXCIExplorerToolStripMenuItem.Text = "Show In XCI Explorer";
+            this.showInWindowsExplorerToolStripMenuItem.Name = "showInWindowsExplorerToolStripMenuItem";
+            this.showInWindowsExplorerToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.showInWindowsExplorerToolStripMenuItem.Text = "Open In Windows Explorer";
+            this.showInWindowsExplorerToolStripMenuItem.Click += new System.EventHandler(this.ToolStripManagement);
             // 
             // formMain
             // 
@@ -740,6 +750,7 @@ namespace SwitchGameManager
         private System.Windows.Forms.ToolStripTextBox textBoxFilter;
         public System.Windows.Forms.ToolStripComboBox locationToolStripComboBox;
         private System.Windows.Forms.ToolStripMenuItem showInXCIExplorerToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem showInWindowsExplorerToolStripMenuItem;
     }
 }
 

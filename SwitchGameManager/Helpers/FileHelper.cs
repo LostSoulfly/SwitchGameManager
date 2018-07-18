@@ -41,10 +41,6 @@ namespace SwitchGameManager.Helpers
             ShowRenameWindow
         }
 
-        //TODO
-        //create a list of successful transfers and failed transfers
-        //and link their xci object to them. Update their file information after transfers, then update their information.
-        //also for trimming. TODO
         public static formMain formMain;
         public static bool isTransferInProgress;
 
@@ -87,6 +83,8 @@ namespace SwitchGameManager.Helpers
                 lock (lockObject)
                     xciTransfers.Remove(xciAction);
 
+                xciAction.fileAction.actionCompleted = true;
+
                 if (transferWorker.CancellationPending)
                 {
                     File.Delete(xciAction.fileAction.destinationPath); //delete the destination if we cancelled early
@@ -94,6 +92,7 @@ namespace SwitchGameManager.Helpers
                     return;
                 }
 
+                xciAction.fileAction.actionSuccess = true;
                 XciHelper.UpdateXci(xciAction);
             }
         }
@@ -110,13 +109,10 @@ namespace SwitchGameManager.Helpers
 
             isTransferInProgress = false;
 
-            if (transferWorker.CancellationPending)
-                formMain.UpdateProgressLabel($"Transfer cancelled; [{transferredFiles}/{totalFiles}] transferred.");
-
             if (e.Cancelled)
-                MessageBox.Show("File transfers were canceled.");
+                formMain.UpdateProgressLabel($"Transfer cancelled; [{transferredFiles}/{totalFiles}] files transferred.");
             else
-                MessageBox.Show("All files transferred.");
+                formMain.UpdateProgressLabel($"Transfers complete. [{transferredFiles}/{totalFiles}] files transferred.");
 
             //refresh the xciList and OLV
             //XciHelper.LoadXcis();
