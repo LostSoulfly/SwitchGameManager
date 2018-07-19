@@ -9,7 +9,7 @@ namespace SwitchGameManager.Helpers
 {
     public class Config
     {
-        
+        public XciHelper.XciLocation defaultView;
 
         //public bool confirmMultiActions;
         public bool encryptCertificates;
@@ -21,22 +21,24 @@ namespace SwitchGameManager.Helpers
         public int formWidth = 975;
         public int listIconSize = 1;
         public List<string> localXciFolders = new List<string>();
-        public string sdDriveLetter = string.Empty;
         public byte[] olvState;
-        public XciHelper.XciLocation defaultView;
-        
+        public string sdDriveLetter = string.Empty;
         //public bool lowMemoryMode = false; //Reduce memory usage at cost of slower UI updates (stop caching info, etc)
     }
 
     public class Settings
     {
-        public static Config config;
-
         public static string cacheFileName = "Cache.json";
-
+        public static Config config;
         public static string configFileName = "Config.json";
 
-        
+        public static bool CheckForSdCard()
+        {
+            if (!string.IsNullOrWhiteSpace(config.sdDriveLetter) && Directory.Exists(config.sdDriveLetter))
+                return true;
+            else
+                return false;
+        }
 
         public static bool LoadSettings(string fileName = "")
         {
@@ -55,14 +57,6 @@ namespace SwitchGameManager.Helpers
             }
 
             return false;
-        }
-
-        public static bool CheckForSdCard()
-        {
-            if (!string.IsNullOrWhiteSpace(config.sdDriveLetter) && Directory.Exists(config.sdDriveLetter))
-                return true;
-            else
-                return false;
         }
 
         public static bool SaveSettings(string fileName = "")

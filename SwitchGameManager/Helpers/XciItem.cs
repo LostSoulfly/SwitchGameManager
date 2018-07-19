@@ -16,6 +16,9 @@ namespace SwitchGameManager.Helpers
         }
         */
 
+        [JsonIgnore]
+        public FileHelper.FileStruct fileAction;
+
         public string gameCardCapacity;
 
         public byte[] gameCert;
@@ -40,29 +43,16 @@ namespace SwitchGameManager.Helpers
         [JsonIgnore]
         public bool isGameOnSd;
 
-        [JsonIgnore]
-        public FileHelper.FileStruct fileAction;
-
-        public XciHelper.XciLocation xciLocation;
-
         public bool isUniqueCert;
-
         public bool isXciTrimmed;
-
         public string masterKeyRevision;
-
         public ulong packageId;
-
         public string productCode;
-
         public string sdkVersion;
-
         public string titleId;
-
         public string xciFilePath;
-
         public long xciFileSize;
-
+        public XciHelper.XciLocation xciLocation;
         //public string xciSdFilePath;
 
         //Can't serialize a Bitmap object.. so we convert it to and from a Byte array on the fly

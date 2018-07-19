@@ -53,7 +53,13 @@ namespace SwitchGameManager
         {
             XciHelper.formMain = this;
             FileHelper.formMain = this;
-            
+
+            if (!File.Exists("keys.txt"))
+            {
+                MessageBox.Show("Please make sure to put the keys.txt file in the same folder as SwitchGameManager.exe" + Environment.NewLine + "The program will now close.", "Keys.txt not found");
+                Application.Exit();
+            }
+
             SetupObjectListView();
 
             SetupDelegates();

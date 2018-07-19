@@ -13,116 +13,23 @@ namespace SwitchGameManager.Helpers
 {
     public static class XciHelper
     {
-
+        private static BackgroundWorker backgroundWorkerFullLoad;
+        private static BackgroundWorker backgroundWorkerSingleLoad;
+        private static object cacheListLock = new object();
+        private static hacbuild.XCI hac = new hacbuild.XCI();
+        private static object pcListLock = new object();
+        private static object refreshListLock = new object();
+        private static object sdListLock = new object();
+        private static List<XciItem> xciCache;
+        private static List<XciItem> xciOnPc = new List<XciItem>();
+        private static List<XciItem> xciOnSd = new List<XciItem>();
+        private static List<XciItem> xciToRefresh = new List<XciItem>();
+        public static formMain formMain;
+        public static bool isGameLoadingComplete = false;
         public enum XciLocation
         {
             PC,
             SD
-        }
-
-        private static hacbuild.XCI hac = new hacbuild.XCI();
-        public static formMain formMain;
-        public static bool isGameLoadingComplete = false;
-        private static BackgroundWorker backgroundWorkerFullLoad;
-        private static BackgroundWorker backgroundWorkerSingleLoad;
-
-        private static List<XciItem> xciOnPc = new List<XciItem>();
-        private static List<XciItem> xciOnSd = new List<XciItem>();
-        private static List<XciItem> xciCache;
-
-        private static List<XciItem> xciToRefresh = new List<XciItem>();
-
-
-        private static object pcListLock = new object();
-        private static object sdListLock = new object();
-        private static object cacheListLock = new object();
-        private static object refreshListLock = new object();
-
-
-        public static void LoadXcisInBackground()
-        {
-            IsFileTransferInProgress();
-
-            if (backgroundWorkerFullLoad == null)
-            {
-                backgroundWorkerFullLoad = new BackgroundWorker();
-                backgroundWorkerFullLoad.RunWorkerCompleted += delegate { formMain.locationToolStripComboBox.Enabled = isGameLoadingComplete; formMain.olvList.EmptyListMsg = "No Games Found!"; };
-                backgroundWorkerFullLoad.DoWork += delegate { LoadXcis(); };
-            }
-            if (!backgroundWorkerFullLoad.IsBusy)
-            {
-                isGameLoadingComplete = false;
-                formMain.locationToolStripComboBox.Enabled = isGameLoadingComplete;
-                formMain.olvList.ClearObjects();
-                backgroundWorkerFullLoad.RunWorkerAsync();
-            }
-        }
-
-        public static void RefreshXciInBackground(XciItem xci)
-        {
-            isGameLoadingComplete = false;
-            formMain.locationToolStripComboBox.Enabled = isGameLoadingComplete;
-
-            lock (refreshListLock)
-                xciToRefresh.Add(xci);
-
-            if (backgroundWorkerSingleLoad == null)
-            {
-                backgroundWorkerSingleLoad = new BackgroundWorker();
-
-                backgroundWorkerSingleLoad.RunWorkerCompleted += delegate {
-                    formMain.locationToolStripComboBox.Enabled = isGameLoadingComplete;
-
-                    lock (refreshListLock)
-                    {
-                        XciItem xciRefresh = xciToRefresh.First();
-                        XciItem oldXci;
-
-                        if (xciRefresh.xciLocation == XciLocation.PC)
-                        {
-                            oldXci = FindXciByIdentifer(xciRefresh.packageId, xciOnPc);
-                            xciOnPc.Remove(oldXci);
-                            xciOnSd.Add(xciRefresh);
-                        }
-                        else
-                        {
-                            oldXci = FindXciByIdentifer(xciRefresh.packageId, xciOnSd);
-                            xciOnSd.Remove(oldXci);
-                            xciOnSd.Add(xciRefresh);
-                        }
-
-                        if (xciRefresh.xciLocation == Settings.config.defaultView)
-                        {
-                            formMain.olvList.RemoveObject(oldXci);
-                            oldXci = xciRefresh;
-                            formMain.olvList.AddObject(oldXci);
-                        }
-                        
-                        formMain.UpdateToolStripLabel($"Refreshed {xciRefresh.gameName}");
-                        xciToRefresh.Remove(xciRefresh);
-                    }
-
-                    if (xciToRefresh.Count > 0)
-                    {
-                        backgroundWorkerSingleLoad.RunWorkerAsync();
-                    }
-                    isGameLoadingComplete = true;
-                    formMain.locationToolStripComboBox.Enabled = isGameLoadingComplete;
-                };
-
-                backgroundWorkerSingleLoad.DoWork += delegate {
-                    XciItem xciRefresh;
-                    lock (refreshListLock)
-                    {
-                        xciRefresh = RefreshGame(xciToRefresh.First(), true);
-                        xciToRefresh[0] = xciRefresh;
-                    }
-                };
-            }
-            if (!backgroundWorkerSingleLoad.IsBusy)
-            {
-                backgroundWorkerSingleLoad.RunWorkerAsync();
-            }
         }
 
         private static bool IsFileTransferInProgress()
@@ -149,17 +56,12 @@ namespace SwitchGameManager.Helpers
                 xciOnPc = GetPcXcis();
             lock (sdListLock)
                 xciOnSd = GetSdXcis();
-            
+
             int progressCount = xciOnPc.Count + xciOnSd.Count;
             int progress = 0;
 
-            if (xciOnPc.Count > 0)
-                progressCount--;
-            if (xciOnSd.Count > 0)
-                progressCount--;
-
             formMain.SetupProgressBar(0, progressCount, progress);
-            
+
             lock (pcListLock)
             {
                 for (int i = 0; i < xciOnPc.Count; i++)
@@ -167,7 +69,7 @@ namespace SwitchGameManager.Helpers
                     formMain.UpdateToolStripLabel($"Processing [{progress}/{progressCount}] {Path.GetFileName(xciOnPc[i].xciFilePath)} ");
 
                     xciOnPc[i] = RefreshGame(xciOnPc[i]);
-                    
+
                     if (Settings.config.defaultView == XciLocation.PC)
                         formMain.olvList.AddObject(xciOnPc[i]);
 
@@ -179,7 +81,8 @@ namespace SwitchGameManager.Helpers
                 }
             }
 
-            lock (sdListLock) {
+            lock (sdListLock)
+            {
                 for (int i = 0; i < xciOnSd.Count; i++)
                 {
                     progress++;
@@ -188,7 +91,7 @@ namespace SwitchGameManager.Helpers
                     formMain.UpdateToolStripLabel($"Processing [{progress}/{progressCount}] {Path.GetFileName(xciOnSd[i].xciFilePath)}");
 
                     xciOnSd[i] = RefreshGame(xciOnSd[i]);
-                    
+
                     xciOnSd[i].xciLocation = XciLocation.SD;
 
                     if (Settings.config.defaultView == XciLocation.SD)
@@ -208,299 +111,25 @@ namespace SwitchGameManager.Helpers
             isGameLoadingComplete = true;
         }
 
-        public static void UpdateXci(XciItem xci)
+        internal static void RebuildCache()
         {
-            XciItem xciTempSource = new XciItem();
-            XciItem xciTempDest = new XciItem();
+            IsFileTransferInProgress();
 
-            Debug.Assert(xci.fileAction.actionCompleted);
-
-            if (xci.fileAction.action == FileHelper.FileAction.None)
-                return;
-
-            if (xci.fileAction.source == XciLocation.SD)
-            {
-                xciTempSource = FindXciByIdentifer(xci.packageId, xciOnSd);
-                xciTempDest = FindXciByIdentifer(xci.packageId, xciOnPc);
-            }
-            else
-            {
-                xciTempSource = FindXciByIdentifer(xci.packageId, xciOnPc);
-                xciTempDest = FindXciByIdentifer(xci.packageId, xciOnSd);
-            }
-
-            switch (xci.fileAction.action)
-            {
-                case FileHelper.FileAction.None:
-                    break;
-                case FileHelper.FileAction.Copy:
-                    xciTempDest = Clone(xci);
-                    xciTempDest.xciFilePath = xci.fileAction.destinationPath;
-                    xciTempDest.xciLocation = xci.fileAction.destination;
-                    xciTempDest = RefreshGame(xciTempDest, true);
-
-                    xciTempSource.isGameOnPc = true;
-                    xciTempSource.isGameOnSd = true;
-                    xciTempDest.isGameOnPc = true;
-                    xciTempDest.isGameOnSd = true;
-
-                    if (xci.fileAction.destination == XciLocation.PC)
-                        xciOnPc.Add(xciTempDest);
-                    else
-                        xciOnSd.Add(xciTempDest);
-
-                    xciTempDest.fileAction = new FileHelper.FileStruct();
-                    xciTempSource.fileAction = new FileHelper.FileStruct();
-
-                    if (Settings.config.defaultView == xciTempDest.xciLocation)
-                        formMain.olvList.AddObject(xciTempDest);
-                    else
-                        formMain.olvList.RefreshObject(xciTempSource);
-
-                    break;
-
-                case FileHelper.FileAction.Move:
-
-                    if (!File.Exists(xci.fileAction.destinationPath))
-                        return;
-                    if (File.Exists(xci.fileAction.sourcePath))
-                        File.Delete(xci.fileAction.sourcePath);
-
-                    xciTempDest = Clone(xci);
-                    xciTempDest.fileAction = new FileHelper.FileStruct();
-                    xciTempDest.xciFilePath = xci.fileAction.destinationPath;
-                    xciTempDest.xciLocation = xci.fileAction.destination;
-                    xciTempDest = RefreshGame(xciTempDest, true);
-
-                    if (xci.fileAction.destination == XciLocation.PC)
-                    {
-                        xciTempDest.isGameOnPc = true;
-                        xciTempDest.isGameOnSd = false;
-                        xciOnPc.Add(xciTempDest);
-                        xciOnSd.Remove(xciTempSource);
-                    }
-                    else
-                    {
-                        xciTempDest.isGameOnPc = false;
-                        xciTempDest.isGameOnSd = true;
-                        xciOnSd.Add(xciTempDest);
-                        xciOnPc.Remove(xciTempSource);
-                    }                       
-
-                    if (Settings.config.defaultView == xciTempDest.xciLocation)
-                        formMain.olvList.AddObject(xciTempDest);
-                    else
-                        formMain.olvList.RemoveObject(xciTempSource);
-
-                    break;
-
-                case FileHelper.FileAction.Delete:
-                    //Check if file exists any longer. May not be necessary if we just refresh the xci lists
-                    if (!File.Exists(xci.xciFilePath))
-                    {
-                        if (xci.xciLocation == XciLocation.PC)
-                        {
-                            if (xciTempSource != null)
-                                xciOnPc.Remove(xciTempSource);
-                            if (xciTempDest != null)
-                                xciTempDest.isGameOnPc = false;
-                        }
-                        else
-                        {
-                            xciOnSd.Remove(xciTempSource);
-                            xciTempDest.isGameOnSd = false;
-                        }
-                        
-                        if (Settings.config.defaultView == xci.xciLocation)
-                            formMain.olvList.RemoveObject(xciTempSource);
-                        else
-                            formMain.olvList.RefreshObject(xciTempDest);
-                    }
-                    break;
-
-                case FileHelper.FileAction.CompletelyDelete:
-                    if (!File.Exists(xci.xciFilePath))
-                    {
-                        if (Settings.config.defaultView == xci.xciLocation)
-                            formMain.olvList.RemoveObject(xciTempSource);
-
-                        if (xci.xciLocation == XciLocation.PC)
-                            xciOnPc.Remove(xciTempSource);
-                        else
-                            xciOnSd.Remove(xciTempSource);
-                    }
-                    break;
-
-                case FileHelper.FileAction.Trim:
-                    //check if the file size changed, and if it did, get the XCI Info again
-                    xciTempSource.gameSize = (double)new FileInfo(xci.xciFilePath).Length;
-                    xciTempSource.isXciTrimmed = (xciTempSource.gameSize == xci.gameUsedSize);
-
-                    xciTempSource.fileAction = new FileHelper.FileStruct();
-
-                    if (Settings.config.defaultView == xci.xciLocation)
-                        formMain.olvList.UpdateObject(xciTempSource);
-
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        public static void RefreshList()
-        {
-
-            if (!XciHelper.isGameLoadingComplete)
-                return;
-
-            formMain.locationToolStripComboBox.Enabled = false;
-
-            formMain.olvList.ClearObjects();
-
-            switch (Settings.config.defaultView)
-            {
-                case XciLocation.PC:
-                    lock (pcListLock)
-                        formMain.olvList.AddObjects(xciOnPc);
-
-                    break;
-
-                case XciLocation.SD:
-                    lock (sdListLock)
-                        formMain.olvList.AddObjects(xciOnSd);
-
-                    break;
-            }
-
-            formMain.locationToolStripComboBox.Enabled = true;
-        }
-
-        public static bool UpdateXciCache(XciItem xci)
-        {
             lock (cacheListLock)
-            {
-                XciItem xciTemp = FindXciByIdentifer(xci.packageId);
+                xciCache = new List<XciItem>();
 
-                if (!IsXciInfoValid(xciTemp))
-                {
-                    if (xciTemp == null)
-                    {
-                        xciCache.Add(xci);
-                        return true;
-                    }
-                }
-            }
-            return false;
+            File.Delete(Settings.cacheFileName);
+            XciHelper.LoadXcisInBackground();
         }
 
-        public static List<XciItem> LoadGamesFromPath(string dirPath, bool recurse = true, bool isSdCard = false)
-        {
-            List<XciItem> pathXciList = new List<XciItem>();
-            ulong packageId;
-            XciItem xciTemp;
-
-            List<string> xciFileList = FindAllFiles(dirPath, "*.xci", recurse);
-
-            foreach (var item in xciFileList)
-            {
-                packageId = XciHelper.GetXciIdentifier(item);
-
-                // Check if this game is in the Cache and Clone the cache XciItem to decouple the objects
-                lock (cacheListLock)
-                    xciTemp = Clone(XciHelper.FindXciByIdentifer(packageId)); 
-
-                if (xciTemp == null)
-                    xciTemp = new XciItem();
-
-                xciTemp.xciFilePath = "";
-
-                xciTemp.isGameOnSd = isSdCard;
-                xciTemp.isGameOnPc = !isSdCard;
-
-                if (isSdCard)
-                    xciTemp.xciLocation = XciLocation.SD;
-                else
-                    xciTemp.xciLocation = XciLocation.PC;
-
-                xciTemp.xciFilePath = item;
-
-                pathXciList.Add(xciTemp);
-            }
-
-            return pathXciList;
-        }
-
-        public static void RemoveXciFromList(XciItem xci, List<XciItem> xciList, bool fromOlvAlso = false)
+        public static T Clone<T>(T source)
         {
             try
             {
-
-                if (fromOlvAlso)
-                    if (xci.xciLocation == Settings.config.defaultView)
-                        formMain.olvList.RemoveObject(xci);
-
-                xciList.Remove(xci);
+                var serialized = JsonConvert.SerializeObject(source);
+                return JsonConvert.DeserializeObject<T>(serialized);
             }
-            catch { }
-        }
-
-        public static XciItem RefreshGame(XciItem xci, bool force = false)
-        {
-            if (force || !IsXciInfoValid(xci))
-            {
-                if (File.Exists(xci.xciFilePath))
-                    xci = GetXciInfo(xci.xciFilePath, xci.xciLocation);
-            }
-
-            xci.isGameOnSd = (FindXciByIdentifer(xci.packageId, xciOnSd) != null);
-            xci.isGameOnPc = (FindXciByIdentifer(xci.packageId, xciOnPc) != null);
-
-            //reset any file actions that would have happened with this xci
-            xci.fileAction = new FileHelper.FileStruct();
-
-            return xci;
-        }
-
-        public static List<XciItem> GetPcXcis()
-        {
-            List<XciItem> xciList = new List<XciItem>();
-
-            foreach (string path in Settings.config.localXciFolders)
-            {
-                xciList.AddRange(XciHelper.LoadGamesFromPath(path, recurse: true, isSdCard: false));
-            }
-
-            //xciList = XciHelper.CreateMasterXciList(xciList, xciOnSd);
-
-            return xciList;
-
-        }
-
-        public static List<XciItem> GetSdXcis()
-        {
-            List<XciItem> xciList = new List<XciItem>();
-
-            if (Directory.Exists(Settings.config.sdDriveLetter))
-            {
-                // SD card games are currently only in the root directory (for SX OS)
-                xciList = XciHelper.LoadGamesFromPath(Settings.config.sdDriveLetter, recurse: false, isSdCard: true);
-            }
-
-            return xciList;
-        }
-
-        public static bool IsXciInfoValid(XciItem xci)
-        {
-            if (xci == null)
-                return false;
-
-            if (string.IsNullOrWhiteSpace(xci.gameName))
-                return false;
-
-            if (string.IsNullOrWhiteSpace(xci.titleId))
-                return false;
-
-            return true;
+            catch { return default(T); }
         }
 
         public static List<string> FindAllFiles(string startDir, string filter, bool recurse = true)
@@ -523,43 +152,72 @@ namespace SwitchGameManager.Helpers
             return files;
         }
 
-        public static T Clone<T>(T source)
+        public static XciItem FindXciByIdentifer(ulong packageId, List<XciItem> xciCache = null)
         {
+            if (xciCache == null)
+            {
+                if (XciHelper.xciCache == null)
+                    XciHelper.xciCache = LoadXciCache();
+
+                xciCache = XciHelper.xciCache;
+            }
+
+            XciItem xci;
             try
             {
-                var serialized = JsonConvert.SerializeObject(source);
-                return JsonConvert.DeserializeObject<T>(serialized);
+                xci = xciCache.First(item => item.packageId == packageId);
             }
-            catch { return default(T); }
-        }
-
-        public static List<XciItem> LoadXciCache(string fileName = "")
-        {
-            List<XciItem> xciCache = new List<XciItem>();
-
-            lock (cacheListLock)
+            catch (Exception ex)
             {
-                if (String.IsNullOrWhiteSpace(fileName))
-                    fileName = Settings.cacheFileName;
-
-                if (!File.Exists(fileName))
-                    return xciCache;
-
-                xciCache = JsonConvert.DeserializeObject<IEnumerable<XciItem>>(File.ReadAllText(fileName)).ToList<XciItem>();
+                return null;
             }
-
-            return xciCache;
+            return xci;
         }
 
-        internal static void RebuildCache()
+        public static List<XciItem> GetAllItemsByIdentifer(ulong packageId)
         {
-            IsFileTransferInProgress();
+            List<XciItem> xciList = new List<XciItem>();
 
-            lock (cacheListLock)
-                xciCache = new List<XciItem>();
+            try
+            {
+                xciList.AddRange(xciOnPc.FindAll(item => item.packageId == packageId));
+            }
+            catch { }
 
-            File.Delete(Settings.cacheFileName);
-            XciHelper.LoadXcisInBackground();
+            try
+            {
+                xciList.AddRange(xciOnSd.FindAll(item => item.packageId == packageId));
+            }
+            catch { }
+
+            return xciList;
+        }
+
+        public static List<XciItem> GetPcXcis()
+        {
+            List<XciItem> xciList = new List<XciItem>();
+
+            foreach (string path in Settings.config.localXciFolders)
+            {
+                xciList.AddRange(XciHelper.LoadGamesFromPath(path, recurse: true, isSdCard: false));
+            }
+
+            //xciList = XciHelper.CreateMasterXciList(xciList, xciOnSd);
+
+            return xciList;
+        }
+
+        public static List<XciItem> GetSdXcis()
+        {
+            List<XciItem> xciList = new List<XciItem>();
+
+            if (Directory.Exists(Settings.config.sdDriveLetter))
+            {
+                // SD card games are currently only in the root directory (for SX OS)
+                xciList = XciHelper.LoadGamesFromPath(Settings.config.sdDriveLetter, recurse: false, isSdCard: true);
+            }
+
+            return xciList;
         }
 
         public static ulong GetXciIdentifier(string fileName)
@@ -580,7 +238,7 @@ namespace SwitchGameManager.Helpers
                 return null;
 
             XCI_Explorer.MainForm mainForm = new XCI_Explorer.MainForm(false);
-            
+
             xci_header header = hac.GetXCIHeader(xci.xciFilePath);
 
             xci.packageId = header.PackageID;
@@ -626,45 +284,92 @@ namespace SwitchGameManager.Helpers
             return xci;
         }
 
-        public static XciItem FindXciByIdentifer(ulong packageId, List<XciItem> xciCache = null)
+        public static bool IsXciInfoValid(XciItem xci)
         {
-            if (xciCache == null)
-            {
-                if (XciHelper.xciCache == null)
-                    XciHelper.xciCache = LoadXciCache();
+            if (xci == null)
+                return false;
 
-                xciCache = XciHelper.xciCache;
-            }
+            if (string.IsNullOrWhiteSpace(xci.gameName))
+                return false;
 
-            XciItem xci;
-            try
-            {
-                xci = xciCache.First(item => item.packageId == packageId);
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
-            return xci;
+            if (string.IsNullOrWhiteSpace(xci.titleId))
+                return false;
+
+            return true;
         }
 
-        public static List<XciItem> GetAllItemsByIdentifer(ulong packageId)
+        public static List<XciItem> LoadGamesFromPath(string dirPath, bool recurse = true, bool isSdCard = false)
         {
-            List<XciItem> xciList = new List<XciItem>();
+            List<XciItem> pathXciList = new List<XciItem>();
+            ulong packageId;
+            XciItem xciTemp;
 
-            try
+            List<string> xciFileList = FindAllFiles(dirPath, "*.xci", recurse);
+
+            foreach (var item in xciFileList)
             {
-                xciList.AddRange(xciOnPc.FindAll(item => item.packageId == packageId));
-            }
-            catch { }
+                packageId = XciHelper.GetXciIdentifier(item);
 
-            try
+                // Check if this game is in the Cache and Clone the cache XciItem to decouple the objects
+                lock (cacheListLock)
+                    xciTemp = Clone(XciHelper.FindXciByIdentifer(packageId));
+
+                if (xciTemp == null)
+                    xciTemp = new XciItem();
+
+                xciTemp.xciFilePath = "";
+
+                xciTemp.isGameOnSd = isSdCard;
+                xciTemp.isGameOnPc = !isSdCard;
+
+                if (isSdCard)
+                    xciTemp.xciLocation = XciLocation.SD;
+                else
+                    xciTemp.xciLocation = XciLocation.PC;
+
+                xciTemp.xciFilePath = item;
+
+                pathXciList.Add(xciTemp);
+            }
+
+            return pathXciList;
+        }
+
+        public static List<XciItem> LoadXciCache(string fileName = "")
+        {
+            List<XciItem> xciCache = new List<XciItem>();
+
+            lock (cacheListLock)
             {
-                xciList.AddRange(xciOnSd.FindAll(item => item.packageId == packageId));
-            }
-            catch { }
+                if (String.IsNullOrWhiteSpace(fileName))
+                    fileName = Settings.cacheFileName;
 
-            return xciList;
+                if (!File.Exists(fileName))
+                    return xciCache;
+
+                xciCache = JsonConvert.DeserializeObject<IEnumerable<XciItem>>(File.ReadAllText(fileName)).ToList<XciItem>();
+            }
+
+            return xciCache;
+        }
+
+        public static void LoadXcisInBackground()
+        {
+            IsFileTransferInProgress();
+
+            if (backgroundWorkerFullLoad == null)
+            {
+                backgroundWorkerFullLoad = new BackgroundWorker();
+                backgroundWorkerFullLoad.RunWorkerCompleted += delegate { formMain.locationToolStripComboBox.Enabled = isGameLoadingComplete; formMain.olvList.EmptyListMsg = "No Games Found!"; };
+                backgroundWorkerFullLoad.DoWork += delegate { LoadXcis(); };
+            }
+            if (!backgroundWorkerFullLoad.IsBusy)
+            {
+                isGameLoadingComplete = false;
+                formMain.locationToolStripComboBox.Enabled = isGameLoadingComplete;
+                formMain.olvList.ClearObjects();
+                backgroundWorkerFullLoad.RunWorkerAsync();
+            }
         }
 
         public static string ReadableFileSize(double fileSize)
@@ -691,6 +396,132 @@ namespace SwitchGameManager.Helpers
             fileStream.Close();
 
             return array;
+        }
+
+        public static XciItem RefreshGame(XciItem xci, bool force = false)
+        {
+            if (force || !IsXciInfoValid(xci))
+            {
+                if (File.Exists(xci.xciFilePath))
+                    xci = GetXciInfo(xci.xciFilePath, xci.xciLocation);
+            }
+
+            xci.isGameOnSd = (FindXciByIdentifer(xci.packageId, xciOnSd) != null);
+            xci.isGameOnPc = (FindXciByIdentifer(xci.packageId, xciOnPc) != null);
+
+            //reset any file actions that would have happened with this xci
+            xci.fileAction = new FileHelper.FileStruct();
+
+            return xci;
+        }
+
+        public static void RefreshList()
+        {
+            if (!XciHelper.isGameLoadingComplete)
+                return;
+
+            formMain.locationToolStripComboBox.Enabled = false;
+
+            formMain.olvList.ClearObjects();
+
+            switch (Settings.config.defaultView)
+            {
+                case XciLocation.PC:
+                    lock (pcListLock)
+                        formMain.olvList.AddObjects(xciOnPc);
+
+                    break;
+
+                case XciLocation.SD:
+                    lock (sdListLock)
+                        formMain.olvList.AddObjects(xciOnSd);
+
+                    break;
+            }
+
+            formMain.locationToolStripComboBox.Enabled = true;
+        }
+
+        public static void RefreshXciInBackground(XciItem xci)
+        {
+            isGameLoadingComplete = false;
+            formMain.locationToolStripComboBox.Enabled = isGameLoadingComplete;
+
+            lock (refreshListLock)
+                xciToRefresh.Add(xci);
+
+            if (backgroundWorkerSingleLoad == null)
+            {
+                backgroundWorkerSingleLoad = new BackgroundWorker();
+
+                backgroundWorkerSingleLoad.RunWorkerCompleted += delegate
+                {
+                    formMain.locationToolStripComboBox.Enabled = isGameLoadingComplete;
+
+                    lock (refreshListLock)
+                    {
+                        XciItem xciRefresh = xciToRefresh.First();
+                        XciItem oldXci;
+
+                        if (xciRefresh.xciLocation == XciLocation.PC)
+                        {
+                            oldXci = FindXciByIdentifer(xciRefresh.packageId, xciOnPc);
+                            xciOnPc.Remove(oldXci);
+                            xciOnSd.Add(xciRefresh);
+                        }
+                        else
+                        {
+                            oldXci = FindXciByIdentifer(xciRefresh.packageId, xciOnSd);
+                            xciOnSd.Remove(oldXci);
+                            xciOnSd.Add(xciRefresh);
+                        }
+
+                        if (xciRefresh.xciLocation == Settings.config.defaultView)
+                        {
+                            formMain.olvList.RemoveObject(oldXci);
+                            oldXci = xciRefresh;
+                            formMain.olvList.AddObject(oldXci);
+                        }
+
+                        formMain.UpdateToolStripLabel($"Refreshed {xciRefresh.gameName}");
+                        xciToRefresh.Remove(xciRefresh);
+                    }
+
+                    if (xciToRefresh.Count > 0)
+                    {
+                        backgroundWorkerSingleLoad.RunWorkerAsync();
+                    }
+                    isGameLoadingComplete = true;
+                    formMain.locationToolStripComboBox.Enabled = isGameLoadingComplete;
+                };
+
+                backgroundWorkerSingleLoad.DoWork += delegate
+                {
+                    XciItem xciRefresh;
+                    lock (refreshListLock)
+                    {
+                        xciRefresh = RefreshGame(xciToRefresh.First(), true);
+                        xciToRefresh[0] = xciRefresh;
+                    }
+                };
+            }
+            if (!backgroundWorkerSingleLoad.IsBusy)
+            {
+                backgroundWorkerSingleLoad.RunWorkerAsync();
+            }
+        }
+
+        public static void RemoveXciFromList(XciItem xci, List<XciItem> xciList, bool fromOlvAlso = false)
+        {
+            try
+            {
+                if (fromOlvAlso)
+                    if (xci.xciLocation == Settings.config.defaultView)
+                        formMain.olvList.RemoveObject(xci);
+
+                xciList.Remove(xci);
+            }
+            catch { }
         }
 
         public static void SaveXciCache(string fileName = "", List<XciItem> xciCache = null)
@@ -746,6 +577,165 @@ namespace SwitchGameManager.Helpers
             }
 
             return true;
+        }
+
+        public static void UpdateXci(XciItem xci)
+        {
+            XciItem xciTempSource = new XciItem();
+            XciItem xciTempDest = new XciItem();
+
+            Debug.Assert(xci.fileAction.actionCompleted);
+
+            if (xci.fileAction.action == FileHelper.FileAction.None)
+                return;
+
+            if (xci.fileAction.source == XciLocation.SD)
+            {
+                xciTempSource = FindXciByIdentifer(xci.packageId, xciOnSd);
+                xciTempDest = FindXciByIdentifer(xci.packageId, xciOnPc);
+            }
+            else
+            {
+                xciTempSource = FindXciByIdentifer(xci.packageId, xciOnPc);
+                xciTempDest = FindXciByIdentifer(xci.packageId, xciOnSd);
+            }
+
+            switch (xci.fileAction.action)
+            {
+                case FileHelper.FileAction.None:
+                    break;
+
+                case FileHelper.FileAction.Copy:
+                    xciTempDest = Clone(xci);
+                    xciTempDest.xciFilePath = xci.fileAction.destinationPath;
+                    xciTempDest.xciLocation = xci.fileAction.destination;
+                    xciTempDest = RefreshGame(xciTempDest, true);
+
+                    xciTempSource.isGameOnPc = true;
+                    xciTempSource.isGameOnSd = true;
+                    xciTempDest.isGameOnPc = true;
+                    xciTempDest.isGameOnSd = true;
+
+                    if (xci.fileAction.destination == XciLocation.PC)
+                        xciOnPc.Add(xciTempDest);
+                    else
+                        xciOnSd.Add(xciTempDest);
+
+                    xciTempDest.fileAction = new FileHelper.FileStruct();
+                    xciTempSource.fileAction = new FileHelper.FileStruct();
+
+                    if (Settings.config.defaultView == xciTempDest.xciLocation)
+                        formMain.olvList.AddObject(xciTempDest);
+                    else
+                        formMain.olvList.RefreshObject(xciTempSource);
+
+                    break;
+
+                case FileHelper.FileAction.Move:
+
+                    if (!File.Exists(xci.fileAction.destinationPath))
+                        return;
+                    if (File.Exists(xci.fileAction.sourcePath))
+                        File.Delete(xci.fileAction.sourcePath);
+
+                    xciTempDest = Clone(xci);
+                    xciTempDest.fileAction = new FileHelper.FileStruct();
+                    xciTempDest.xciFilePath = xci.fileAction.destinationPath;
+                    xciTempDest.xciLocation = xci.fileAction.destination;
+                    xciTempDest = RefreshGame(xciTempDest, true);
+
+                    if (xci.fileAction.destination == XciLocation.PC)
+                    {
+                        xciTempDest.isGameOnPc = true;
+                        xciTempDest.isGameOnSd = false;
+                        xciOnPc.Add(xciTempDest);
+                        xciOnSd.Remove(xciTempSource);
+                    }
+                    else
+                    {
+                        xciTempDest.isGameOnPc = false;
+                        xciTempDest.isGameOnSd = true;
+                        xciOnSd.Add(xciTempDest);
+                        xciOnPc.Remove(xciTempSource);
+                    }
+
+                    if (Settings.config.defaultView == xciTempDest.xciLocation)
+                        formMain.olvList.AddObject(xciTempDest);
+                    else
+                        formMain.olvList.RemoveObject(xciTempSource);
+
+                    break;
+
+                case FileHelper.FileAction.Delete:
+                    //Check if file exists any longer. May not be necessary if we just refresh the xci lists
+                    if (!File.Exists(xci.xciFilePath))
+                    {
+                        if (xci.xciLocation == XciLocation.PC)
+                        {
+                            if (xciTempSource != null)
+                                xciOnPc.Remove(xciTempSource);
+                            if (xciTempDest != null)
+                                xciTempDest.isGameOnPc = false;
+                        }
+                        else
+                        {
+                            xciOnSd.Remove(xciTempSource);
+                            xciTempDest.isGameOnSd = false;
+                        }
+
+                        if (Settings.config.defaultView == xci.xciLocation)
+                            formMain.olvList.RemoveObject(xciTempSource);
+                        else
+                            formMain.olvList.RefreshObject(xciTempDest);
+                    }
+                    break;
+
+                case FileHelper.FileAction.CompletelyDelete:
+                    if (!File.Exists(xci.xciFilePath))
+                    {
+                        if (Settings.config.defaultView == xci.xciLocation)
+                            formMain.olvList.RemoveObject(xciTempSource);
+
+                        if (xci.xciLocation == XciLocation.PC)
+                            xciOnPc.Remove(xciTempSource);
+                        else
+                            xciOnSd.Remove(xciTempSource);
+                    }
+                    break;
+
+                case FileHelper.FileAction.Trim:
+                    //check if the file size changed, and if it did, get the XCI Info again
+                    xciTempSource.gameSize = (double)new FileInfo(xci.xciFilePath).Length;
+                    xciTempSource.isXciTrimmed = (xciTempSource.gameSize == xci.gameUsedSize);
+
+                    xciTempSource.fileAction = new FileHelper.FileStruct();
+
+                    if (Settings.config.defaultView == xci.xciLocation)
+                        formMain.olvList.UpdateObject(xciTempSource);
+
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        public static bool UpdateXciCache(XciItem xci)
+        {
+            lock (cacheListLock)
+            {
+                XciItem xciTemp = FindXciByIdentifer(xci.packageId);
+
+                if (!IsXciInfoValid(xciTemp))
+                {
+                    if (xciTemp == null)
+                    {
+                        xciCache.Add(xci);
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     }
 }

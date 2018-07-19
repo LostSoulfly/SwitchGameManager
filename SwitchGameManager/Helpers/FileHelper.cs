@@ -16,16 +16,9 @@ namespace SwitchGameManager.Helpers
         private static BackgroundWorker transferWorker;
         private static List<XciItem> xciTransfers = new List<XciItem>();
 
-        public struct FileStruct
-        {
-            public FileAction action;
-            public string destinationPath;
-            public string sourcePath;
-            public XciHelper.XciLocation source;
-            public XciHelper.XciLocation destination;
-            public bool actionCompleted;
-            public bool actionSuccess;
-        }
+        public static formMain formMain;
+
+        public static bool isTransferInProgress;
 
         public enum FileAction
         {
@@ -41,8 +34,16 @@ namespace SwitchGameManager.Helpers
             ShowRenameWindow
         }
 
-        public static formMain formMain;
-        public static bool isTransferInProgress;
+        public struct FileStruct
+        {
+            public FileAction action;
+            public bool actionCompleted;
+            public bool actionSuccess;
+            public XciHelper.XciLocation destination;
+            public string destinationPath;
+            public XciHelper.XciLocation source;
+            public string sourcePath;
+        }
 
         private static void CustomCopy_OnComplete(bool Canceled)
         {
@@ -79,7 +80,7 @@ namespace SwitchGameManager.Helpers
                 customCopy.Copy();
 
                 transferredFiles++;
-                
+
                 lock (lockObject)
                     xciTransfers.Remove(xciAction);
 
@@ -118,12 +119,6 @@ namespace SwitchGameManager.Helpers
             //XciHelper.LoadXcis();
         }
 
-        public static void StopTransfers()
-        {
-            if (transferWorker.IsBusy)
-                transferWorker.CancelAsync();
-        }
-
         public static bool IsXciInTransferList(XciItem xci)
         {
             lock (lockObject)
@@ -135,9 +130,14 @@ namespace SwitchGameManager.Helpers
             return false;
         }
 
+        public static void StopTransfers()
+        {
+            if (transferWorker.IsBusy)
+                transferWorker.CancelAsync();
+        }
+
         public static bool TransferXci(XciItem xci)
         {
-
             if (xci.fileAction.action != FileAction.Copy &&
                 xci.fileAction.action != FileAction.Move)
                 return false;
@@ -165,7 +165,6 @@ namespace SwitchGameManager.Helpers
                 xci.fileAction.destinationPath = Path.Combine(Settings.config.localXciFolders[0], Path.GetFileName(xci.fileAction.sourcePath));
             else
                 xci.fileAction.destinationPath = Path.Combine(Settings.config.sdDriveLetter, Path.GetFileName(xci.fileAction.sourcePath));
-
 
             if (String.IsNullOrWhiteSpace(xci.fileAction.sourcePath) || String.IsNullOrWhiteSpace(xci.fileAction.destinationPath))
                 return false;
