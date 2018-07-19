@@ -95,22 +95,22 @@ namespace SwitchGameManager
                 sdWatcher = new FileSystemWatcher(Settings.config.sdDriveLetter);
                 sdWatcher.Changed += delegate (object o, FileSystemEventArgs e)
                 {
-                    UpdateToolStripLabel("SD Card: " + e.FullPath + " " + e.ChangeType);
+                    //UpdateToolStripLabel("SD Card: " + e.FullPath + " " + e.ChangeType);
                     UpdateSdInfo();
                 };
                 sdWatcher.Deleted += delegate (object o, FileSystemEventArgs e)
                 {
-                    UpdateToolStripLabel("SD Card: " + e.FullPath + " " + e.ChangeType);
+                    //UpdateToolStripLabel("SD Card: " + e.FullPath + " " + e.ChangeType);
                     UpdateSdInfo();
                 };
                 sdWatcher.Created += delegate (object o, FileSystemEventArgs e)
                 {
-                    UpdateToolStripLabel("SD Card: " + e.FullPath + " " + e.ChangeType);
+                    //UpdateToolStripLabel("SD Card: " + e.FullPath + " " + e.ChangeType);
                     UpdateSdInfo();
                 };
                 sdWatcher.Error += delegate (object sender, ErrorEventArgs e)
                 {
-                    UpdateToolStripLabel("SD Card Err: " + e.GetException().Message);
+                    //UpdateToolStripLabel("SD Card Err: " + e.GetException().Message);
                     UpdateSdInfo();
                 };
                 sdWatcher.EnableRaisingEvents = true;
@@ -258,6 +258,7 @@ namespace SwitchGameManager
             locationToolStripComboBox.SelectedIndexChanged += delegate (object s, EventArgs e) {
                 Settings.config.defaultView = (XciLocation)locationToolStripComboBox.SelectedIndex;
                 XciHelper.RefreshList();
+                UpdateToolStripLabel();
             };
 
             this.FormClosing += delegate (object s, FormClosingEventArgs e) { SaveSettings(); };
@@ -467,6 +468,18 @@ namespace SwitchGameManager
             if (toolIndex == 1) fileAction.action = FileAction.Move;
             if (toolIndex == 2) fileAction.action = FileAction.Delete;
 
+            //Refresh Game Info
+            if (toolIndex == 3)
+            {
+                List<XciItem> filtered = olvList.SelectedObjects.Cast<XciItem>().ToList();
+
+                foreach (XciItem obj in filtered)
+                    XciHelper.RefreshXciInBackground(obj);
+
+                return;
+            }
+
+
             if (Settings.config.defaultView == XciLocation.PC)
             {
                 fileAction.destination = XciLocation.SD;
@@ -485,8 +498,25 @@ namespace SwitchGameManager
             if (olvList.SelectedIndices.Count > 1)
             {
 
+                List<XciItem> filtered = olvList.SelectedObjects.Cast<XciItem>().ToList();
+
+                double totalSize = filtered.Sum(x => x.gameSize);
+                double sizeDiff;
                 if (fileAction.action == FileAction.Move || fileAction.action == FileAction.Copy)
-                    message = $"Are you sure you want to {action} {olvList.SelectedObjects.Count} games to {destination}?";
+                {
+                    try
+                    {
+                        if ((double)sdInfo.AvailableFreeSpace <= totalSize)
+                        {
+                            sizeDiff = totalSize - (double)sdInfo.AvailableFreeSpace;
+                            MessageBox.Show($"Unable to copy games to SD! {Environment.NewLine} You need {ReadableFileSize(sizeDiff)} more space for this transfer!", "Unable To Transfer", MessageBoxButtons.OK);
+                            return;
+                        }
+                    }
+                    catch { }
+
+                    message = $"Are you sure you want to {action} {olvList.SelectedObjects.Count} games ({ReadableFileSize(totalSize)}) to {destination}?";
+                }
 
                 if (fileAction.action == FileAction.Delete)
                     message = $"Are you sure you want to {action} {olvList.SelectedObjects.Count} games from {source}?";
@@ -494,7 +524,7 @@ namespace SwitchGameManager
                 if (MessageBox.Show(message, $"Confirm {action.ToUpperInvariant()}", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
                     return;
 
-                List<XciItem> filtered = olvList.SelectedObjects.Cast<XciItem>().ToList();
+                
 
                 foreach (XciItem obj in filtered)
                 {
@@ -524,7 +554,7 @@ namespace SwitchGameManager
                 if (MessageBox.Show(message, $"Confirm {action.ToUpperInvariant()}", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
                     return;
 
-                xci.fileAction = Clone(fileAction);
+                xci.fileAction = fileAction;
                 if (ProcessFileManagement(xci))
                     UpdateToolStripLabel($"{action.ToUpperInvariant()} successful for {xci.gameName}");
                 else
@@ -552,12 +582,23 @@ namespace SwitchGameManager
             if (toolIndex < 0)
                 toolIndex = gameManagementToolStripMenuItem.DropDownItems.IndexOf(clicked);
 
-            if (toolIndex == 1) fileAction.action = FileAction.Delete;
+            if (toolIndex == 1) fileAction.action = FileAction.CompletelyDelete;
             if (toolIndex == 2) fileAction.action = FileAction.Trim;
             if (toolIndex == 3) fileAction.action = FileAction.ShowRenameWindow;
             if (toolIndex == 4) fileAction.action = FileAction.ShowCert;
             if (toolIndex == 5) fileAction.action = FileAction.ShowXciInfo;
             if (toolIndex == 6) fileAction.action = FileAction.ShowInExplorer;
+
+            if (Settings.config.defaultView == XciLocation.PC)
+            {
+                fileAction.destination = XciLocation.SD;
+                fileAction.source = XciLocation.PC;
+            }
+            else
+            {
+                fileAction.destination = XciLocation.PC;
+                fileAction.source = XciLocation.SD;
+            }
 
             switch (fileAction.action)
             {
@@ -795,10 +836,10 @@ namespace SwitchGameManager
                         if (!File.Exists(deleteItems[i].xciFilePath))
                             success = true;
 
+                        deleteItems[i].fileAction = Clone(xci.fileAction);
                         deleteItems[i].fileAction.actionCompleted = true;
                         deleteItems[i].fileAction.actionSuccess = success;
 
-                        XciHelper.UpdateXci(deleteItems[i]);
                         UpdateXci(deleteItems[i]);
                     }
 
@@ -819,7 +860,7 @@ namespace SwitchGameManager
                         xci.fileAction.actionSuccess = true;
 
                         //re-process the XCI
-                        RefreshXciInBackground(xci);
+                        //RefreshXciInBackground(xci);
 
                         return trim;
                     }
