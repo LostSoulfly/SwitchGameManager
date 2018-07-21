@@ -1,5 +1,6 @@
 ﻿using BrightIdeasSoftware;
 using SwitchGameManager.Helpers;
+using SwitchGameManager.Properties;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -45,7 +46,7 @@ namespace SwitchGameManager
                     item.Checked = false;
             }
 
-            Settings.config.listIconSize = displayIndex;
+            Helpers.Settings.config.listIconSize = displayIndex;
             ProcessChangeIconSize(displayIndex);
         }
 
@@ -65,7 +66,7 @@ namespace SwitchGameManager
             SetupDelegates();
 
             //Load the settings
-            if (Settings.LoadSettings() == false)
+            if (Helpers.Settings.LoadSettings() == false)
                 manageXciLocToolStripMenuItem_Click(null, null);
 
             SetupFileSysWatcher();
@@ -73,17 +74,17 @@ namespace SwitchGameManager
             locationToolStripComboBox.SelectedIndex = 0;
 
             //Setup the OLV with the saved state (if it was saved)
-            if (Settings.config.olvState != null)
+            if (Helpers.Settings.config.olvState != null)
             {
-                olvList.RestoreState(Settings.config.olvState);
-                ProcessChangeIconSize(Settings.config.listIconSize);
+                olvList.RestoreState(Helpers.Settings.config.olvState);
+                ProcessChangeIconSize(Helpers.Settings.config.listIconSize);
             }
 
-            if (Settings.config.formHeight > 0)
-                this.Height = Settings.config.formHeight;
+            if (Helpers.Settings.config.formHeight > 0)
+                this.Height = Helpers.Settings.config.formHeight;
 
-            if (Settings.config.formWidth > 0)
-                this.Width = Settings.config.formWidth;
+            if (Helpers.Settings.config.formWidth > 0)
+                this.Width = Helpers.Settings.config.formWidth;
 
             UpdateToolMenus();
             XciHelper.LoadXcisInBackground();
@@ -96,9 +97,9 @@ namespace SwitchGameManager
 
         private void SetupFileSysWatcher()
         {
-            if (Settings.CheckForSdCard())
+            if (Helpers.Settings.CheckForSdCard())
             {
-                sdWatcher = new FileSystemWatcher(Settings.config.sdDriveLetter);
+                sdWatcher = new FileSystemWatcher(Helpers.Settings.config.sdDriveLetter);
                 sdWatcher.Changed += delegate (object o, FileSystemEventArgs e)
                 {
                     //UpdateToolStripLabel("SD Card: " + e.FullPath + " " + e.ChangeType);
@@ -130,7 +131,7 @@ namespace SwitchGameManager
         {
             try
             {
-                if (Settings.CheckForSdCard())
+                if (Helpers.Settings.CheckForSdCard())
                 {
                     sdInfo = new DriveInfo(sdWatcher.Path);
                     sdInfoToolStripStatus.Text = $"{sdInfo.RootDirectory} ({ReadableFileSize(sdInfo.AvailableFreeSpace)}) Free";
@@ -156,7 +157,7 @@ namespace SwitchGameManager
                     DEV_BROADCAST_VOLUME vol = (DEV_BROADCAST_VOLUME)Marshal.PtrToStructure(m.LParam, typeof(DEV_BROADCAST_VOLUME));
                     if ((m.WParam.ToInt32() == DBT_DEVICEARRIVAL) && (vol.dbcv_devicetype == DBT_DEVTYPVOLUME))
                     {
-                        if (Settings.config.sdDriveLetter.Contains(DriveMaskToLetter(vol.dbcv_unitmask).ToString()))
+                        if (Helpers.Settings.config.sdDriveLetter.Contains(DriveMaskToLetter(vol.dbcv_unitmask).ToString()))
                         {
                             locationToolStripComboBox.SelectedIndex = 1;
                             XciHelper.LoadXcisInBackground();
@@ -165,7 +166,7 @@ namespace SwitchGameManager
                     }
                     if ((m.WParam.ToInt32() == DBT_DEVICEREMOVALCOMPLETE) && (vol.dbcv_devicetype == DBT_DEVTYPVOLUME))
                     {
-                        if (Settings.config.sdDriveLetter.Contains(DriveMaskToLetter(vol.dbcv_unitmask).ToString()))
+                        if (Helpers.Settings.config.sdDriveLetter.Contains(DriveMaskToLetter(vol.dbcv_unitmask).ToString()))
                         {
                             locationToolStripComboBox.SelectedIndex = 0;
                             XciHelper.LoadXcisInBackground();
@@ -227,8 +228,8 @@ namespace SwitchGameManager
 
             if (result == DialogResult.OK)
             {
-                Settings.config.localXciFolders = form.localFolders;
-                Settings.config.sdDriveLetter = form.sdDriveLetter;
+                Helpers.Settings.config.localXciFolders = form.localFolders;
+                Helpers.Settings.config.sdDriveLetter = form.sdDriveLetter;
                 SetupFileSysWatcher();
                 XciHelper.LoadXcisInBackground();
                 //XciHelper.LoadXcis();
@@ -262,9 +263,15 @@ namespace SwitchGameManager
             exitToolStripMenuItem.Click += delegate (object s, EventArgs e) { Application.Exit(); };
 
             locationToolStripComboBox.SelectedIndexChanged += delegate (object s, EventArgs e) {
-                Settings.config.defaultView = (XciLocation)locationToolStripComboBox.SelectedIndex;
+                Helpers.Settings.config.defaultView = (XciLocation)locationToolStripComboBox.SelectedIndex;
                 XciHelper.RefreshList();
                 UpdateToolStripLabel();
+            };
+
+            aboutToolStripMenuItem.Click += delegate (object o, EventArgs e)
+            {
+                formAbout formAbout = new formAbout();
+                formAbout.Show();
             };
 
             this.FormClosing += delegate (object s, FormClosingEventArgs e) { SaveSettings(); };
@@ -273,8 +280,8 @@ namespace SwitchGameManager
             {
                 if (this.WindowState != FormWindowState.Maximized)
                 {
-                    Settings.config.formHeight = this.Height;
-                    Settings.config.formWidth = this.Width;
+                    Helpers.Settings.config.formHeight = this.Height;
+                    Helpers.Settings.config.formWidth = this.Width;
                 }
             };
 
@@ -290,7 +297,7 @@ namespace SwitchGameManager
 
             XciLocation destination = new XciLocation();
             XciLocation source = new XciLocation();
-            if (Settings.config.defaultView == XciLocation.PC)
+            if (Helpers.Settings.config.defaultView == XciLocation.PC)
             {
                 destination = XciLocation.SD;
                 source = XciLocation.PC;
@@ -402,8 +409,15 @@ namespace SwitchGameManager
 
             /*
             this.olvColumnisXciTrimmed.Renderer = new MappedImageRenderer(new Object[] {
-                "True", Resources.check,
-                "False", Resources.error
+                true, Resources.trimmed
+            });
+
+            this.olvColumnLocalGame.Renderer = new MappedImageRenderer(new Object[] {
+                true, Resources.computer
+            });
+
+            this.olvColumnSdGame.Renderer = new MappedImageRenderer(new Object[] {
+                true, Resources.microsd
             });
             */
 
@@ -486,7 +500,7 @@ namespace SwitchGameManager
             }
 
 
-            if (Settings.config.defaultView == XciLocation.PC)
+            if (Helpers.Settings.config.defaultView == XciLocation.PC)
             {
                 fileAction.destination = XciLocation.SD;
                 fileAction.source = XciLocation.PC;
@@ -595,7 +609,7 @@ namespace SwitchGameManager
             if (toolIndex == 5) fileAction.action = FileAction.ShowXciInfo;
             if (toolIndex == 6) fileAction.action = FileAction.ShowInExplorer;
 
-            if (Settings.config.defaultView == XciLocation.PC)
+            if (Helpers.Settings.config.defaultView == XciLocation.PC)
             {
                 fileAction.destination = XciLocation.SD;
                 fileAction.source = XciLocation.PC;
@@ -795,7 +809,7 @@ namespace SwitchGameManager
         {
             bool success = false;
 
-            if (!Settings.CheckForSdCard() &&
+            if (!Helpers.Settings.CheckForSdCard() &&
                 (xci.fileAction.action == FileAction.Copy
                 || xci.fileAction.action == FileAction.Delete
                 || xci.fileAction.action == FileAction.Move))
@@ -905,9 +919,9 @@ namespace SwitchGameManager
         public void SaveSettings()
         {
             //save the OLV state to olvState byte array (column positions, etc)
-            Settings.config.olvState = olvList.SaveState();
+            Helpers.Settings.config.olvState = olvList.SaveState();
             XciHelper.SaveXciCache();
-            Settings.SaveSettings();
+            Helpers.Settings.SaveSettings();
         }
 
         public void SetupProgressBar(int min, int max, int initial)
@@ -968,16 +982,6 @@ namespace SwitchGameManager
                     toolStripStatus.Text = text;
                 }
             }
-        }
-
-        private void sdSelectComboBox_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void buttonRefresh_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }

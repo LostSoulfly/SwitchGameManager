@@ -59,6 +59,7 @@ namespace SwitchGameManager
             this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.moveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.refreshGameInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cancelTransfersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteGameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.trimGameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -85,13 +86,12 @@ namespace SwitchGameManager
             this.selectImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.locationToolStripComboBox = new System.Windows.Forms.ToolStripComboBox();
             this.textBoxFilter = new System.Windows.Forms.ToolStripTextBox();
+            this.sdInfoToolStripStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripSpring = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.sdInfoToolStripStatus = new System.Windows.Forms.ToolStripStatusLabel();
-            this.refreshGameInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.olvList)).BeginInit();
             this.menuStrip.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -386,7 +386,7 @@ namespace SwitchGameManager
             // copyToolStripMenuItem
             // 
             this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
-            this.copyToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.copyToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
             this.copyToolStripMenuItem.Tag = "SD";
             this.copyToolStripMenuItem.Text = "Copy";
             this.copyToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
@@ -394,7 +394,7 @@ namespace SwitchGameManager
             // moveToolStripMenuItem
             // 
             this.moveToolStripMenuItem.Name = "moveToolStripMenuItem";
-            this.moveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.moveToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
             this.moveToolStripMenuItem.Tag = "SD";
             this.moveToolStripMenuItem.Text = "Move";
             this.moveToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
@@ -402,15 +402,21 @@ namespace SwitchGameManager
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
             this.deleteToolStripMenuItem.Tag = "SD";
             this.deleteToolStripMenuItem.Text = "Delete";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
             // 
+            // refreshGameInfoToolStripMenuItem
+            // 
+            this.refreshGameInfoToolStripMenuItem.Name = "refreshGameInfoToolStripMenuItem";
+            this.refreshGameInfoToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.refreshGameInfoToolStripMenuItem.Text = "Refresh Game Info";
+            // 
             // cancelTransfersToolStripMenuItem
             // 
             this.cancelTransfersToolStripMenuItem.Name = "cancelTransfersToolStripMenuItem";
-            this.cancelTransfersToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.cancelTransfersToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
             this.cancelTransfersToolStripMenuItem.Tag = "SD";
             this.cancelTransfersToolStripMenuItem.Text = "Cancel Transfers";
             // 
@@ -607,6 +613,12 @@ namespace SwitchGameManager
             this.textBoxFilter.Name = "textBoxFilter";
             this.textBoxFilter.Size = new System.Drawing.Size(125, 23);
             // 
+            // sdInfoToolStripStatus
+            // 
+            this.sdInfoToolStripStatus.Name = "sdInfoToolStripStatus";
+            this.sdInfoToolStripStatus.Size = new System.Drawing.Size(125, 18);
+            this.sdInfoToolStripStatus.Text = "E:\\ (120GB Remaining)";
+            // 
             // toolStripStatus
             // 
             this.toolStripStatus.Name = "toolStripStatus";
@@ -644,18 +656,6 @@ namespace SwitchGameManager
             this.statusStrip1.Size = new System.Drawing.Size(959, 23);
             this.statusStrip1.TabIndex = 5;
             this.statusStrip1.Text = "statusStrip1";
-            // 
-            // sdInfoToolStripStatus
-            // 
-            this.sdInfoToolStripStatus.Name = "sdInfoToolStripStatus";
-            this.sdInfoToolStripStatus.Size = new System.Drawing.Size(125, 18);
-            this.sdInfoToolStripStatus.Text = "E:\\ (120GB Remaining)";
-            // 
-            // refreshGameInfoToolStripMenuItem
-            // 
-            this.refreshGameInfoToolStripMenuItem.Name = "refreshGameInfoToolStripMenuItem";
-            this.refreshGameInfoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.refreshGameInfoToolStripMenuItem.Text = "Refresh Game Info";
             // 
             // formMain
             // 
