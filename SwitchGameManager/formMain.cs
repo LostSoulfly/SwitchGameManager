@@ -634,26 +634,7 @@ namespace SwitchGameManager
                     return;
 
                 case FileAction.ShowInExplorer:
-                    List<XciItem> showList = olvList.SelectedObjects.Cast<XciItem>().ToList();
-
-                    foreach (XciItem item in showList)
-                    {
-                        item.fileAction = Clone(fileAction);
-                        ProcessFileManagement(item);
-                    }
-
-                    return;
-
                 case FileAction.ShowCert:
-                    List<XciItem> showCert = olvList.SelectedObjects.Cast<XciItem>().ToList();
-
-                    foreach (XciItem item in showCert)
-                    {
-                        item.fileAction = Clone(fileAction);
-                        ProcessFileManagement(item);
-                    }
-                    return;
-
                 case FileAction.ShowXciInfo:
                     List<XciItem> showInfo = olvList.SelectedObjects.Cast<XciItem>().ToList();
 
