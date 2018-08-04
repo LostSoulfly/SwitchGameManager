@@ -406,6 +406,8 @@ namespace SwitchGameManager
                 }
                 return key;
             };
+            
+            
 
             /*
             this.olvColumnisXciTrimmed.Renderer = new MappedImageRenderer(new Object[] {
@@ -767,7 +769,6 @@ namespace SwitchGameManager
                     break;
             }
 
-            olvList.ClearObjects();
 
             olvList.LargeImageList = new ImageList();
             olvList.SmallImageList = new ImageList();
@@ -775,7 +776,7 @@ namespace SwitchGameManager
             olvList.LargeImageList.ImageSize = largeSize;
             olvList.SmallImageList.ImageSize = smallSize;
 
-            //olvList.SetObjects(XciHelper.xciList);
+            Helpers.XciHelper.RefreshList();
         }
 
         public void ProcessDisplayChange(int displayIndex)
