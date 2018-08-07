@@ -4,7 +4,7 @@ Manage your XCI files on SD and PC, from multiple PC folders. Rename, search, tr
 
 Display your library in a few different ways, with more likely to come. For now, it relies on hacbuild to extract the PackageID of each XCI and uses that as a unique identifier, then uses the decompiled XCI-Explorer to retrieve game info.
 
-I'll transition to [libhac](https://github.com/Thealexbarney/libhac) soon to speed up the initial library processing and remove the extra bloat.
+I'll transition to [libhac](https://github.com/Thealexbarney/libhac) soon to speed up the initial library processing and remove the extra bloat as soon as XCI reading is implemented.
 
 ## Important
 You need a keys.txt file to use this program.
@@ -17,24 +17,20 @@ In addition to the usual keys, you'll also need **xci_header_key**!
 ![Screenshot](Screens/4.png)
 
 ## Bugs
-- Crashes if any file operations (such as trimming) occur during a file transfer
-- It's slow to build the library initially. I'll move to libhac soon.
 - Can copy the same file(s) multiple times
-- Doesn't verify keys.txt existence
-- I don't recommend having the same game multiple times in your library as that hasn't been well tested.
 - Probably some others, please report them!
 
 ## Current todo list
-- [ ] Make it easier to see PC or SD only games
-- [ ] Show SD card remaining size and other info at a glance
-- [ ] Prevent copying games to SD if it would exceed SD space
+- [X] Make it easier to see PC or SD only games
+- [X] Show SD card remaining size and other info at a glance
+- [X] Prevent copying games to SD if it would exceed SD space
 - [ ] Use pretty icons for games on PC/SD instead of "True" or "False"
 - [ ] Move to libhac and stop using hacbuild + XCI-Explorer
-- [ ] Refactor everything
-- [ ] Do the heavy lifting in the background so the program is more responsive (loading game info)
+- [X] Refactor most things
+- [X] Do the heavy lifting in the background so the program is more responsive (loading game info)
 - [ ] Better file transfer manager
-- [ ] Fix all the bugs
-- [ ] ?
+- [X] Fix most bugs
+- [ ] Add NSP support
 
 ### Credits
 http://objectlistview.sourceforge.net/cs/index.html
