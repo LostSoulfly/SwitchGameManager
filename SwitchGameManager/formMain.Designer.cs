@@ -386,7 +386,7 @@ namespace SwitchGameManager
             // copyToolStripMenuItem
             // 
             this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
-            this.copyToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.copyToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.copyToolStripMenuItem.Tag = "SD";
             this.copyToolStripMenuItem.Text = "Copy";
             this.copyToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
@@ -394,7 +394,7 @@ namespace SwitchGameManager
             // moveToolStripMenuItem
             // 
             this.moveToolStripMenuItem.Name = "moveToolStripMenuItem";
-            this.moveToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.moveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.moveToolStripMenuItem.Tag = "SD";
             this.moveToolStripMenuItem.Text = "Move";
             this.moveToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
@@ -402,7 +402,7 @@ namespace SwitchGameManager
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.deleteToolStripMenuItem.Tag = "SD";
             this.deleteToolStripMenuItem.Text = "Delete";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.ToolStripFileManagement);
@@ -410,13 +410,13 @@ namespace SwitchGameManager
             // refreshGameInfoToolStripMenuItem
             // 
             this.refreshGameInfoToolStripMenuItem.Name = "refreshGameInfoToolStripMenuItem";
-            this.refreshGameInfoToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.refreshGameInfoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.refreshGameInfoToolStripMenuItem.Text = "Refresh Game Info";
             // 
             // cancelTransfersToolStripMenuItem
             // 
             this.cancelTransfersToolStripMenuItem.Name = "cancelTransfersToolStripMenuItem";
-            this.cancelTransfersToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.cancelTransfersToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.cancelTransfersToolStripMenuItem.Tag = "SD";
             this.cancelTransfersToolStripMenuItem.Text = "Cancel Transfers";
             // 
@@ -482,7 +482,7 @@ namespace SwitchGameManager
             this.detailsToolStripMenuItem,
             this.iconsOnlyToolStripMenuItem});
             this.displayStyleToolStripMenuItem.Name = "displayStyleToolStripMenuItem";
-            this.displayStyleToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.displayStyleToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.displayStyleToolStripMenuItem.Text = "List Display Style";
             // 
             // smallIconsToolStripMenuItem
@@ -535,7 +535,7 @@ namespace SwitchGameManager
             this.small64x64ToolStripMenuItem,
             this.smallest32x32ToolStripMenuItem});
             this.iconSizeToolStripMenuItem.Name = "iconSizeToolStripMenuItem";
-            this.iconSizeToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.iconSizeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.iconSizeToolStripMenuItem.Text = "Icon Size";
             // 
             // biggestToolStripMenuItem
@@ -572,7 +572,7 @@ namespace SwitchGameManager
             this.backgroundImageToolStripMenuItem});
             this.themesToolStripMenuItem.Enabled = false;
             this.themesToolStripMenuItem.Name = "themesToolStripMenuItem";
-            this.themesToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.themesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.themesToolStripMenuItem.Text = "Themes";
             this.themesToolStripMenuItem.Visible = false;
             // 

@@ -463,11 +463,15 @@ namespace SwitchGameManager.Helpers
                         XciItem xciRefresh = xciToRefresh.First();
                         XciItem oldXci;
 
+                        oldXci = FindXciByIdentifer(xciRefresh.packageId, xciCache);
+                        xciCache.Remove(oldXci);
+                        xciCache.Add(xciRefresh);
+
                         if (xciRefresh.xciLocation == XciLocation.PC)
                         {
                             oldXci = FindXciByIdentifer(xciRefresh.packageId, xciOnPc);
                             xciOnPc.Remove(oldXci);
-                            xciOnSd.Add(xciRefresh);
+                            xciOnPc.Add(xciRefresh);
                         }
                         else
                         {
@@ -475,7 +479,7 @@ namespace SwitchGameManager.Helpers
                             xciOnSd.Remove(oldXci);
                             xciOnSd.Add(xciRefresh);
                         }
-
+                        
                         if (xciRefresh.xciLocation == Settings.config.defaultView)
                         {
                             formMain.olvList.RemoveObject(oldXci);
@@ -491,8 +495,12 @@ namespace SwitchGameManager.Helpers
                     {
                         backgroundWorkerSingleLoad.RunWorkerAsync();
                     }
-                    isGameLoadingComplete = true;
-                    formMain.locationToolStripComboBox.Enabled = isGameLoadingComplete;
+                    else
+                    {
+                        SaveXciCache();
+                        isGameLoadingComplete = true;
+                        formMain.locationToolStripComboBox.Enabled = isGameLoadingComplete;
+                    }
                 };
 
                 backgroundWorkerSingleLoad.DoWork += delegate
