@@ -40,7 +40,9 @@ namespace SwitchGameManager
         {
             string about = string.Empty;
 
-            about = @"Programmed by LostSoulfly
+            about = "SwitchGameManager " + Application.ProductVersion + Environment.NewLine;
+
+            about += @"Programmed by LostSoulfly
 
 Programmed off and on in under two weeks for fun. If you find any issues, please report them on GitHub!
 

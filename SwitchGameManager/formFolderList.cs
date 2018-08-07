@@ -49,6 +49,10 @@ namespace SwitchGameManager
 
             foreach (DriveInfo item in driveInfo)
             {
+
+                if (!item.IsReady)
+                    continue;
+
                 if (item.DriveType == DriveType.Removable && (item.DriveFormat.ToLower() == "exfat")) // || item.DriveFormat.ToLower() == "fat32"))
                 {
                     if (Directory.GetFiles(item.RootDirectory.ToString(), "*.xci").ToList<string>().Count > 0)
