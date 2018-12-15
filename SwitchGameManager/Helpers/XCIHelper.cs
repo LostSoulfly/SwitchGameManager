@@ -5,7 +5,9 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 using static hacbuild.XCIManager;
 
@@ -152,6 +154,29 @@ namespace SwitchGameManager.Helpers
             return files;
         }
 
+        public static XciItem FindXciByIdentifer(string uniqueId, List<XciItem> xciCache = null)
+        {
+            if (xciCache == null)
+            {
+                if (XciHelper.xciCache == null)
+                    XciHelper.xciCache = LoadXciCache();
+
+                xciCache = XciHelper.xciCache;
+            }
+
+            XciItem xci;
+            try
+            {
+                xci = xciCache.First(item => item.uniqueId == uniqueId);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+            return xci;
+        }
+
+        /*
         public static XciItem FindXciByIdentifer(ulong packageId, List<XciItem> xciCache = null)
         {
             if (xciCache == null)
@@ -173,7 +198,8 @@ namespace SwitchGameManager.Helpers
             }
             return xci;
         }
-
+        
+        
         public static List<XciItem> GetAllItemsByIdentifer(ulong packageId)
         {
             List<XciItem> xciList = new List<XciItem>();
@@ -187,6 +213,26 @@ namespace SwitchGameManager.Helpers
             try
             {
                 xciList.AddRange(xciOnSd.FindAll(item => item.packageId == packageId));
+            }
+            catch { }
+
+            return xciList;
+        }
+        */
+
+        public static List<XciItem> GetAllItemsByIdentifer(string uniqueId)
+        {
+            List<XciItem> xciList = new List<XciItem>();
+
+            try
+            {
+                xciList.AddRange(xciOnPc.FindAll(item => item.uniqueId == uniqueId));
+            }
+            catch { }
+
+            try
+            {
+                xciList.AddRange(xciOnSd.FindAll(item => item.uniqueId == uniqueId));
             }
             catch { }
 
@@ -220,14 +266,27 @@ namespace SwitchGameManager.Helpers
             return xciList;
         }
 
-        public static ulong GetXciIdentifier(string fileName)
+        public static string GetXciIdentifier(string fileName)
         {
             if (!File.Exists(fileName))
-                return 0;
+                return "UNKNOWN";
 
-            xci_header header = hac.GetXCIHeader(fileName);
+            //xci_header header = hac.GetXCIHeader(fileName);
+            
+            return sha256(Path.GetFileNameWithoutExtension(fileName));
 
-            return header.PackageID;
+            //return header.PackageID;
+        }
+
+        public static XciItem GetXciInfoNew(string filePath, XciLocation location)
+        {
+            XciItem xci = new XciItem(filePath);
+
+            if (!File.Exists(filePath))
+                return null;
+
+            return xci;
+
         }
 
         public static XciItem GetXciInfo(string filePath, XciLocation location)
@@ -239,24 +298,26 @@ namespace SwitchGameManager.Helpers
 
             XCI_Explorer.MainForm mainForm = new XCI_Explorer.MainForm(false);
 
-            xci_header header = hac.GetXCIHeader(xci.xciFilePath);
+            //xci_header header = hac.GetXCIHeader(xci.xciFilePath);
 
-            xci.packageId = header.PackageID;
+            //xci.packageId = header.PackageID;
+
+            xci.uniqueId = GetXciIdentifier(filePath);
 
             mainForm.ReadXci(filePath);
 
-            xci.gameName = mainForm.TB_Name.Text;
-            xci.gameDeveloper = mainForm.TB_Dev.Text;
-            xci.gameCardCapacity = mainForm.TB_Capacity.Text;
+            xci.gameName = mainForm.TB_Name.Text.Trim().TrimEnd('\0');
+            xci.gameDeveloper = mainForm.TB_Dev.Text.Trim().TrimEnd('\0');
+            xci.gameCardCapacity = mainForm.TB_Capacity.Text.Trim().TrimEnd('\0');
             xci.gameIcon = (Bitmap)mainForm.PB_GameIcon.BackgroundImage;
-            xci.gameRevision = mainForm.TB_GameRev.Text;
-            xci.masterKeyRevision = mainForm.TB_MKeyRev.Text;
-            xci.sdkVersion = mainForm.TB_SDKVer.Text;
-            xci.titleId = mainForm.TB_TID.Text;
+            xci.gameRevision = mainForm.TB_GameRev.Text.Trim().TrimEnd('\0');
+            xci.masterKeyRevision = mainForm.TB_MKeyRev.Text.Trim().TrimEnd('\0');
+            xci.sdkVersion = mainForm.TB_SDKVer.Text.Trim().TrimEnd('\0');
+            xci.titleId = mainForm.TB_TID.Text.Trim().TrimEnd('\0');
             if (xci.titleId.Length != 16) xci.titleId = 0 + xci.titleId;
             xci.gameSize = mainForm.exactSize;
-            xci.gameUsedSize = mainForm.exactUsedSpace;
-            xci.productCode = mainForm.TB_ProdCode.Text;
+            xci.gameUsedSize = mainForm.UsedSize;
+            xci.productCode = mainForm.TB_ProdCode.Text.Trim().TrimEnd('\0');
             xci.gameCert = ReadXciCert(xci.xciFilePath);
             xci.xciFileSize = new System.IO.FileInfo(xci.xciFilePath).Length;
 
@@ -301,18 +362,19 @@ namespace SwitchGameManager.Helpers
         public static List<XciItem> LoadGamesFromPath(string dirPath, bool recurse = true, bool isSdCard = false)
         {
             List<XciItem> pathXciList = new List<XciItem>();
-            ulong packageId;
+            //ulong packageId;
+            string uniqueId;
             XciItem xciTemp;
 
             List<string> xciFileList = FindAllFiles(dirPath, "*.xci", recurse);
 
             foreach (var item in xciFileList)
             {
-                packageId = XciHelper.GetXciIdentifier(item);
+                uniqueId = XciHelper.GetXciIdentifier(item);
 
                 // Check if this game is in the Cache and Clone the cache XciItem to decouple the objects
                 lock (cacheListLock)
-                    xciTemp = Clone(XciHelper.FindXciByIdentifer(packageId));
+                    xciTemp = Clone(XciHelper.FindXciByIdentifer(uniqueId));
 
                 if (xciTemp == null)
                     xciTemp = new XciItem();
@@ -337,7 +399,7 @@ namespace SwitchGameManager.Helpers
 
         public static List<XciItem> LoadXciCache(string fileName = "")
         {
-            List<XciItem> xciCache = new List<XciItem>();
+            List<XciItem> cache = new List<XciItem>();
 
             lock (cacheListLock)
             {
@@ -345,12 +407,12 @@ namespace SwitchGameManager.Helpers
                     fileName = Settings.cacheFileName;
 
                 if (!File.Exists(fileName))
-                    return xciCache;
+                    return cache;
 
-                xciCache = JsonConvert.DeserializeObject<IEnumerable<XciItem>>(File.ReadAllText(fileName)).ToList<XciItem>();
+                cache = JsonConvert.DeserializeObject<IEnumerable<XciItem>>(File.ReadAllText(fileName)).ToList<XciItem>();
             }
 
-            return xciCache;
+            return cache;
         }
 
         public static void LoadXcisInBackground()
@@ -406,8 +468,8 @@ namespace SwitchGameManager.Helpers
                     xci = GetXciInfo(xci.xciFilePath, xci.xciLocation);
             }
 
-            xci.isGameOnSd = (FindXciByIdentifer(xci.packageId, xciOnSd) != null);
-            xci.isGameOnPc = (FindXciByIdentifer(xci.packageId, xciOnPc) != null);
+            xci.isGameOnSd = (FindXciByIdentifer(xci.uniqueId, xciOnSd) != null);
+            xci.isGameOnPc = (FindXciByIdentifer(xci.uniqueId, xciOnPc) != null);
 
             //reset any file actions that would have happened with this xci
             xci.fileAction = new FileHelper.FileStruct();
@@ -463,19 +525,19 @@ namespace SwitchGameManager.Helpers
                         XciItem xciRefresh = xciToRefresh.First();
                         XciItem oldXci;
 
-                        oldXci = FindXciByIdentifer(xciRefresh.packageId, xciCache);
+                        oldXci = FindXciByIdentifer(xciRefresh.uniqueId, xciCache);
                         xciCache.Remove(oldXci);
                         xciCache.Add(xciRefresh);
 
                         if (xciRefresh.xciLocation == XciLocation.PC)
                         {
-                            oldXci = FindXciByIdentifer(xciRefresh.packageId, xciOnPc);
+                            oldXci = FindXciByIdentifer(xciRefresh.uniqueId, xciOnPc);
                             xciOnPc.Remove(oldXci);
                             xciOnPc.Add(xciRefresh);
                         }
                         else
                         {
-                            oldXci = FindXciByIdentifer(xciRefresh.packageId, xciOnSd);
+                            oldXci = FindXciByIdentifer(xciRefresh.uniqueId, xciOnSd);
                             xciOnSd.Remove(oldXci);
                             xciOnSd.Add(xciRefresh);
                         }
@@ -599,13 +661,13 @@ namespace SwitchGameManager.Helpers
 
             if (xci.fileAction.source == XciLocation.SD)
             {
-                xciTempSource = FindXciByIdentifer(xci.packageId, xciOnSd);
-                xciTempDest = FindXciByIdentifer(xci.packageId, xciOnPc);
+                xciTempSource = FindXciByIdentifer(xci.uniqueId, xciOnSd);
+                xciTempDest = FindXciByIdentifer(xci.uniqueId, xciOnPc);
             }
             else
             {
-                xciTempSource = FindXciByIdentifer(xci.packageId, xciOnPc);
-                xciTempDest = FindXciByIdentifer(xci.packageId, xciOnSd);
+                xciTempSource = FindXciByIdentifer(xci.uniqueId, xciOnPc);
+                xciTempDest = FindXciByIdentifer(xci.uniqueId, xciOnSd);
             }
 
             switch (xci.fileAction.action)
@@ -732,7 +794,7 @@ namespace SwitchGameManager.Helpers
         {
             lock (cacheListLock)
             {
-                XciItem xciTemp = FindXciByIdentifer(xci.packageId);
+                XciItem xciTemp = FindXciByIdentifer(xci.uniqueId);
 
                 if (!IsXciInfoValid(xciTemp))
                 {
@@ -744,6 +806,57 @@ namespace SwitchGameManager.Helpers
                 }
             }
             return false;
+        }
+
+        public static string sha256(string randomString)
+        {
+            var crypt = new System.Security.Cryptography.SHA256Managed();
+            var hash = new System.Text.StringBuilder();
+            byte[] crypto = crypt.ComputeHash(Encoding.UTF8.GetBytes(randomString));
+            foreach (byte theByte in crypto)
+            {
+                hash.Append(theByte.ToString("x2"));
+            }
+            return hash.ToString();
+        }
+
+        public static byte[] Compress(byte[] raw)
+        {
+            using (MemoryStream memory = new MemoryStream())
+            {
+                using (GZipStream gzip = new GZipStream(memory,
+                    CompressionMode.Compress, true))
+                {
+                    gzip.Write(raw, 0, raw.Length);
+                }
+                return memory.ToArray();
+            }
+        }
+
+        public static byte[] Decompress(byte[] gzip)
+        {
+            // Create a GZIP stream with decompression mode.
+            // ... Then create a buffer and write into while reading from the GZIP stream.
+            using (GZipStream stream = new GZipStream(new MemoryStream(gzip),
+                CompressionMode.Decompress))
+            {
+                const int size = 4096;
+                byte[] buffer = new byte[size];
+                using (MemoryStream memory = new MemoryStream())
+                {
+                    int count = 0;
+                    do
+                    {
+                        count = stream.Read(buffer, 0, size);
+                        if (count > 0)
+                        {
+                            memory.Write(buffer, 0, count);
+                        }
+                    }
+                    while (count > 0);
+                    return memory.ToArray();
+                }
+            }
         }
     }
 }

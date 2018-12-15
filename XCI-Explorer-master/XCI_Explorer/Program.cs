@@ -1,24 +1,24 @@
 using System;
 using System.Windows.Forms;
 
-namespace XCI_Explorer
-{
-	public static class Program
-	{
-		[STAThread]
-		private static void Main()
-		{
-			Application.EnableVisualStyles();
-			Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run(new MainForm());
-		}
+namespace XCI_Explorer {
+    public static class Program {
 
         [STAThread]
-        public static MainForm Startup(bool visible = true)
-        {
-            MainForm main = new MainForm(visible);
-            Application.Run(main);
-            return main;
+        public static void Main() {
+            AppDomain.CurrentDomain.AssemblyResolve += (Object sender, ResolveEventArgs args) => {
+                System.Reflection.AssemblyName embeddedAssembly = new System.Reflection.AssemblyName(args.Name);
+                String resourceName = "XCI_Explorer" + "." + embeddedAssembly.Name + ".dll";
+
+                using (var stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName)) {
+                    Byte[] assemblyData = new Byte[stream.Length];
+                    stream.Read(assemblyData, 0, assemblyData.Length);
+                    return System.Reflection.Assembly.Load(assemblyData);
+                }
+            };
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new MainForm());
         }
     }
 }

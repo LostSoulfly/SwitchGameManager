@@ -397,7 +397,7 @@ namespace SwitchGameManager
             olvColumnXciName.ImageGetter = delegate (object row)
             {
                 XciItem xciInfo = (XciItem)row;
-                String key = xciInfo.packageId.ToString();
+                String key = xciInfo.uniqueId;
                 if (!this.olvList.LargeImageList.Images.ContainsKey(key))
                 {
                     if (xciInfo.gameIcon != null)
@@ -830,7 +830,7 @@ namespace SwitchGameManager
 
                 case FileAction.CompletelyDelete:
 
-                    List<XciItem> deleteItems = GetAllItemsByIdentifer(xci.packageId);
+                    List<XciItem> deleteItems = GetAllItemsByIdentifer(xci.uniqueId);
 
                     for (int i = deleteItems.Count - 1; i >= 0; i--)
                     {

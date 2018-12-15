@@ -219,6 +219,7 @@ namespace SwitchGameManager
             try
             {
                 File.Move(item.filePath, item.renamePath);
+                item.xci.uniqueId = XciHelper.GetXciIdentifier(item.renamePath);
                 //TODO verify file was moved
                 return true;
             } catch (Exception ex)

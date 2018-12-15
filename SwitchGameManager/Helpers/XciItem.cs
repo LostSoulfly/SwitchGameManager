@@ -21,7 +21,20 @@ namespace SwitchGameManager.Helpers
 
         public string gameCardCapacity;
 
-        public byte[] gameCert;
+        public byte[] gameCertCompressed;
+
+        [JsonIgnore]
+        public byte[] gameCert
+        {
+            get
+            {
+                return XciHelper.Decompress(this.gameCertCompressed);
+            }
+            set
+            {
+                this.gameCertCompressed = XciHelper.Compress(value);
+            }
+        }
 
         public string gameDeveloper;
 
@@ -46,7 +59,8 @@ namespace SwitchGameManager.Helpers
         public bool isUniqueCert;
         public bool isXciTrimmed;
         public string masterKeyRevision;
-        public ulong packageId;
+        //public ulong packageId;
+        public string uniqueId;
         public string productCode;
         public string sdkVersion;
         public string titleId;
@@ -63,7 +77,7 @@ namespace SwitchGameManager.Helpers
                 Bitmap bmp;
                 try
                 {
-                    using (var ms = new MemoryStream(this.gameIconBytes))
+                    using (var ms = new MemoryStream(XciHelper.Decompress(this.gameIconBytes)))
                     {
                         bmp = new Bitmap(ms);
                         return bmp;
@@ -73,11 +87,15 @@ namespace SwitchGameManager.Helpers
             }
             set
             {
-                using (var stream = new MemoryStream())
+                try
                 {
-                    value.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
-                    this.gameIconBytes = stream.ToArray();
+                    using (var stream = new MemoryStream())
+                    {
+                        value.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
+                        this.gameIconBytes = XciHelper.Compress(stream.ToArray());
+                    }
                 }
+                catch { }
             }
         }
 
