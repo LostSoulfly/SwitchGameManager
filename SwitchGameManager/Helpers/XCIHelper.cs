@@ -48,7 +48,8 @@ namespace SwitchGameManager.Helpers
         private static void LoadXcis()
         {
             bool updatedXciCache = false;
-
+            
+            Log($"LoadXcis");
             formMain.UpdateToolStripLabel("Loading games..");
             formMain.olvList.EmptyListMsg = "Loading games..";
 
@@ -115,7 +116,8 @@ namespace SwitchGameManager.Helpers
 
         internal static void RebuildCache()
         {
-            IsFileTransferInProgress();
+            if (IsFileTransferInProgress())
+                return;
 
             lock (cacheListLock)
                 xciCache = new List<XciItem>();
@@ -278,6 +280,7 @@ namespace SwitchGameManager.Helpers
             //return header.PackageID;
         }
 
+        /*
         public static XciItem GetXciInfoNew(string filePath, XciLocation location)
         {
             XciItem xci = new XciItem(filePath);
@@ -288,10 +291,13 @@ namespace SwitchGameManager.Helpers
             return xci;
 
         }
+        */
 
         public static XciItem GetXciInfo(string filePath, XciLocation location)
         {
             XciItem xci = new XciItem(filePath);
+
+            Log($"GetXciInfo {filePath}");
 
             if (!File.Exists(filePath))
                 return null;
@@ -345,6 +351,16 @@ namespace SwitchGameManager.Helpers
             return xci;
         }
 
+        private static void Log(string text)
+        {
+            /*
+            using (var tw = new StreamWriter("log.txt", true))
+            {
+                tw.WriteLine(DateTime.Now + " " + text);
+            }
+            */
+        }
+
         public static bool IsXciInfoValid(XciItem xci)
         {
             if (xci == null)
@@ -366,11 +382,13 @@ namespace SwitchGameManager.Helpers
             string uniqueId;
             XciItem xciTemp;
 
+            Log($"LoadGamesFromPath: {dirPath}");
             List<string> xciFileList = FindAllFiles(dirPath, "*.xci", recurse);
 
             foreach (var item in xciFileList)
             {
                 uniqueId = XciHelper.GetXciIdentifier(item);
+                //Log($"LoadGamesFromPath: {uniqueId} - {item}");
 
                 // Check if this game is in the Cache and Clone the cache XciItem to decouple the objects
                 lock (cacheListLock)
@@ -401,6 +419,7 @@ namespace SwitchGameManager.Helpers
         {
             List<XciItem> cache = new List<XciItem>();
 
+            Log($"LoadXciCache: {fileName}");
             lock (cacheListLock)
             {
                 if (String.IsNullOrWhiteSpace(fileName))
@@ -418,6 +437,7 @@ namespace SwitchGameManager.Helpers
         public static void LoadXcisInBackground()
         {
             IsFileTransferInProgress();
+            Log($"LoadXcisInBackground: {IsFileTransferInProgress()}");
 
             if (backgroundWorkerFullLoad == null)
             {
@@ -451,17 +471,23 @@ namespace SwitchGameManager.Helpers
 
         public static byte[] ReadXciCert(string filePath)
         {
-            FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
             byte[] array = new byte[512];
-            fileStream.Position = 28672L;
-            fileStream.Read(array, 0, 512);
-            fileStream.Close();
 
+            if (File.Exists(filePath))
+            {
+                Log($"ReadXciCert {filePath}");
+                FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+                
+                fileStream.Position = 28672L;
+                fileStream.Read(array, 0, 512);
+                fileStream.Close();
+            }
             return array;
         }
 
         public static XciItem RefreshGame(XciItem xci, bool force = false)
         {
+            Log($"RefreshGame: {xci.gameName}");
             if (force || !IsXciInfoValid(xci))
             {
                 if (File.Exists(xci.xciFilePath))
@@ -470,15 +496,23 @@ namespace SwitchGameManager.Helpers
 
             xci.isGameOnSd = (FindXciByIdentifer(xci.uniqueId, xciOnSd) != null);
             xci.isGameOnPc = (FindXciByIdentifer(xci.uniqueId, xciOnPc) != null);
+            xci.keepInCache = true;
 
             //reset any file actions that would have happened with this xci
             xci.fileAction = new FileHelper.FileStruct();
 
+            XciItem oldXci = FindXciByIdentifer(xci.uniqueId);
+            lock (cacheListLock)
+            {
+                xciCache.Remove(oldXci);
+                xciCache.Add(xci);
+            }
             return xci;
         }
 
         public static void RefreshList()
         {
+            Log($"RefreshList");
             if (!XciHelper.isGameLoadingComplete)
                 return;
 
@@ -506,6 +540,7 @@ namespace SwitchGameManager.Helpers
 
         public static void RefreshXciInBackground(XciItem xci)
         {
+            Log($"RefreshXciInBackground {xci.gameName}");
             isGameLoadingComplete = false;
             formMain.locationToolStripComboBox.Enabled = isGameLoadingComplete;
 
@@ -526,8 +561,6 @@ namespace SwitchGameManager.Helpers
                         XciItem oldXci;
 
                         oldXci = FindXciByIdentifer(xciRefresh.uniqueId, xciCache);
-                        xciCache.Remove(oldXci);
-                        xciCache.Add(xciRefresh);
 
                         if (xciRefresh.xciLocation == XciLocation.PC)
                         {
@@ -594,20 +627,32 @@ namespace SwitchGameManager.Helpers
             catch { }
         }
 
-        public static void SaveXciCache(string fileName = "", List<XciItem> xciCache = null)
+        public static void SaveXciCache(string fileName = "", List<XciItem> cache = null)
         {
             if (String.IsNullOrWhiteSpace(fileName))
                 fileName = Settings.cacheFileName;
 
+            Log($"SaveXciCache {fileName}");
+
             lock (cacheListLock)
             {
-                if (xciCache == null)
-                    xciCache = XciHelper.xciCache;
+                if (cache == null)
+                    cache = XciHelper.xciCache;
 
-                if (xciCache == null || xciCache.Count == 0)
+                if (cache == null || cache.Count == 0)
                     return;
 
-                File.WriteAllText(fileName, JsonConvert.SerializeObject(xciCache, Formatting.Indented));
+                int length = cache.Count - 1;
+                for (int i = length; i > 0; i--)
+                {
+                    if (!cache[i].keepInCache)
+                    {
+                        Log($"CacheCleanup: {cache[i].gameName}");
+                        cache.RemoveAt(i);
+                    }
+                }
+
+                File.WriteAllText(fileName, JsonConvert.SerializeObject(cache, Formatting.Indented));
             }
         }
 
@@ -651,6 +696,10 @@ namespace SwitchGameManager.Helpers
 
         public static void UpdateXci(XciItem xci)
         {
+
+
+            Log($"UpdateXci: {xci.gameName}");
+
             XciItem xciTempSource = new XciItem();
             XciItem xciTempDest = new XciItem();
 
@@ -792,6 +841,8 @@ namespace SwitchGameManager.Helpers
 
         public static bool UpdateXciCache(XciItem xci)
         {
+            Log($"UpdateXciCache: {xci.gameName}");
+
             lock (cacheListLock)
             {
                 XciItem xciTemp = FindXciByIdentifer(xci.uniqueId);

@@ -67,6 +67,8 @@ namespace SwitchGameManager.Helpers
         public string xciFilePath;
         public long xciFileSize;
         public XciHelper.XciLocation xciLocation;
+        internal bool keepInCache;
+
         //public string xciSdFilePath;
 
         //Can't serialize a Bitmap object.. so we convert it to and from a Byte array on the fly
