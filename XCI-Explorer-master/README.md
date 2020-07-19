@@ -1,35 +1,39 @@
 # XCI Explorer
 
-[Original MaxConsole Release](https://www.maxconsole.com/threads/exclusive-xci-explorer-released-for-switch-game-cartridge-backups.47046/)
+Originally Released by Anonymous on MaxConsole
 
-View contents of XCI files and more!
+View the contents of Switch files and more!
 
 ## Features
-* View metadata
+* View metadata for XCI and NSP files
 * Explore partitions
 * Check NCA hashes
 * Extract NCA
 * Modify cert
 
-## Requirements
-* Visual Studio 2017
-* [Hactool](https://github.com/SciresM/hactool/releases)
-* [Dumped keys](https://gbatemp.net/threads/how-to-get-switch-keys-for-hactool-xci-decrypting.506978/) ([or get them here](https://github.com/StudentBlake/XCI-Explorer/releases/download/v1.0.0.0/Get-keys.txt.bat))
-
-Main Tab Metadata/Cert/Trimming | Partitions Tab NCA Extract/Hash Check
+Main | Partitions
 :-------------------------:|:-------------------------:
-![main](https://imgur.com/NdYOcgW.jpg) | ![partitions](https://imgur.com/ehPoPWB.jpg)
+![main](https://cdn.discordapp.com/attachments/373320120707055617/686252629852291095/1.JPG) | ![partitions](https://cdn.discordapp.com/attachments/373320120707055617/686252642204385288/2.JPG)
+
+## Build Requirements
+* [Visual Studio Community 2019](https://visualstudio.microsoft.com/downloads/)
+* [.NET Framework 4.8 Developer Pack](https://dotnet.microsoft.com/download/dotnet-framework/thank-you/net48-developer-pack-offline-installer)
+* [hactool](https://github.com/SciresM/hactool/releases)
+* [Lockpick](https://github.com/shchmue/Lockpick_RCM/releases)
 
 ## Build Instructions
-* Open `XCI Explorer.sln`
-* Build -> Build Solution
-* Add hactool.exe + dependencies + keys.txt to `XCI-Explorer/bin/Debug/` folder
-* Run `XCI-Explorer.exe`
+* Open **XCI Explorer.sln**
+* Change *Debug* to *Release* in the dropdown menu
+* Go to *Build*, then *Build Solution*
+* Extract **hactool.zip** to the `XCI-Explorer/bin/Release/tools/` folder
+* Run **XCI-Explorer.exe**
 
 ## Special Thanks
-klks - CARD2, Hash Validation, bug fixes
+* klks - CARD2, hash validation and bug fixes
+* garoxas - Game revision, QoL changes and bug fixes
+* CodingKoopa, zzpong, and everyone else that's helped this project!
 
-## Disclaimer
-This is not my original work. I just decompiled the executable and made minor changes.
-
-I am NOT a developer and this has NOT been extensively tested!
+## Disclaimers
+* This is not my original work
+* Some code may be unfinished and unoptimized
+* Please use at your own risk!

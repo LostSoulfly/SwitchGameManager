@@ -2,10 +2,16 @@ using System;
 using System.IO;
 using System.Linq;
 
-namespace XCI_Explorer {
-    internal static class Util {
-        public static string GetCapacity(int id) {
-            switch (id) {
+namespace XCI_Explorer
+{
+    internal static class Util
+    {
+        public static string GetCapacity(int id)
+        {
+            switch (id)
+            {
+                case 250:
+                    return "1GB";
                 case 248:
                     return "2GB";
                 case 240:
@@ -21,8 +27,10 @@ namespace XCI_Explorer {
             }
         }
 
-        public static string GetMkey(byte id) {
-            switch (id) {
+        public static string GetMkey(byte id)
+        {
+            switch (id)
+            {
                 case 0:
                 case 1:
                     return "MasterKey0 (1.0.0-2.3.0)";
@@ -37,15 +45,15 @@ namespace XCI_Explorer {
                 case 6:
                     return "MasterKey5 (6.0.0-6.1.0)";
                 case 7:
-                    return "MasterKey6 (?)";
+                    return "MasterKey6 (6.2.0)";
                 case 8:
-                    return "MasterKey7 (?)";
+                    return "MasterKey7 (7.0.0-8.0.1)";
                 case 9:
-                    return "MasterKey8 (?)";
+                    return "MasterKey8 (8.1.0)";
                 case 10:
-                    return "MasterKey9 (?)";
+                    return "MasterKey9 (9.0.0-9.0.1)";
                 case 11:
-                    return "MasterKey10 (?)";
+                    return "MasterKey10 (9.1.0-9.2.0)";
                 case 12:
                     return "MasterKey11 (?)";
                 case 13:
@@ -95,17 +103,28 @@ namespace XCI_Explorer {
             }
         }
 
-        public static bool checkFile(string filepath) {
-            if (File.Exists(filepath)) {
-                return true;
-            }
-            return false;
+        public static bool checkFile(string filepath)
+        {
+            return File.Exists(filepath);
         }
 
-        public static byte[] StringToByteArray(string hex) {
+        public static byte[] StringToByteArray(string hex)
+        {
             return (from x in Enumerable.Range(0, hex.Length)
                     where x % 2 == 0
                     select Convert.ToByte(hex.Substring(x, 2), 16)).ToArray();
+        }
+
+        public static string Base64Encode(string plainText)
+        {
+            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
+            return System.Convert.ToBase64String(plainTextBytes);
+        }
+
+        public static string Base64Decode(string base64EncodedData)
+        {
+            var base64EncodedBytes = System.Convert.FromBase64String(base64EncodedData);
+            return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
         }
     }
 }

@@ -1,10 +1,10 @@
 # SwitchGameManager
 
+Updated to work with current master keys, thanks to https://github.com/StudentBlake/XCI-Explorer
+
 Manage your XCI files on SD and PC, from multiple PC folders. Rename, search, trim, sort, copy/move/delete games.
 
 Display your library in a few different ways, with more likely to come. For now, it relies on hacbuild to extract the PackageID of each XCI and uses that as a unique identifier, then uses the decompiled XCI-Explorer to retrieve game info.
-
-I'll transition to [libhac](https://github.com/Thealexbarney/libhac) soon to speed up the initial library processing and remove the extra bloat as soon as XCI reading is implemented.
 
 ## Important
 You need a keys.txt file to use this program.
@@ -36,7 +36,8 @@ In addition to the usual keys, you'll also need **xci_header_key**!
 http://objectlistview.sourceforge.net/cs/index.html
 https://stackoverflow.com/a/6055385
 https://github.com/LucaFraga/hacbuild
-xci_explorer decompiled and https://www.nuget.org/packages/Be.Windows.Forms.HexBox/
+https://github.com/StudentBlake/XCI-Explorer
+https://www.nuget.org/packages/Be.Windows.Forms.HexBox/
 Newtonsoft.Json
 https://www.iconfinder.com/icons/3151574/game_nintendo_switch_video_icon
 Lots of people on StackExchange/Overflow

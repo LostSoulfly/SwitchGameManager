@@ -2,8 +2,10 @@
 using System.Windows.Forms;
 using XCI_Explorer.Helpers;
 
-namespace XCI_Explorer {
-    partial class MainForm {
+namespace XCI_Explorer
+{
+    partial class MainForm
+    {
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -13,8 +15,10 @@ namespace XCI_Explorer {
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing) {
-            if (disposing && (components != null)) {
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
                 components.Dispose();
             }
             base.Dispose(disposing);
@@ -26,7 +30,8 @@ namespace XCI_Explorer {
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent() {
+        private void InitializeComponent()
+        {
             this.B_LoadROM = new System.Windows.Forms.Button();
             this.TB_File = new System.Windows.Forms.TextBox();
             this.TABC_Main = new System.Windows.Forms.TabControl();
@@ -92,6 +97,7 @@ namespace XCI_Explorer {
             // 
             // TB_File
             // 
+            this.TB_File.AllowDrop = true;
             this.TB_File.Location = new System.Drawing.Point(85, 13);
             this.TB_File.Name = "TB_File";
             this.TB_File.ReadOnly = true;
@@ -526,6 +532,7 @@ namespace XCI_Explorer {
             // 
             // MainForm
             // 
+            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(362, 529);
@@ -537,7 +544,6 @@ namespace XCI_Explorer {
             this.Name = "MainForm";
             this.ShowIcon = false;
             this.Text = "XCI Explorer";
-            this.Load += new System.EventHandler(this.MainForm_Load);
             this.TABC_Main.ResumeLayout(false);
             this.TABP_XCI.ResumeLayout(false);
             this.TABP_XCI.PerformLayout();
@@ -554,51 +560,51 @@ namespace XCI_Explorer {
 
         #endregion
 
-        public long[] SecureSize;
-        public long[] NormalSize;
-        public long[] SecureOffset;
-        public long[] NormalOffset;
-        public string[] SecureName = { };
-        public long gameNcaOffset;
-        public long gameNcaSize;
-        public long PFS0Offset;
-        public long PFS0Size;
-        public long selectedOffset;
-        public long selectedSize;
-        public TreeViewFileSystem TV_Parti;
-        public BetterTreeNode rootNode;
-        public Button B_LoadROM;
-        public TabControl TABC_Main;
-        public TabPage TABP_XCI;
-        public TabPage tabPage2;
-        public TreeView TV_Partitions;
-        public Label label3;
-        public Label label2;
-        public Label label1;
-        public Label label4;
-        public Label label6;
-        public Label label5;
-        public Label label7;
-        public GroupBox groupBox1;
-        public Button B_ClearCert;
-        public Button B_ImportCert;
-        public Button B_ExportCert;
-        public ComboBox CB_RegionName;
-        public Label label8;
-        public GroupBox groupBox2;
-        public Label label10;
-        public Label label9;
-        public Button B_ViewCert;
+        private long[] SecureSize;
+        private long[] NormalSize;
+        private long[] SecureOffset;
+        private long[] NormalOffset;
+        private string[] SecureName = { };
+        private long gameNcaOffset;
+        private long gameNcaSize;
+        private long PFS0Offset;
+        private long PFS0Size;
+        private long selectedOffset;
+        private long selectedSize;
+        private TreeViewFileSystem TV_Parti;
+        private BetterTreeNode rootNode;
+        private Button B_LoadROM;
+        private TabControl TABC_Main;
+        private TabPage TABP_XCI;
+        private TabPage tabPage2;
+        private TreeView TV_Partitions;
+        private Label label3;
+        private Label label2;
+        private Label label1;
+        private Label label4;
+        private Label label6;
+        private Label label5;
+        private Label label7;
+        private GroupBox groupBox1;
+        private Button B_ClearCert;
+        private Button B_ImportCert;
+        private Button B_ExportCert;
+        private ComboBox CB_RegionName;
+        private Label label8;
+        private GroupBox groupBox2;
+        private Label label10;
+        private Label label9;
+        private Button B_ViewCert;
         public TextBox TB_File;
-        public Label LB_SelectedData;
-        public Label LB_DataOffset;
-        public Label LB_DataSize;
-        public Button B_Extract;
-        public Label LB_ExpectedHash;
-        public Label LB_ActualHash;
-        public Label LB_HashedRegionSize;
-        public BackgroundWorker backgroundWorker1;
-        public Button B_TrimXCI;
+        private Label LB_SelectedData;
+        private Label LB_DataOffset;
+        private Label LB_DataSize;
+        private Button B_Extract;
+        private Label LB_ExpectedHash;
+        private Label LB_ActualHash;
+        private Label LB_HashedRegionSize;
+        private BackgroundWorker backgroundWorker1;
+        private Button B_TrimXCI;
         public TextBox TB_TID;
         public TextBox TB_MKeyRev;
         public TextBox TB_ExactUsedSpace;
@@ -606,11 +612,11 @@ namespace XCI_Explorer {
         public TextBox TB_UsedSpace;
         public TextBox TB_ROMSize;
         public TextBox TB_GameRev;
+        public PictureBox PB_GameIcon;
+        public TextBox TB_ProdCode;
         public TextBox TB_Dev;
         public TextBox TB_Name;
         public TextBox TB_SDKVer;
         public TextBox TB_Capacity;
-        public TextBox TB_ProdCode;
-        public PictureBox PB_GameIcon;
     }
 }

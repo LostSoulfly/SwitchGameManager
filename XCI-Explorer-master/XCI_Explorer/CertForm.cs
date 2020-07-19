@@ -2,9 +2,12 @@
 using System.IO;
 using System.Windows.Forms;
 
-namespace XCI_Explorer {
-    public partial class CertForm : Form {
-        public CertForm(MainForm mainForm) {
+namespace XCI_Explorer
+{
+    public partial class CertForm : Form
+    {
+        public CertForm(MainForm mainForm)
+        {
             InitializeComponent();
             FileStream fileStream = new FileStream(mainForm.TB_File.Text, FileMode.Open, FileAccess.Read);
             byte[] array = new byte[512];
@@ -13,7 +16,6 @@ namespace XCI_Explorer {
             hbxHexView.ByteProvider = new DynamicByteProvider(array);
             fileStream.Close();
         }
-
         public CertForm(byte[] cert, string gameName = "")
         {
             InitializeComponent();

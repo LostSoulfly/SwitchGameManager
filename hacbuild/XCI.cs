@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using static hacbuild.XCIManager;
 
 namespace hacbuild
@@ -40,7 +41,7 @@ namespace hacbuild
             }
             else
             {
-                Console.WriteLine("[WARN] Could not load XCI Header Key");
+                MessageBox.Show("[WARN] Could not load xci_header_key from keys.txt");
             }
 
             AES128CBC.BlockSize = 128;

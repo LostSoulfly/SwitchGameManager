@@ -310,8 +310,8 @@ namespace SwitchGameManager.Helpers
 
             xci.uniqueId = GetXciIdentifier(filePath);
 
-            mainForm.ReadXci(filePath);
-
+            mainForm.SGM_ProcessFile(filePath);
+            
             xci.gameName = mainForm.TB_Name.Text.Trim().TrimEnd('\0');
             xci.gameDeveloper = mainForm.TB_Dev.Text.Trim().TrimEnd('\0');
             xci.gameCardCapacity = mainForm.TB_Capacity.Text.Trim().TrimEnd('\0');
@@ -321,11 +321,12 @@ namespace SwitchGameManager.Helpers
             xci.sdkVersion = mainForm.TB_SDKVer.Text.Trim().TrimEnd('\0');
             xci.titleId = mainForm.TB_TID.Text.Trim().TrimEnd('\0');
             if (xci.titleId.Length != 16) xci.titleId = 0 + xci.titleId;
-            xci.gameSize = mainForm.exactSize;
+            xci.gameSize = mainForm.ExactSize;
             xci.gameUsedSize = mainForm.UsedSize;
             xci.productCode = mainForm.TB_ProdCode.Text.Trim().TrimEnd('\0');
             xci.gameCert = ReadXciCert(xci.xciFilePath);
             xci.xciFileSize = new System.IO.FileInfo(xci.xciFilePath).Length;
+            
 
             if (location == XciLocation.PC)
             {
@@ -671,7 +672,7 @@ namespace SwitchGameManager.Helpers
         public static void ShowXciExplorer(string filePath)
         {
             XCI_Explorer.MainForm mainForm = new XCI_Explorer.MainForm(true);
-            mainForm.ReadXci(filePath);
+            mainForm.SGM_ProcessFile(filePath);
         }
 
         public static bool TrimXci(XciItem xci)
