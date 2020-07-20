@@ -31,7 +31,8 @@ namespace SwitchGameManager.Helpers
             ShowCert,
             ShowXciInfo,
             ShowInExplorer,
-            ShowRenameWindow
+            ShowRenameWindow,
+            OpenOnTinfoilWeb
         }
 
         public struct FileStruct

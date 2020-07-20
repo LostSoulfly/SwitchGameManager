@@ -616,6 +616,7 @@ namespace SwitchGameManager
             if (toolIndex == 4) fileAction.action = FileAction.ShowCert;
             if (toolIndex == 5) fileAction.action = FileAction.ShowXciInfo;
             if (toolIndex == 6) fileAction.action = FileAction.ShowInExplorer;
+            if (toolIndex == 7) fileAction.action = FileAction.OpenOnTinfoilWeb;
 
             if (Helpers.Settings.config.defaultView == XciLocation.PC)
             {
@@ -650,6 +651,17 @@ namespace SwitchGameManager
                         ProcessFileManagement(item);
                     }
                     return;
+
+                case FileAction.OpenOnTinfoilWeb:
+                    List<XciItem> openWeb = olvList.SelectedObjects.Cast<XciItem>().ToList();
+
+                    foreach (XciItem item in openWeb)
+                    {
+                        if (item.titleId != null || item.titleId.Length > 0)
+                        System.Diagnostics.Process.Start("https://tinfoil.io/Title/" + item.titleId);
+                    }
+                    return;
+                    
 
                 default:
                     break;

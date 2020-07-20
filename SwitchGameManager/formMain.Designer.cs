@@ -33,6 +33,7 @@ namespace SwitchGameManager
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(formMain));
             this.olvList = new BrightIdeasSoftware.ObjectListView();
             this.olvColumnXciName = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.olvColumnContentType = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvColumnDeveloper = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvColumnTitleID = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvColumnProductCode = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
@@ -92,7 +93,7 @@ namespace SwitchGameManager
             this.toolStripProgressLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.olvColumnContentType = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.openOnTinfoilioToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.olvList)).BeginInit();
             this.menuStrip.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -168,6 +169,13 @@ namespace SwitchGameManager
             this.olvColumnXciName.UseInitialLetterForGroup = true;
             this.olvColumnXciName.Width = 150;
             this.olvColumnXciName.WordWrap = true;
+            // 
+            // olvColumnContentType
+            // 
+            this.olvColumnContentType.AspectName = "contentType";
+            this.olvColumnContentType.Text = "Content Type";
+            this.olvColumnContentType.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.olvColumnContentType.Width = 82;
             // 
             // olvColumnDeveloper
             // 
@@ -374,7 +382,8 @@ namespace SwitchGameManager
             this.renameXCIFilesToolStripMenuItem,
             this.showXCICertificateToolStripMenuItem,
             this.showInXCIExplorerToolStripMenuItem,
-            this.showInWindowsExplorerToolStripMenuItem});
+            this.showInWindowsExplorerToolStripMenuItem,
+            this.openOnTinfoilioToolStripMenuItem});
             this.gameManagementToolStripMenuItem.Name = "gameManagementToolStripMenuItem";
             this.gameManagementToolStripMenuItem.Size = new System.Drawing.Size(124, 23);
             this.gameManagementToolStripMenuItem.Text = "Game Management";
@@ -666,12 +675,11 @@ namespace SwitchGameManager
             this.statusStrip1.TabIndex = 5;
             this.statusStrip1.Text = "statusStrip1";
             // 
-            // olvColumnContentType
+            // openOnTinfoilioToolStripMenuItem
             // 
-            this.olvColumnContentType.AspectName = "contentType";
-            this.olvColumnContentType.Text = "Content Type";
-            this.olvColumnContentType.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.olvColumnContentType.Width = 82;
+            this.openOnTinfoilioToolStripMenuItem.Name = "openOnTinfoilioToolStripMenuItem";
+            this.openOnTinfoilioToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
+            this.openOnTinfoilioToolStripMenuItem.Text = "Open On Tinfoil.io";
             // 
             // formMain
             // 
@@ -760,6 +768,7 @@ namespace SwitchGameManager
         private System.Windows.Forms.ToolStripStatusLabel sdInfoToolStripStatus;
         private System.Windows.Forms.ToolStripMenuItem refreshGameInfoToolStripMenuItem;
         private BrightIdeasSoftware.OLVColumn olvColumnContentType;
+        private System.Windows.Forms.ToolStripMenuItem openOnTinfoilioToolStripMenuItem;
     }
 }
 
