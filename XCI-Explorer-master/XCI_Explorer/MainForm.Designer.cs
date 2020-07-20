@@ -628,5 +628,6 @@ namespace XCI_Explorer
         public TextBox TB_Name;
         public TextBox TB_SDKVer;
         public TextBox TB_Capacity;
+        public TextBox TB_ContentType;
     }
 }

@@ -193,6 +193,7 @@ namespace XCI_Explorer
                     B_ClearCert.Enabled = false;
 
                     LoadNSP();
+                    TB_ContentType.Text = ContentType;
 
 
                 }
@@ -204,8 +205,8 @@ namespace XCI_Explorer
                     B_ViewCert.Enabled = true;
                     B_ClearCert.Enabled = true;
                     ContentType = "XCI";
-                    TB_ContentType.Text = ContentType;
                     LoadXCI();
+                    TB_ContentType.Text = ContentType;
                 }
                 else
                 {
@@ -359,7 +360,7 @@ namespace XCI_Explorer
                         XDocument xml = XDocument.Parse(Encoding.UTF8.GetString(array4));
                         TB_TID.Text = xml.Element("ContentMeta").Element("Id").Value.Remove(1, 2).ToUpper();
                         contentType = xml.Element("ContentMeta").Element("Type").Value;
-                        TB_ContentType.Text = contentType;
+                        
                         if (contentType == "Patch")
                         {
                             xmlVersion = "v" + xml.Element("ContentMeta").Element("Version").Value;
@@ -742,7 +743,7 @@ namespace XCI_Explorer
         public void SGM_ProcessFile(string filePath)
         {
             TB_File.Text = filePath;
-            Application.DoEvents();
+            //Application.DoEvents();
             ProcessFile();
         }
 

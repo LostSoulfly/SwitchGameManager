@@ -173,7 +173,7 @@ namespace SwitchGameManager.Helpers
             {
                 xci = xciCache.First(item => item.uniqueId == uniqueId);
             }
-            catch (Exception ex)
+            catch
             {
                 return null;
             }
