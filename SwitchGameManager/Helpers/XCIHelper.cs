@@ -333,12 +333,12 @@ namespace SwitchGameManager.Helpers
 
         private static void Log(string text)
         {
-            
+            /*
             using (var tw = new StreamWriter("log.txt", true))
             {
                 tw.WriteLine(DateTime.Now + " " + text);
             }
-            
+            */
         }
 
         public static bool IsXciInfoValid(XciItem xci)

@@ -54,11 +54,13 @@ Credits
 http://objectlistview.sourceforge.net/cs/index.html
 https://stackoverflow.com/a/6055385
 https://github.com/LucaFraga/hacbuild
+https://github.com/StudentBlake/XCI-Explorer
 https://www.nuget.org/packages/Be.Windows.Forms.HexBox/
+Newtonsoft.Json
 https://www.iconfinder.com/icons/3151574/game_nintendo_switch_video_icon
 Lots of people on StackExchange/Overflow
-xci_explorer decompiled
-Newtonsoft.Json
+
+And probably a few I'm missing.
 
 
 Donations
