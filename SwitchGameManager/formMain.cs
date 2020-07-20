@@ -968,6 +968,9 @@ namespace SwitchGameManager
                 }
                 else
                 {
+                    if (toolStripProgressBar.Value % 10 == 0)
+                        Application.DoEvents();
+
                     toolStripStatus.Text = text;
                 }
             }

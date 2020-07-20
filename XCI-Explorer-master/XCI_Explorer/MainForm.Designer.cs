@@ -77,6 +77,7 @@ namespace XCI_Explorer
             this.LB_SelectedData = new System.Windows.Forms.Label();
             this.TV_Partitions = new System.Windows.Forms.TreeView();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.TB_ContentType = new System.Windows.Forms.TextBox();
             this.TABC_Main.SuspendLayout();
             this.TABP_XCI.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -118,6 +119,7 @@ namespace XCI_Explorer
             // 
             // TABP_XCI
             // 
+            this.TABP_XCI.Controls.Add(this.TB_ContentType);
             this.TABP_XCI.Controls.Add(this.B_TrimXCI);
             this.TABP_XCI.Controls.Add(this.TB_ProdCode);
             this.TABP_XCI.Controls.Add(this.label8);
@@ -529,6 +531,14 @@ namespace XCI_Explorer
             // 
             this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
             this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
+            // 
+            // TB_ContentType
+            // 
+            this.TB_ContentType.Location = new System.Drawing.Point(166, 207);
+            this.TB_ContentType.Name = "TB_ContentType";
+            this.TB_ContentType.ReadOnly = true;
+            this.TB_ContentType.Size = new System.Drawing.Size(157, 20);
+            this.TB_ContentType.TabIndex = 22;
             // 
             // MainForm
             // 
