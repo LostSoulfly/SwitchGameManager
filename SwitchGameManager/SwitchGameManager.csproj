@@ -129,9 +129,11 @@
     </EmbeddedResource>
     <EmbeddedResource Include="formRenameHelper.resx">
       <DependentUpon>formRenameHelper.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="formRenamer.resx">
       <DependentUpon>formRenamer.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -158,10 +160,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\hacbuild\hacbuild.csproj">
-      <Project>{423bc4fd-36ba-4356-aa31-84269d80d36b}</Project>
-      <Name>hacbuild</Name>
-    </ProjectReference>
     <ProjectReference Include="..\XCI-Explorer-master\XCI Explorer.csproj">
       <Project>{89dbe891-22c7-40ff-a3d3-36f26224e09d}</Project>
       <Name>XCI Explorer</Name>

@@ -92,6 +92,7 @@ namespace SwitchGameManager
             this.toolStripProgressLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.olvColumnContentType = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             ((System.ComponentModel.ISupportInitialize)(this.olvList)).BeginInit();
             this.menuStrip.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -100,6 +101,7 @@ namespace SwitchGameManager
             // olvList
             // 
             this.olvList.AllColumns.Add(this.olvColumnXciName);
+            this.olvList.AllColumns.Add(this.olvColumnContentType);
             this.olvList.AllColumns.Add(this.olvColumnDeveloper);
             this.olvList.AllColumns.Add(this.olvColumnTitleID);
             this.olvList.AllColumns.Add(this.olvColumnProductCode);
@@ -119,6 +121,7 @@ namespace SwitchGameManager
             this.olvList.CellEditUseWholeCell = false;
             this.olvList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.olvColumnXciName,
+            this.olvColumnContentType,
             this.olvColumnDeveloper,
             this.olvColumnTitleID,
             this.olvColumnProductCode,
@@ -132,6 +135,7 @@ namespace SwitchGameManager
             this.olvList.EmptyListMsgFont = new System.Drawing.Font("Microsoft Sans Serif", 24F);
             this.olvList.FullRowSelect = true;
             this.olvList.HeaderUsesThemes = true;
+            this.olvList.HideSelection = false;
             this.olvList.LabelWrap = false;
             this.olvList.Location = new System.Drawing.Point(0, 30);
             this.olvList.Name = "olvList";
@@ -197,7 +201,7 @@ namespace SwitchGameManager
             // olvColumnPackageId
             // 
             this.olvColumnPackageId.AspectName = "uniqueId";
-            this.olvColumnPackageId.DisplayIndex = 4;
+            this.olvColumnPackageId.DisplayIndex = 5;
             this.olvColumnPackageId.IsVisible = false;
             this.olvColumnPackageId.MinimumWidth = 75;
             this.olvColumnPackageId.Text = "UniqueID";
@@ -207,7 +211,7 @@ namespace SwitchGameManager
             // olvColumnGameCardCapacity
             // 
             this.olvColumnGameCardCapacity.AspectName = "gameCardCapacity";
-            this.olvColumnGameCardCapacity.DisplayIndex = 5;
+            this.olvColumnGameCardCapacity.DisplayIndex = 6;
             this.olvColumnGameCardCapacity.IsEditable = false;
             this.olvColumnGameCardCapacity.IsVisible = false;
             this.olvColumnGameCardCapacity.MinimumWidth = 50;
@@ -226,7 +230,7 @@ namespace SwitchGameManager
             // olvColumnGameUsedSize
             // 
             this.olvColumnGameUsedSize.AspectName = "gameUsedSize";
-            this.olvColumnGameUsedSize.DisplayIndex = 4;
+            this.olvColumnGameUsedSize.DisplayIndex = 8;
             this.olvColumnGameUsedSize.IsEditable = false;
             this.olvColumnGameUsedSize.IsVisible = false;
             this.olvColumnGameUsedSize.MinimumWidth = 50;
@@ -238,6 +242,7 @@ namespace SwitchGameManager
             // olvColumnGameCertEmpty
             // 
             this.olvColumnGameCertEmpty.AspectName = "isUniqueCert";
+            this.olvColumnGameCertEmpty.DisplayIndex = 8;
             this.olvColumnGameCertEmpty.IsEditable = false;
             this.olvColumnGameCertEmpty.IsTileViewColumn = true;
             this.olvColumnGameCertEmpty.MinimumWidth = 35;
@@ -250,6 +255,7 @@ namespace SwitchGameManager
             // olvColumnisXciTrimmed
             // 
             this.olvColumnisXciTrimmed.AspectName = "isXciTrimmed";
+            this.olvColumnisXciTrimmed.DisplayIndex = 9;
             this.olvColumnisXciTrimmed.IsEditable = false;
             this.olvColumnisXciTrimmed.IsTileViewColumn = true;
             this.olvColumnisXciTrimmed.MinimumWidth = 35;
@@ -270,6 +276,7 @@ namespace SwitchGameManager
             // olvColumnSdGame
             // 
             this.olvColumnSdGame.AspectName = "isGameOnSd";
+            this.olvColumnSdGame.DisplayIndex = 6;
             this.olvColumnSdGame.Text = "On SD";
             this.olvColumnSdGame.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.olvColumnSdGame.Width = 76;
@@ -277,6 +284,7 @@ namespace SwitchGameManager
             // olvColumnXciPath
             // 
             this.olvColumnXciPath.AspectName = "xciFilePath";
+            this.olvColumnXciPath.DisplayIndex = 7;
             this.olvColumnXciPath.FillsFreeSpace = true;
             this.olvColumnXciPath.IsEditable = false;
             this.olvColumnXciPath.IsTileViewColumn = true;
@@ -380,7 +388,7 @@ namespace SwitchGameManager
             this.refreshGameInfoToolStripMenuItem,
             this.cancelTransfersToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
             this.fileToolStripMenuItem.Text = "File Management";
             // 
             // copyToolStripMenuItem
@@ -423,42 +431,42 @@ namespace SwitchGameManager
             // deleteGameToolStripMenuItem
             // 
             this.deleteGameToolStripMenuItem.Name = "deleteGameToolStripMenuItem";
-            this.deleteGameToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.deleteGameToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
             this.deleteGameToolStripMenuItem.Text = "Delete from PC and SD";
             this.deleteGameToolStripMenuItem.Click += new System.EventHandler(this.ToolStripManagement);
             // 
             // trimGameToolStripMenuItem
             // 
             this.trimGameToolStripMenuItem.Name = "trimGameToolStripMenuItem";
-            this.trimGameToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.trimGameToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
             this.trimGameToolStripMenuItem.Text = "Trim";
             this.trimGameToolStripMenuItem.Click += new System.EventHandler(this.ToolStripManagement);
             // 
             // renameXCIFilesToolStripMenuItem
             // 
             this.renameXCIFilesToolStripMenuItem.Name = "renameXCIFilesToolStripMenuItem";
-            this.renameXCIFilesToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.renameXCIFilesToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
             this.renameXCIFilesToolStripMenuItem.Text = "Open Rename Tool..";
             this.renameXCIFilesToolStripMenuItem.Click += new System.EventHandler(this.ToolStripManagement);
             // 
             // showXCICertificateToolStripMenuItem
             // 
             this.showXCICertificateToolStripMenuItem.Name = "showXCICertificateToolStripMenuItem";
-            this.showXCICertificateToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.showXCICertificateToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
             this.showXCICertificateToolStripMenuItem.Text = "Show XCI Certificate";
             this.showXCICertificateToolStripMenuItem.Click += new System.EventHandler(this.ToolStripManagement);
             // 
             // showInXCIExplorerToolStripMenuItem
             // 
             this.showInXCIExplorerToolStripMenuItem.Name = "showInXCIExplorerToolStripMenuItem";
-            this.showInXCIExplorerToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.showInXCIExplorerToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
             this.showInXCIExplorerToolStripMenuItem.Text = "Show In XCI Explorer";
             this.showInXCIExplorerToolStripMenuItem.Click += new System.EventHandler(this.ToolStripManagement);
             // 
             // showInWindowsExplorerToolStripMenuItem
             // 
             this.showInWindowsExplorerToolStripMenuItem.Name = "showInWindowsExplorerToolStripMenuItem";
-            this.showInWindowsExplorerToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.showInWindowsExplorerToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
             this.showInWindowsExplorerToolStripMenuItem.Text = "Open In Windows Explorer";
             this.showInWindowsExplorerToolStripMenuItem.Click += new System.EventHandler(this.ToolStripManagement);
             // 
@@ -541,28 +549,28 @@ namespace SwitchGameManager
             // biggestToolStripMenuItem
             // 
             this.biggestToolStripMenuItem.Name = "biggestToolStripMenuItem";
-            this.biggestToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.biggestToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.biggestToolStripMenuItem.Text = "Biggest (256x256)";
             this.biggestToolStripMenuItem.Click += new System.EventHandler(this.ChangeIconSize);
             // 
             // bigger128x128ToolStripMenuItem
             // 
             this.bigger128x128ToolStripMenuItem.Name = "bigger128x128ToolStripMenuItem";
-            this.bigger128x128ToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.bigger128x128ToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.bigger128x128ToolStripMenuItem.Text = "Bigger {128x128)";
             this.bigger128x128ToolStripMenuItem.Click += new System.EventHandler(this.ChangeIconSize);
             // 
             // small64x64ToolStripMenuItem
             // 
             this.small64x64ToolStripMenuItem.Name = "small64x64ToolStripMenuItem";
-            this.small64x64ToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.small64x64ToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.small64x64ToolStripMenuItem.Text = "Small (64x64)";
             this.small64x64ToolStripMenuItem.Click += new System.EventHandler(this.ChangeIconSize);
             // 
             // smallest32x32ToolStripMenuItem
             // 
             this.smallest32x32ToolStripMenuItem.Name = "smallest32x32ToolStripMenuItem";
-            this.smallest32x32ToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.smallest32x32ToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.smallest32x32ToolStripMenuItem.Text = "Smallest (32x32)";
             this.smallest32x32ToolStripMenuItem.Click += new System.EventHandler(this.ChangeIconSize);
             // 
@@ -610,6 +618,7 @@ namespace SwitchGameManager
             // 
             this.textBoxFilter.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
             this.textBoxFilter.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.textBoxFilter.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.textBoxFilter.Name = "textBoxFilter";
             this.textBoxFilter.Size = new System.Drawing.Size(125, 23);
             // 
@@ -656,6 +665,13 @@ namespace SwitchGameManager
             this.statusStrip1.Size = new System.Drawing.Size(959, 23);
             this.statusStrip1.TabIndex = 5;
             this.statusStrip1.Text = "statusStrip1";
+            // 
+            // olvColumnContentType
+            // 
+            this.olvColumnContentType.AspectName = "contentType";
+            this.olvColumnContentType.Text = "Content Type";
+            this.olvColumnContentType.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.olvColumnContentType.Width = 82;
             // 
             // formMain
             // 
@@ -743,6 +759,7 @@ namespace SwitchGameManager
         private System.Windows.Forms.ToolStripTextBox textBoxFilter;
         private System.Windows.Forms.ToolStripStatusLabel sdInfoToolStripStatus;
         private System.Windows.Forms.ToolStripMenuItem refreshGameInfoToolStripMenuItem;
+        private BrightIdeasSoftware.OLVColumn olvColumnContentType;
     }
 }
 

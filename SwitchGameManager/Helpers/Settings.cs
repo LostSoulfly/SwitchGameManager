@@ -53,7 +53,7 @@ namespace SwitchGameManager.Helpers
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Unable to read configuration! Please set up your directories.", "Configuration Error");
+                //MessageBox.Show($"Unable to read configuration! Please set up your directories.", "Configuration Error");
             }
 
             return false;

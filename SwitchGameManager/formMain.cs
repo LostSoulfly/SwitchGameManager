@@ -29,6 +29,8 @@ namespace SwitchGameManager
         public formMain()
         {
             InitializeComponent();
+            this.Show();
+            Application.DoEvents();
         }
 
         [DllImport("user32.dll")]
@@ -233,6 +235,7 @@ namespace SwitchGameManager
             {
                 Helpers.Settings.config.localXciFolders = form.localFolders;
                 Helpers.Settings.config.sdDriveLetter = form.sdDriveLetter;
+                SaveSettings();
                 SetupFileSysWatcher();
                 XciHelper.LoadXcisInBackground();
                 //XciHelper.LoadXcis();
@@ -939,6 +942,7 @@ namespace SwitchGameManager
                         toolStripProgressBar.Value++;
                     else
                         toolStripProgressBar.Value = value;
+                    //Application.DoEvents();
                 }
                 catch { }
             }

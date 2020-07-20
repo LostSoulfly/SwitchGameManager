@@ -48,6 +48,8 @@ namespace SwitchGameManager.Helpers
 
         public double gameUsedSize;
 
+        public string contentType;
+
         public bool isCertEncrypted;
 
         [JsonIgnore]
@@ -93,8 +95,11 @@ namespace SwitchGameManager.Helpers
                 {
                     using (var stream = new MemoryStream())
                     {
-                        value.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
-                        this.gameIconBytes = XciHelper.Compress(stream.ToArray());
+                        try
+                        {
+                            value.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
+                            this.gameIconBytes = XciHelper.Compress(stream.ToArray());
+                        } catch { }
                     }
                 }
                 catch { }

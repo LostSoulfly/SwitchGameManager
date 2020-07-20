@@ -117,6 +117,7 @@ namespace SwitchGameManager
             }
 
             comboBoxDriveLetters.Items.Add("Disable SD Management");
+            comboBoxDriveLetters.SelectedIndex = 0;
 
             foreach (var item in getAvailableDriveLetters())
             {

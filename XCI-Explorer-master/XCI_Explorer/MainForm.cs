@@ -25,6 +25,7 @@ namespace XCI_Explorer
         public string Mkey;
         public double UsedSize;
         public double ExactSize;
+        public string ContentType;
         private Image[] Icons = new Image[16];
         private string[] Language = new string[16] {
             "American English",
@@ -78,14 +79,10 @@ namespace XCI_Explorer
 
             if (!File.Exists("keys.txt"))
             {
-                MessageBox.Show("keys.txt is missing.\nMake sure it has keys up to and including incmaster_key_0a.", "XCI Explorer");
+                MessageBox.Show("keys.txt is missing.\nMake sure it has keys up to and including master_key_0a.", "XCI Explorer");
                 
-
-                if (!File.Exists("keys.txt"))
-                {
-                    MessageBox.Show("keys.txt failed to load.\nPlease include keys.txt in the root folder.");
-                    Environment.Exit(0);
-                }
+                MessageBox.Show("keys.txt failed to load.\nPlease include keys.txt in the root folder.");
+                Environment.Exit(0);
             }
 
             if (!File.Exists($"tools{Path.DirectorySeparatorChar}hactool.exe"))
@@ -196,6 +193,8 @@ namespace XCI_Explorer
                     B_ClearCert.Enabled = false;
 
                     LoadNSP();
+
+
                 }
                 else if (CheckXCI())
                 {
@@ -204,6 +203,7 @@ namespace XCI_Explorer
                     B_ImportCert.Enabled = true;
                     B_ViewCert.Enabled = true;
                     B_ClearCert.Enabled = true;
+                    ContentType = "XCI";
 
                     LoadXCI();
                 }
@@ -286,6 +286,7 @@ namespace XCI_Explorer
             TV_Partitions.Nodes.Clear();
             FileInfo fi = new FileInfo(TB_File.Text);
             string contentType = "";
+            //this.ContentType = "NSP Game";
 
             // Maximum number of files in NSP to read in
             const int MAXFILES = 250;
@@ -489,14 +490,41 @@ namespace XCI_Explorer
                                             if (array7[0].Type == (byte)CNMT.CNMT_Header.TitleType.REGULAR_APPLICATION)
                                             {
                                                 contentType = "Application";
+                                                this.ContentType = "NSP Game";
                                             }
                                             else if (array7[0].Type == (byte)CNMT.CNMT_Header.TitleType.UPDATE_TITLE)
                                             {
                                                 contentType = "Patch";
+                                                this.ContentType = "NSP Patch";
                                             }
                                             else if (array7[0].Type == (byte)CNMT.CNMT_Header.TitleType.ADD_ON_CONTENT)
                                             {
                                                 contentType = "AddOnContent";
+                                                this.ContentType = "NSP DLC";
+                                            }
+                                            else if (array7[0].Type == (byte)CNMT.CNMT_Header.TitleType.FIRMWARE_PACKAGE_A)
+                                            {
+                                                contentType = "Firmware Package A";
+                                            }
+                                            else if (array7[0].Type == (byte)CNMT.CNMT_Header.TitleType.FIRMWARE_PACKAGE_B)
+                                            {
+                                                contentType = "Firmware Package B";
+                                            }
+                                            else if (array7[0].Type == (byte)CNMT.CNMT_Header.TitleType.SYSTEM_UPDATE)
+                                            {
+                                                contentType = "System Update";
+                                            }
+                                            else if (array7[0].Type == (byte)CNMT.CNMT_Header.TitleType.SYSTEM_PROGRAMS)
+                                            {
+                                                contentType = "System Program";
+                                            }
+                                            else if (array7[0].Type == (byte)CNMT.CNMT_Header.TitleType.DELTA_TITLE)
+                                            {
+                                                contentType = "Delta Title";
+                                            }
+                                            else if (array7[0].Type == (byte)CNMT.CNMT_Header.TitleType.SYSTEM_DATA_ARCHIVES)
+                                            {
+                                                contentType = "Data Archive";
                                             }
 
                                             fileStream3.Position = array7[0].Offset + 32;
@@ -511,7 +539,7 @@ namespace XCI_Explorer
                                                     break;
                                                 }
                                             }
-
+                                           
                                             fileStream3.Close();
                                         }
                                     }
@@ -624,8 +652,6 @@ namespace XCI_Explorer
                     }
                     catch { }
 
-                    /*if (contentType == "Patch") {
-                    }*/
                 }
                 else
                 {
@@ -706,6 +732,7 @@ namespace XCI_Explorer
             {
                 CB_RegionName.SelectedIndex = 0;
             }
+
         }
 
         public void SGM_ProcessFile(string filePath)

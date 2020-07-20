@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwitchGameManager", "SwitchGameManager\SwitchGameManager.csproj", "{FEC1C984-3760-4C61-A933-3D2CED86D629}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "hacbuild", "hacbuild\hacbuild.csproj", "{423BC4FD-36BA-4356-AA31-84269D80D36B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XCI Explorer", "XCI-Explorer-master\XCI Explorer.csproj", "{89DBE891-22C7-40FF-A3D3-36F26224E09D}"
 EndProject
 Global
@@ -25,14 +23,6 @@ Global
 		{FEC1C984-3760-4C61-A933-3D2CED86D629}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FEC1C984-3760-4C61-A933-3D2CED86D629}.Release|x64.ActiveCfg = Release|x64
 		{FEC1C984-3760-4C61-A933-3D2CED86D629}.Release|x64.Build.0 = Release|x64
-		{423BC4FD-36BA-4356-AA31-84269D80D36B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{423BC4FD-36BA-4356-AA31-84269D80D36B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{423BC4FD-36BA-4356-AA31-84269D80D36B}.Debug|x64.ActiveCfg = Debug|x64
-		{423BC4FD-36BA-4356-AA31-84269D80D36B}.Debug|x64.Build.0 = Debug|x64
-		{423BC4FD-36BA-4356-AA31-84269D80D36B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{423BC4FD-36BA-4356-AA31-84269D80D36B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{423BC4FD-36BA-4356-AA31-84269D80D36B}.Release|x64.ActiveCfg = Release|x64
-		{423BC4FD-36BA-4356-AA31-84269D80D36B}.Release|x64.Build.0 = Release|x64
 		{89DBE891-22C7-40FF-A3D3-36F26224E09D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{89DBE891-22C7-40FF-A3D3-36F26224E09D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{89DBE891-22C7-40FF-A3D3-36F26224E09D}.Debug|x64.ActiveCfg = Debug|Any CPU
