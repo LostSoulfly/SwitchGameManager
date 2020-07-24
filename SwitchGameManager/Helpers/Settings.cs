@@ -19,6 +19,7 @@ namespace SwitchGameManager.Helpers
 
         public int formHeight = 475;
         public int formWidth = 975;
+        public bool ignoreFileCorruptErrors = false;
         public int listIconSize = 1;
         public List<string> localXciFolders = new List<string>();
         public byte[] olvState;

@@ -26,6 +26,7 @@ namespace XCI_Explorer
         public double UsedSize;
         public double ExactSize;
         public string ContentType;
+        public bool IgnoreFileCorruptErrors = false;
         private Image[] Icons = new Image[16];
         private string[] Language = new string[16] {
             "American English",
@@ -211,12 +212,12 @@ namespace XCI_Explorer
                 else
                 {
                     TB_File.Text = null;
-                    MessageBox.Show("File is corrupt or unsupported.");
+                    if (!IgnoreFileCorruptErrors) MessageBox.Show("File is corrupt or unsupported.");
                 }
             }
             catch (Exception e)
             {
-                MessageBox.Show("Error: " + e.ToString() + "\nFile is corrupt or unsupported.");
+                if (!IgnoreFileCorruptErrors) MessageBox.Show("Error: " + e.ToString() + "\nFile is corrupt or unsupported.");
             }
 
         }

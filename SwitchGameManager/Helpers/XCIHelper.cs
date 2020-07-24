@@ -273,6 +273,7 @@ namespace SwitchGameManager.Helpers
                 return null;
 
             XCI_Explorer.MainForm mainForm = new XCI_Explorer.MainForm(false);
+            mainForm.IgnoreFileCorruptErrors = Helpers.Settings.config.ignoreFileCorruptErrors;
 
             //xci_header header = hac.GetXCIHeader(xci.xciFilePath);
 
@@ -305,7 +306,9 @@ namespace SwitchGameManager.Helpers
             xci.productCode = mainForm.TB_ProdCode.Text.Trim().TrimEnd('\0');
             xci.gameCert = ReadXciCert(xci.xciFilePath);
             xci.xciFileSize = new System.IO.FileInfo(xci.xciFilePath).Length;
-            
+
+            if (xci.gameName.Length == 0 && xci.gameUsedSize == 0)
+                xci.gameName = Path.GetFileName(xci.xciFilePath) + " (Corrupt?)";
 
             if (location == XciLocation.PC)
             {
@@ -662,6 +665,7 @@ namespace SwitchGameManager.Helpers
         public static void ShowXciExplorer(string filePath)
         {
             XCI_Explorer.MainForm mainForm = new XCI_Explorer.MainForm(true);
+            mainForm.IgnoreFileCorruptErrors = Helpers.Settings.config.ignoreFileCorruptErrors;
             mainForm.SGM_ProcessFile(filePath);
         }
 
